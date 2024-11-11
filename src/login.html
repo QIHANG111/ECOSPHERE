@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECOSPHERE - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2em;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 1em;
+            color: #333;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.8em;
+            margin: 0.5em 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: start;
+            margin-bottom: 1em;
+        }
+        .checkbox-container input {
+            margin-right: 0.5em;
+        }
+        .button {
+            width: 100%;
+            padding: 0.8em;
+            background-color: #1c8c05;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #005ea6;
+        }
+        .links {
+            margin-top: 1em;
+            font-size: 14px;
+        }
+        .links a {
+            color: #0078D7;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 1.5em;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h1>Welcome to ECOSPHERE</h1>
+
+    <form action="/login" method="post">
+        <input type="text" name="email_or_phone" placeholder="Enter Email or Phone Number" required>
+        <input type="password" name="password" placeholder="Enter Password" required>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="rememberMe" name="rememberMe">
+            <label for="rememberMe">Remember Me</label>
+        </div>
+
+        <button type="submit" class="button">Login</button>
+    </form>
+
+    <div class="links">
+        <a href="/forgot-password">Forgot Password?</a><br>
+        <a href="/signup.html">Create an Account</a>
+    </div>
+
+    <div class="footer">
+        <p>Data is securely stored and encrypted to protect your privacy.</p>
+        <a href="/help-support">Help & Support</a> | <a href="/privacy-policy">Privacy Policy</a>
+    </div>
+</div>
+
+</body>
+</html>
