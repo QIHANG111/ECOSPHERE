@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    background-image: url("../src/resource/picture/background.jpg");
+    background-image: url("assets/picture/background.jpg");
     align-items: flex-start;
     justify-content: flex-start;
     display: flex;
@@ -10,106 +10,184 @@ body {
     background-color: rgba(255, 255, 255, 0.3);
     position: relative;
     justify-content: flex-start;
-    width: 15%;
-    height: 100vh;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 15vw; /* Width based on viewport width */
+    height: 100vh; /* Full viewport height */
+    box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
+    border: 0.1vw solid rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(0.5vw);
     transition: width 0.3s ease;
     padding: 0; /* Remove padding so items can fill the sidebar completely */
 }
 
 .sidebar:hover {
-    width: 17%; /* Expand sidebar width on hover */
+    width: 17vw; /* Expand sidebar width on hover */
 }
 
 .menu-item {
     width: 100%;
-    height: calc(100% / 4); /* Divide sidebar height equally for 4 items */
+    height: 25vh; /* Height relative to viewport height */
     color: #333;
-    font-size: 25px;
+    font-size: 2vw; /* Font size relative to viewport width */
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center text vertically */
-    justify-content: center; /* Center text horizontally */
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     border-radius: 0;
     transition: color 0.3s ease, background-color 0.3s ease, height 0.3s ease;
 }
 
 .ui-menu-icon {
-    margin-bottom: 4px;
+    margin-bottom: 0.5vw; /* Spacing relative to viewport */
 }
 
 .menu-text {
-    font-size: 14px;
+    font-size: 1.5vw; /* Font size relative to viewport width */
 }
 
 .menu-item:hover {
-    height: calc(100% / 3); /* Divide sidebar height equally for 4 items */
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2); /* Add shadow on hover */
+    height: 33vh; /* Adjusted height for hover effect */
+    box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2); /* Shadow on hover */
     background-color: rgba(255, 255, 255, 0.7);
 }
 
 .dashboard {
-    width: 80%;
-    padding: 20px;
+    width: 80vw; /* Width relative to viewport width */
+    padding: 2vw; /* Padding relative to viewport width */
 }
 
 .dashboard-content {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-gap: 15%;
+    grid-gap: 15%; /* Gap between grid items */
 }
 
-.deviceCard {
-    background-color: rgba(255, 255, 255, 0.4); /* Semi-transparent white */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(40px);
-    border-radius: 40px;
-    height: 200px;
+
+.normalCard {
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(0.5vw);
+    border-radius: 3vw;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    height: 30vh;
     width: 100%;
     text-align: center;
-    transition: color 0.3s ease, background-color 0.3s ease, height 0.3s ease, width 0.3s ease;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    transform-origin: center;
 }
-.deviceCard:hover {
-    width: 105%;
-    height: 350px;
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.7);
+
+.normalCard:hover {
+    transform: scale(1.05);
+    height: 40vh;
+    box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.6);
+    .upToDownList {
+        height: 30vh; /* Set fixed height for overflow control */
+    }
 }
-.reportCard {
-    background-color: rgba(255, 255, 255, 0.4); /* Semi-transparent white */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(40px);
-    border-radius: 40px;
-    height: 200px;
-    width: 235%;
+
+.upToDownList {
+    height: 20vh; /* Set fixed height for overflow control */
+    overflow-y: auto;
     text-align: center;
-    transition: color 0.3s ease, background-color 0.3s ease, height 0.3s ease, width 0.3s ease;
-}
-.reportCard:hover {
-    width: 240%;
-    height: 350px;
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.7);
-}
-.deviceList{
-    text-align: center;
-}
-.device{
-    margin: 10px;
-    display: flex;
-    justify-content: space-between;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: aliceblue 0 0 10px;
     transition: all 0.3s ease;
 }
-.device:hover{
-    padding: 20px;
+
+.upToDownList::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari */
+}
+.leftToRightList {
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+}
+
+.hBar {
+    margin: 1vw;
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.5);
+    justify-content: space-between;
+    padding: 1vw;
+    border-radius: 1vw;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.hBar:hover {
+    padding: 1.5vw;
     background-color: rgba(255, 255, 255, 0.7);
 }
+
+.hButton {
+    text-align: center;
+    font-size: 1vw;
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 1vw;
+    border-radius: 1vw;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    width: 5vw;
+    height: 1.5vw;
+    transform-origin: center;
+    transition: all 0.3s ease;
+}
+.hButton:hover {
+    transform: scale(1.005);
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 1.5vw;
+}
+
+.mui-switch {
+    width: 52px;
+    height: 31px;
+    position: relative;
+    border: 1px solid #dfdfdf;
+    background-color: #fdfdfd;
+    box-shadow: #dfdfdf 0 0 0 0 inset;
+    border-radius: 20px;
+    background-clip: content-box;
+    display: inline-block;
+    -webkit-appearance: none;
+    user-select: none;
+    outline: none; }
+.mui-switch:before {
+    content: '';
+    width: 29px;
+    height: 29px;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    border-radius: 20px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
+.mui-switch:checked {
+    border-color: #64bd63;
+    box-shadow: #64bd63 0 0 0 16px inset;
+    background-color: #64bd63; }
+.mui-switch:checked:before {
+    left: 21px; }
+.mui-switch.mui-switch-animbg {
+    transition: background-color ease 0.4s; }
+.mui-switch.mui-switch-animbg:before {
+    transition: left 0.3s; }
+.mui-switch.mui-switch-animbg:checked {
+    box-shadow: #dfdfdf 0 0 0 0 inset;
+    background-color: #64bd63;
+    transition: border-color 0.4s, background-color ease 0.4s; }
+.mui-switch.mui-switch-animbg:checked:before {
+    transition: left 0.3s; }
+.mui-switch.mui-switch-anim {
+    transition: border cubic-bezier(0, 0, 0, 1) 0.4s, box-shadow cubic-bezier(0, 0, 0, 1) 0.4s; }
+.mui-switch.mui-switch-anim:before {
+    transition: left 0.3s; }
+.mui-switch.mui-switch-anim:checked {
+    box-shadow: #64bd63 0 0 0 16px inset;
+    background-color: #64bd63;
+    transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s; }
+.mui-switch.mui-switch-anim:checked:before {
+    transition: left 0.3s; }
