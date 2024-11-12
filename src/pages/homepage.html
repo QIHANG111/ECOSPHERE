@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+<div class="sidebar">
+    <div class="menu-item" data-target="user.html">
+        <div class = ui-menu-icon>
+            <img src="../resource/picture/users.svg" alt="Vector Icon" width="70" height="70">
+        </div>
+        <div class="menu-text">Users</div>
+    </div>
+    <div class="menu-item" data-target="homepage.html">
+        <div class = ui-menu-icon>
+            <img src="../resource/picture/home.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Homepage</div>
+    </div>
+    <div class="menu-item" data-target="devicesPage.html">
+        <div class="ui-menu-icon">
+            <img src="../resource/picture/devices.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Devices</div>
+    </div>
+    <div class="menu-item" data-target="settings.html">
+        <div class="ui-menu-icon">
+            <img src="../resource/picture/settings.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Settings</div>
+    </div>
+</div>
+
+<div class="dashboard">
+    <div class="dashboard-content">
+        <div class="card">
+            <h3>Status:</h3>
+            <div class =deviceList>
+                <div class="device">
+                    <img src="../resource/picture/devices.svg" alt="Vector Icon" width="30" height="30">
+                    <div class="device-name">AC1</div>
+                    <div class="device-status">Status: Off</div>
+                </div>
+                <div class="device">
+                    <img src="../resource/picture/devices.svg" alt="Vector Icon" width="30" height="30">
+                    <div class="device-name">AC2</div>
+                    <div class="device-status">Status: Off</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../homepage/homepage.js"></script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+body {
+    margin: 0;
+    background-image: url("../src/resource/picture/background.jpg");
+    align-items: flex-start;
+    justify-content: flex-start;
+    display: flex;
+}
+
+.sidebar {
+    background-color: rgba(255, 255, 255, 0.3);
+    position: relative;
+    justify-content: flex-start;
+    width: 15%;
+    height: 100vh;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    backdrop-filter: blur(5px);
+    transition: width 0.3s ease;
+    padding: 0; /* Remove padding so items can fill the sidebar completely */
+}
+
+.sidebar:hover {
+    width: 17%; /* Expand sidebar width on hover */
+}
+
+.menu-item {
+    width: 100%;
+    height: calc(100% / 4); /* Divide sidebar height equally for 4 items */
+    color: #333;
+    font-size: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    cursor: pointer;
+    border-radius: 0;
+    transition: color 0.3s ease, background-color 0.3s ease, height 0.3s ease;
+}
+
+.ui-menu-icon {
+    margin-bottom: 4px;
+}
+
+.menu-text {
+    font-size: 14px;
+}
+
+.menu-item:hover {
+    height: calc(100% / 3); /* Divide sidebar height equally for 4 items */
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2); /* Add shadow on hover */
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.dashboard {
+    width: 80%;
+    padding: 20px;
+}
+
+.dashboard-header {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 15%;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.4); /* Semi-transparent white */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(40px);
+    border-radius: 40px;
+    height: 200px;
+    width: 100%;
+    text-align: center;
+    transition: color 0.3s ease, background-color 0.3s ease, height 0.3s ease, width 0.3s ease;
+}
+.card:hover {
+    width: 105%;
+    height: 600px;
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.7);
+}
+.deviceList{
+    text-align: center;
+}
+.device{
+    margin: 10px;
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: aliceblue 0 0 10px;
+}
+.device:hover{
+    background-color: rgba(255, 255, 255, 0.7);
+}
