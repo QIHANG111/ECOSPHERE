@@ -1,11 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="../style.css">
-</head>
-<body>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoginPage</title>
+    <style>
+        .background-box {
+            width: 100%;
+            height: 1000px;
+            background-image: url('file:///Users/mayanzi/IdeaProjects/ECOSPHERE/src/login/Login%20page_copy.jpg');
+            border-radius: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
+        .main-box {
+            width: 70%;
+            height: 700px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 40px;
+            text-align: center;
+        }
+
+        .account,
+        .password {
+            width: 90%;
+            height: 70px;
+            background-color: white;
+            border-radius: 40px;
+            margin: 30px auto;
+            color: lightgray;
+            font-size: 20px;
+            padding-left: 20px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: left;
+        }
+
+        .checked {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+        }
+
+        .span1 {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            margin-top: 10px;
+            margin-left: 70px;
+            margin-right: 40px;
+        }
+
+        .span2 {
+            margin-top: 10px;
+            font-size: 16px;
+            color: black;
+        }
+
+        .login {
+            width: 50%;
+            height: 50px;
+            background-color: yellowgreen;
+            border-radius: 40px;
+            font-size: 20px;
+            color: black;
+            margin-top: 40px;
+            margin-left: 240px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .forgot,
+        .create {
+            color: royalblue;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .Data {
+            color: black;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .three-box {
+            color: blue;
+            font-size: 16px;
+            text-decoration: underline;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin-top: 80px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-box">
+        <div class="main-box">
+            <h1>Welcome to ECOSPHERE</h1>
+            <div class="account">Enter Email or Phone Number</div>
+            <div class="password">Enter Password</div>
+            <div class="checked">
+                <span class="span1"></span>
+                <span class="span2">Remember Me</span>
+            </div>
+            <div class="login">Login</div>
+            <div class="forgot">Forgot Password?</div>
+            <div class="create">Create an Account</div>
+            <div class="Data">Data is securely and encrypted to protect your privacy</div>
+            <div class="three-box"> Help & Support | Private Policy</div>
+        </div>
 </body>
+
 </html>
