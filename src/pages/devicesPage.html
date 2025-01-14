@@ -5,10 +5,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevicesPage</title>
+
     <link rel="stylesheet" href="../style.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 20px;
+            padding: 20px;
+
+            justify-content: center;
+            align-items: center;
+            min-height: 100%;
+
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+
+        .content>div {
+            background-color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+            width: auto;
+            height: auto;
+        }
+
+        .content>div:nth-child(1) {
+            height: 80px;
+            width: 1100px;
+            border-radius: 40px;
+            flex-shrink: 0;
+        }
+
+        .content>div:nth-child(2) {
+            height: 300px;
+            width: 900px;
+            border-radius: 40px;
+            flex-grow: 1;
+        }
+
+        .content>div:nth-child(3) {
+            height: 70px;
+            width: 200px;
+            border-radius: 40px;
+            flex-shrink: 0;
+        }
+
+        .selection-Bar {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .selection-Bar span {
+            font-size: 20px;
+            padding: 10px;
+            color: rgba(169, 169, 169, 0.8);
+            text-shadow:
+                    1px 1px 0px rgba(0, 0, 0, 0.4);
+
+        }
+
+        .add-button {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            background-color: transparent;
+            border-radius: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: none;
+        }
+
+        .add-button img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-right: 23px;
+        }
+
+        .button-text {
+            font-size: 20px;
+            color: #333;
+            text-align: left;
+        }
+    </style>
 </head>
 
 <body>
+<div class="container">
+
     <div class="sidebar">
         <div class="menu-item" data-target="user.html">
             <div class=ui-menu-icon>
@@ -36,9 +141,28 @@
         </div>
     </div>
 
+    <div class="content">
+        <div class="selection-Bar">
+            <span>All Devices</span>
+            <span>Bedroom</span>
+            <span>Living Room</span>
+            <span>Gym</span>
+            <span>Bathroom</span>
+            <span>Kitchen</span>
+        </div>
+        <div class="main-box"></div>
+        <div class="add">
+                <span class="add-button">
+                    <img src="../assets/picture/add-button.svg" alt="add-button">
+                    <span class="button-text">Add</span>
+                </span>
+
+        </div>
+    </div>
 
 
-    <script src="../script/devicesPage.js"></script>
+</div>
+<script src="../script/devicesPage.js"></script>
 </body>
 
 </html>
