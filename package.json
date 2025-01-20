@@ -1,0 +1,18 @@
+{
+  "name": "ecosphere",
+  "version": "1.0.0",
+  "description": "None",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "null"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
+  }
+}
