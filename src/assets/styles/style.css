@@ -1,6 +1,6 @@
 body {
     margin: 0;
-    background-image: url("assets/picture/background.jpg");
+    background-image: url("../images/background.jpg");
     align-items: flex-start;
     justify-content: flex-start;
     display: flex;
