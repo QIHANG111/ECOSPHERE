@@ -9,6 +9,7 @@
 ## Structure
 public: contains the static files.
 src: contains the source code.
+```
 /webapp
 ├── /src
 │   ├── /public             # Static files directory
@@ -18,7 +19,8 @@ src: contains the source code.
 │   │   │   └── script.js
 │   │   ├── /images         # Stores image files
 │   │   │   └── logo.png
-│   │   └── index.html      # HTML file
+│   │   └── /pages     # HTML file
+│   │       └── homePage.html
 │   ├── /routes             # Routes directory
 │   │   └── appRoutes.js    # Route configuration file
 │   ├── /models             # Database models and schemas
@@ -31,3 +33,4 @@ src: contains the source code.
 ├── package-lock.json       # Locked dependency versions
 ├── .env                    # Environment variables configuration
 └── README.md               # Project documentation
+```
