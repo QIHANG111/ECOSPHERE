@@ -18,7 +18,9 @@ src: contains the source code.
 │   │   ├── /js             # Stores JavaScript files
 │   │   │   └── script.js
 │   │   ├── /images         # Stores image files
-│   │   │   └── logo.png
+│   │   │   └── logo.jpg
+│   │   ├── /icons         
+│   │   │   └── logo.svg
 │   │   └── /pages     # HTML file
 │   │       └── homePage.html
 │   ├── /routes             # Routes directory
