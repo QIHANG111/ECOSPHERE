@@ -2,8 +2,7 @@
 1. Download the jetbrains WebStorm IDE.
 2. Login your github account.
 2. Choose "get from VCS" and clone the repository from the github.
-3. "control+," to open the settings,set the node.js and choose the npm(it should be set up by default, if not 
-go to:[nodejs](https://nodejs.org/en/download）
+3. "control+," to open the settings,set the node.js and choose the npm(it should be set up by default, if not， go to:https://nodejs.org/en/download
 4. open the terminal(built in) and run the command `npm install` to install the dependencies.
 5. run the command `npm start` to start the server.
 
