@@ -86,6 +86,7 @@ body {
 .item1 {
     grid-row: 1 / 2;
     grid-column: 1 / 2;
+
 }
 
 .item2 {
@@ -247,6 +248,7 @@ body {
     opacity: 0;
     transform: scaleY(0);
     position: absolute;
+    z-index: 9999;
     border-radius: 2vw;
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.7);

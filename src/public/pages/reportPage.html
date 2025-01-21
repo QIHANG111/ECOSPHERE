@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Homepage</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -27,9 +28,9 @@
     <div class="dropdown">
       <button class="dropdown-btn" onclick="toggleDropdown()">▼</button>
       <div class="dropdown-content" id="dropdownMenu">
-        <a href="#">Option 1</a>
-        <a href="#">Option 2</a>
-        <a href="#">Option 3</a>
+        <a href="#">Week</a>
+        <a href="#">Month</a>
+        <a href="#">Year</a>
       </div>
     </div>
       </div>
@@ -49,23 +50,23 @@
   </div>
 </div>
 <div class="dashboard" style="text-align: left; font-size: 3vw; font-weight: bold;"> Energy Usage Report
-  <div class="dashboard-content" style="grid-template-columns: 3fr 1fr; grid-gap: 3% 8.5%;">
-    <div class="item1">
-    <div class="normalCard">
-      <div class="chart"></div>
+  <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
+    <div class="item1" id = "weeklyReport">
+    <div class="normalCard" style="height: 120%">
+      <div id="chartSection1"></div>
     </div>
     </div>
     <div class="item3">
-  <div class="normalCard" style="height: 100%">
+  <div class="normalCard" style="height: 120%">
     <div class = "Tips"></div>
   </div>
   </div>
-    <div class="item2">
-    <div class="normalCard">
-      <div class="report">
-      </div>
-  </div>
-    </div>
+<!--    <div class="item2">-->
+<!--    <div class="normalCard">-->
+<!--      <div class="report">-->
+<!--      </div>-->
+<!--  </div>-->
+<!--    </div>-->
 </div>
 </div>
 
