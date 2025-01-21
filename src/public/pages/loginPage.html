@@ -8,39 +8,27 @@
     <title>LoginPage</title>
     <style>
         .background-box {
-            width: 100%;
-            height: 1000px;
-            background-image: url('../images/background.jpg');
-            border-radius: 40px;
-            display: flex;
-            justify-content: center;
+            margin: 0;
+            background-image: url("../images/background.jpg");
             align-items: center;
+            justify-content: center;
+            display: flex;
+            width: 100%;
+            height: 100vh;
         }
 
         .main-box {
             width: 70%;
-            height: 700px;
+            height: 70%;
             background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 40px;
+            border-radius: 2vw;
             text-align: center;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .account,
-        .password {
-            width: 90%;
-            height: 70px;
-            background-color: white;
-            border-radius: 40px;
-            margin: 30px auto;
-            color: lightgray;
-            font-size: 20px;
-            padding-left: 20px;
+            box-shadow: 0.2vw 0.2vw 1vw rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
             display: flex;
-            justify-content: flex-start;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            text-align: left;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .checked {
@@ -63,77 +51,127 @@
             box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
         }
 
+        .span1:hover {
+            transform: scale(1.05);
+            background-color: rgba(240, 240, 240, 0.8);
+        }
+
         .span2 {
             margin-top: 10px;
             font-size: 16px;
             color: black;
         }
 
+        .account,
+        .password {
+            width: 90%;
+            height: 8%;
+            background-color: white;
+            border-radius: 2vw;
+            margin: 2vh auto;
+            color: lightgray;
+            font-size: 1.2vw;
+            padding-left: 2vw;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: left;
+            box-shadow: 0.2vw 0.2vw 1vw rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .account:hover,
+        .password:hover {
+            transform: scale(1.05);
+            background-color: rgba(240, 240, 240, 0.8);
+        }
+
         .login {
             width: 50%;
-            height: 50px;
+            height: 8%;
             background-color: yellowgreen;
-            border-radius: 40px;
-            font-size: 20px;
+            border-radius: 2vw;
+            font-size: 1.2vw;
             color: black;
-            margin-top: 40px;
-            margin-left: 240px;
-            margin-bottom: 40px;
+            margin: 4vh auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0.2vw 0.2vw 1vw rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .login:hover {
+            transform: scale(1.05);
+            background-color: rgba(154, 205, 50, 0.8);
         }
 
         .forgot,
         .create {
             color: royalblue;
-            font-size: 20px;
+            font-size: 1.2vw;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 2vh;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .forgot:hover,
+        .create:hover {
+            transform: scale(1.05);
+            text-decoration: underline;
         }
 
         .Data {
             color: black;
-            font-size: 12px;
+            font-size: 0.8vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 2vh;
         }
 
         .three-box {
             color: blue;
-            font-size: 16px;
+            font-size: 1vw;
             text-decoration: underline;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            margin-top: 80px;
+            margin-top: 6vh;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
+
+        .three-box:hover {
+            transform: scale(1.05);
+            color: darkblue;
+        }
+
     </style>
 </head>
 
 <body>
-    <div class="background-box">
-        <div class="main-box">
-            <h1>Welcome to ECOSPHERE</h1>
-            <div class="account">Enter Email or Phone Number</div>
-            <div class="password">Enter Password</div>
-            <div class="checked">
-                <span class="span1"></span>
-                <span class="span2">Remember Me</span>
-            </div>
-            <div class="login">Login</div>
-            <div class="forgot">Forgot Password?</div>
-            <div class="create">Create an Account</div>
-            <div class="Data">Data is securely and encrypted to protect your privacy</div>
-            <div class="three-box"> Help & Support | Private Policy</div>
+<div class="background-box">
+    <div class="main-box">
+        <h1>Welcome to ECOSPHERE</h1>
+        <div class="account">Enter Email or Phone Number</div>
+        <div class="password">Enter Password</div>
+        <div class="checked">
+            <span class="span1"></span>
+            <span class="span2">Remember Me</span>
         </div>
+        <div class="login">Login</div>
+        <div class="forgot">Forgot Password?</div>
+        <div class="create">Create an Account</div>
+        <div class="Data">Data is securely and encrypted to protect your privacy</div>
+        <div class="three-box"> Help & Support | Private Policy</div>
+    </div>
 </body>
-
 </html>
