@@ -8,21 +8,26 @@ body {
 
 /* Sidebar styling */
 .sidebar {
-    background-color: rgba(255, 255, 255, 0.3);
-    width: 10vw; /* Initial sidebar width */
-    height: 100vh;
+    border-radius: 2vw; /* Rounded corners on all sides */
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 7vw; /* Initial sidebar width */
+    height: 92vh; /* Reduce height to leave space around edges */
     box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
     border: 0.1vw solid rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0;
+    padding: 1vw; /* Add internal padding for spacing */
+    position: fixed;
+    left: 1vw; /* Leave space from the left edge */
+    top: 1vh; /* Leave space from the top edge */
     transition: width 0.3s ease; /* Smooth width transition */
+    z-index: 1000; /* Ensure sidebar stays above other elements */
 }
 
 /* Sidebar expands on hover */
 .sidebar:hover {
-    width: 12vw; /* Expanded sidebar width */
+    width: 10vw; /* Expanded sidebar width */
 }
 
 /* Menu item styling */
@@ -73,11 +78,22 @@ body {
 }
 
 .dashboard {
-    width: 80vw; /* Width relative to viewport width */
-    padding: 2vw; /* Padding relative to viewport width */
+    margin-left: 12vw; /* Default offset for sidebar */
+    width: calc(100% - 14vw); /* Adjust width dynamically */
+    padding: 2vw;
+    overflow-y: auto;
+    height: 92vh;
+    transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
+}
+
+/* Adjust dashboard when sidebar expands */
+.sidebar:hover ~ .dashboard {
+    margin-left: 14vw; /* Adjust margin when sidebar expands */
+    width: calc(100% - 16vw); /* Adjust width accordingly */
 }
 
 .dashboard-content {
+    width: 95%;
     display: grid;
     grid-gap: 10% 15%;
     grid-template-columns: repeat(2, 1fr);

@@ -12,7 +12,7 @@ menuItems.forEach((item) => {
 });
 
 
-fetch('../assets/example/homepageReport.txt')
+fetch('/exampleData/data.json')
     .then(response => response.text())
     .then(data => {
         document.getElementById('text-content').innerText = data;

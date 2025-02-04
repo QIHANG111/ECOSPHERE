@@ -1,7 +1,3 @@
 {
-  "energyUsage": {
-    "labels": ["Jan", "Feb", "Mar", "Apr"],
-    "dataPoints": [65, 59, 80, 81],
-    "title": "Energy Usage (kWh)"
-  }
+"example" : "data"
 }
