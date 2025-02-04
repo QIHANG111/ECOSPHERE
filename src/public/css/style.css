@@ -1,15 +1,43 @@
+/* Define CSS variables for light mode */
+:root {
+    --background-color: white;
+    --text-color: black;
+    --sidebar-background: rgba(255, 255, 255, 0.5);
+    --card-background: rgba(255, 255, 255, 0.4);
+    --button-background: #007bff;
+    --button-hover: #0056b3;
+    --input-border: #ccc;
+    --input-shadow: rgba(0, 0, 0, 0.1);
+    --background-image: url("../images/background.jpg");
+}
+
+/* Define CSS variables for dark mode */
+.dark-mode {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --sidebar-background: rgba(30, 30, 30, 0.7);
+    --card-background: rgba(30, 30, 30, 0.7);
+    --button-background: #1e88e5;
+    --button-hover: #1565c0;
+    --input-border: #555;
+    --input-shadow: rgba(255, 255, 255, 0.2);
+    --background-image: url("../images/darkbackground.jpg");
+}
+
 body {
     margin: 0;
-    background-image: url("../images/background.jpg");
+    background-image: var(--background-image);
     align-items: flex-start;
     justify-content: flex-start;
     display: flex;
+    transition: background-color 0.3s;
 }
 
 /* Sidebar styling */
 .sidebar {
+    color: var(--text-color);
     border-radius: 2vw; /* Rounded corners on all sides */
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--sidebar-background);
     width: 7vw; /* Initial sidebar width */
     height: 92vh; /* Reduce height to leave space around edges */
     box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
@@ -21,7 +49,7 @@ body {
     position: fixed;
     left: 1vw; /* Leave space from the left edge */
     top: 1vh; /* Leave space from the top edge */
-    transition: width 0.3s ease; /* Smooth width transition */
+    transition: width 0.3s ease, background-color 0.3s;
     z-index: 1000; /* Ensure sidebar stays above other elements */
 }
 
@@ -333,4 +361,24 @@ body {
 .bar:hover .right {
     opacity: 1;
     flex: 1;
+}
+
+
+/* Dark mode toggle button */
+.toggle-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: var(--button-background);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.3s;
+}
+
+/* Toggle button hover effect */
+.toggle-button:hover {
+    background-color: var(--button-hover);
 }
