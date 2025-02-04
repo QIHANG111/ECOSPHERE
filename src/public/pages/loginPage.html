@@ -250,14 +250,23 @@
 </div>
 
     <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                let checkbox = document.getElementById("agreeCheckbox");
-                let loginBtn = document.getElementById("loginBtn");
+        document.addEventListener("DOMContentLoaded", function () {
+            let checkbox = document.getElementById("agreeCheckbox");
+            let loginBtn = document.getElementById("loginBtn");
 
-                checkbox.addEventListener("change", function () {
-                    loginBtn.disabled = !checkbox.checked;
-                });
+            checkbox.addEventListener("change", function () {
+                loginBtn.disabled = !checkbox.checked;
             });
+
+            loginBtn.addEventListener("click", function () {
+                if (loginBtn.disabled) {
+                    alert("Please check the consent terms first!");
+                } else {
+                    window.location.href = "../pages/homePage.html";
+                }
+            });
+        });
+
         </script>
 
 </body>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AddElectrics</title>
+  <style>
+
+    .add-button {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      background-color: transparent;
+      border-radius: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .add-button img {
+      width: 3vw;
+      height: 3vw;
+      object-fit: contain;
+      margin-right: 2vw;
+    }
+
+    .button-text {
+      font-size: 1.5vw;
+      font-weight: bold;
+      color: #333;
+      text-align: left;
+    }
+
+    .device-list {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .device-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .device-item input {
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      flex-grow: 1;
+    }
+
+    .device-item button {
+      padding: 5px 10px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .device-item button:hover {
+      background-color: #cc0000;
+    }
+
+  </style>
+</head>
+<body>
+<div class="add">
+        <span class="add-button" id="addButton">
+            <img src="../icons/add-button.svg" alt="add-button">
+            <span class="button-text">Add</span>
+        </span>
+</div>
+
+<div id="deviceList" class="device-list"></div>
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log("Script loaded!");
+
+    const addButton = document.getElementById('addButton');
+    const deviceList = document.getElementById('deviceList');
+
+    if (!addButton || !deviceList) {
+      console.error("Not found!");
+      return;
+    }
+
+    addButton.addEventListener('click', function () {
+      console.log("Add button clicked!");
+
+      const deviceItem = document.createElement('div');
+      deviceItem.className = 'device-item';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'input the device name';
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'DELETE';
+
+      deleteButton.addEventListener('click', function () {
+        deviceList.removeChild(deviceItem);
+      });
+
+      deviceItem.appendChild(input);
+      deviceItem.appendChild(deleteButton);
+
+      deviceList.appendChild(deviceItem);
+    });
+  });
+</script>
+</body>
+</html>

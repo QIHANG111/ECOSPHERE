@@ -29,7 +29,7 @@
             display: flex;
             flex-direction: column;
             flex-grow: 1;
-            gap: 2vh; /* 使用相对间距 */
+            gap: 2vh;
             padding: 2vw;
             justify-content: center;
             align-items: center;
@@ -37,7 +37,6 @@
             background-color: rgba(0, 255, 0, 0.1);
         }
 
-        /* General content boxes */
         .content > div {
             background-color: rgba(255, 255, 255, 0.5);
             display: flex;
@@ -47,10 +46,9 @@
             width: auto;
             height: auto;
             box-shadow: 0.5vw 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease; /* 增加过渡效果 */
+            transition: all 0.3s ease;
         }
 
-        /* Header box */
         .content > div:nth-child(1) {
             height: 8vh;
             width: 70vw;
@@ -58,7 +56,6 @@
             flex-shrink: 0;
         }
 
-        /* Middle content area with hover effect */
         .content > div:nth-child(2) {
             height: 30vh;
             width: 60vw;
@@ -81,7 +78,7 @@
         .content > div:nth-child(2):hover {
             background-color: rgba(255, 255, 255, 0.5);
             box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
-            transform: scale(1.05); /* 增加放大效果 */
+            transform: scale(1.05);
         }
         .content > div:nth-child(2)::-webkit-scrollbar {
             width: 0.5vw;
@@ -96,14 +93,12 @@
             background-color: rgba(0, 0, 0, 0.1);
         }
 
-        /* 测试内容高度超出效果 */
         .content > div:nth-child(2):after {
             content: '';
             display: block;
-            height: 150%; /* 模拟超出高度 */
+            height: 150%;
         }
 
-        /* Text input and grid layout */
         .Your-home {
             width: 100%;
             height: auto;
@@ -133,7 +128,7 @@
             box-shadow: 0.5vw 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
         }
 
-        /* Footer box with hover effect */
+
         .content > div:nth-child(3) {
             height: 7vh;
             width: 20vw;
@@ -148,10 +143,9 @@
         .content > div:nth-child(3):hover {
             background-color: rgba(255, 255, 255, 0.5);
             box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
-            transform: scale(1.05); /* 增加放大效果 */
+            transform: scale(1.05);
         }
 
-        /* Selection bar with hover effect */
         .selection-Bar {
             display: flex;
             gap: 3vw;
@@ -165,18 +159,28 @@
             box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
         }
 
-        /* Expand selection bar on hover */
         .selection-Bar:hover {
             gap: 4vw;
             background-color: rgba(255, 255, 255, 0.5);
             box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
         }
 
-        .selection-Bar span {
+        .nav-button {
             font-size: 1.5vw;
             padding: 0.5vw;
             color: rgba(169, 169, 169, 0.8);
             text-shadow: 0.1vw 0.1vw 0 rgba(0, 0, 0, 0.4);
+            text-decoration: none;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .nav-button:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .nav-button:active {
+            color: rgba(255, 255, 255, 1);
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .add-button {
@@ -206,6 +210,7 @@
 
     </style>
 </head>
+
 <body>
 <div class="container">
 
@@ -239,13 +244,14 @@
 
     <div class="content">
         <div class="selection-Bar">
-            <span>All Devices</span>
-            <span>Bedroom</span>
-            <span>Living Room</span>
-            <span>Gym</span>
-            <span>Bathroom</span>
-            <span>Kitchen</span>
+            <a href="../pages/devicesPage.html" class="nav-button">All Devices</a>
+            <a href="../pages/Bedroom.html" class="nav-button">Bedroom</a>
+            <a href="../pages/Living-Room.html" class="nav-button">LivingRoom</a>
+            <a href="../pages/GymPage.html" class="nav-button">Gym</a>
+            <a href="../pages/Bathroom.html" class="nav-button">Bathroom</a>
+            <a href="../pages/Kitchen.html" class="nav-button">Kitchen</a>
         </div>
+
         <div class="main-box">
             <div class="Your-home">
                 <span class="line1">Your Home ></span> <br/>
@@ -283,16 +289,23 @@
             </div>
         </div>
         <div class="add">
-                <span class="add-button">
+                <span class="add-button" id="addButton">
                     <img src="../icons/add-button.svg" alt="add-button">
                     <span class="button-text">Add</span>
                 </span>
-
         </div>
+
     </div>
 
 
 </div>
 <script src="../js/devicesPage.js"></script>
+<script>
+    const addButton = document.getElementById('addButton');
+
+    addButton.addEventListener('click', function () {
+        window.location.href = '../terms-pages/addelectric.html';
+    });
+    </script>
 </body>
 </html>
