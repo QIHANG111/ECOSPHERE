@@ -22,4 +22,9 @@ CREATE TABLE role (
 
 )
 
-;
+
+CREATE TABLE devices (
+                       device_id int AUTO_INCREMENT PRIMARY KEY,
+                       
+
+);
