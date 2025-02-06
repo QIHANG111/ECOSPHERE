@@ -209,28 +209,27 @@
     <div class="main-box"> <!-- create for the middle transparency box -->
         <h2>Welcome to ECOSPHERE</h2>
 
-        <form action="Login.php" method="POST" name = "LoginPage-users-information" class="form-container"> <!-- form filed for collect user information, connect to database -->
-
+        <form action="/Users/mayanzi/IdeaProjects/ECOSPHERE-1/src/Php/Login.php" method="POST" name="LoginPage-users-information" class="form-container">
             <div class="input-box">
                 <img src="../icons/letter-svgrepo-com.svg" alt="letter">
-                <input type="text"  placeholder="Enter Email or Phone Number" required>
+                <input type="text" name="email_or_phone" placeholder="Enter Email or Phone Number" required>
             </div>
 
             <div class="input-box">
                 <img src="../icons/lock-alt.svg" alt="lock">
-                <input type="password"  placeholder="Enter Password" required>
+                <input type="password" name="password" placeholder="Enter Password" required>
             </div>
 
-
             <div class="checkbox-container">
-                    <input type="checkbox" id="agreeCheckbox" name="agreeCheckbox">
+                <input type="checkbox" id="agreeCheckbox" name="agreeCheckbox">
                 <label for="agreeCheckbox">
-                    I confirm that I have read, consent and agree to ECOSPHERE's
+                    I confirm that I have read, consent, and agree to ECOSPHERE's
                     <a href="../terms-pages/terms-of-use.html" target="_blank">Terms of Use</a> and
                     <a href="../terms-pages/private-policy.html" target="_blank">Privacy Policy</a>.
                 </label>
-                </div>
-                <button type="submit" class="login-button" id="loginBtn" disabled>Login</button>
+            </div>
+
+            <button type="submit" class="login-button" id="loginBtn" disabled>Login</button>
         </form>
 
         <div class="extra-links">
