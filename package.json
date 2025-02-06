@@ -15,5 +15,18 @@
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
     "supertest": "^6.3.3"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QIHANG111/ECOSPHERE.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/QIHANG111/ECOSPHERE/issues"
+  },
+  "homepage": "https://github.com/QIHANG111/ECOSPHERE#readme"
 }
