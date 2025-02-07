@@ -4,7 +4,7 @@ const router = express.Router();
 
 // Route to serve the HTML page
 router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/pages/homePage.html'));
+    res.sendFile(path.join(__dirname, '../public/pages/loginPage.html'));
 });
 
 // Example API endpoint to get mock data
