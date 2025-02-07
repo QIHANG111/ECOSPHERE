@@ -5,19 +5,6 @@
     <title>devicePage</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background-image: url("../images/background.jpg");
-            align-items: flex-start;
-            justify-content: flex-start;
-            display: flex;
-        }
 
         .container {
             display: flex;
@@ -33,8 +20,8 @@
             padding: 2vw;
             justify-content: center;
             align-items: center;
-            min-height: 100%;
-            background-color: rgba(0, 255, 0, 0.1);
+            height: 92vh;
+
         }
 
         .content > div {
@@ -148,7 +135,6 @@
 
         .selection-Bar {
             display: flex;
-            gap: 3vw;
             justify-content: center;
             margin-bottom: 2vh;
             background-color: rgba(255, 255, 255, 0.3);
@@ -160,9 +146,7 @@
         }
 
         .selection-Bar:hover {
-            gap: 4vw;
-            background-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
+            height: 1vh;
         }
 
         .nav-button {
@@ -212,44 +196,47 @@
 </head>
 
 <body>
-<div class="container">
-
-    <div class="sidebar">
-        <div class="menu-item" data-target="/pages/usersPage.html">
-            <div class = ui-menu-icon>
-                <img src="/icons/users.svg" alt="Vector Icon" width="70" height="70">
-            </div>
-            <div class="menu-text">Users</div>
+<div class="sidebar">
+    <div class="menu-item" data-target="/pages/usersPage.html">
+        <div class = ui-menu-icon>
+            <img src="/icons/users.svg" alt="Vector Icon" width="70" height="70">
         </div>
-        <div class="menu-item" data-target="/pages/homepage.html">
-            <div class = ui-menu-icon>
-                <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
-            </div>
-            <div class="menu-text">Homepage</div>
-        </div>
-        <div class="menu-item" data-target="/pages/devicesPage.html">
-            <div class="ui-menu-icon">
-                <img src="/icons/devices.svg" alt="Vector Icon" width="50" height="50">
-            </div>
-            <div class="menu-text">Devices</div>
-        </div>
-        <div class="menu-item" data-target="settings.html">
-            <div class="ui-menu-icon">
-                <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
-            </div>
-            <div class="menu-text">Settings</div>
-        </div>
+        <div class="menu-text">Users</div>
     </div>
-
-
+    <div class="menu-item" data-target="/pages/homepage.html">
+        <div class = ui-menu-icon>
+            <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Homepage</div>
+    </div>
+    <div class="menu-item" data-target="/pages/devicesPage.html">
+        <div class="ui-menu-icon">
+            <img src="/icons/devices.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Devices</div>
+    </div>
+    <div class="menu-item" data-target="settings.html">
+        <div class="ui-menu-icon">
+            <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Settings</div>
+    </div>
+</div>
+<div class="container">
     <div class="content">
         <div class="selection-Bar">
-            <a href="../pages/devicesPage.html" class="nav-button">All Devices</a>
-            <a href="../pages/Bedroom.html" class="nav-button">Bedroom</a>
-            <a href="../pages/Living-Room.html" class="nav-button">LivingRoom</a>
-            <a href="../pages/GymPage.html" class="nav-button">Gym</a>
-            <a href="../pages/Bathroom.html" class="nav-button">Bathroom</a>
-            <a href="../pages/Kitchen.html" class="nav-button">Kitchen</a>
+            <div class="menu-item" data-target="/pages/devicesPage.html">
+            <a href="../pages/devicesPage.html" class="nav-button">All Devices</a></div>
+            <div class="menu-item"style="height: 10vh" data-target="/pages/Bedroom.html">
+                <a href="../pages/Bedroom.html" class="nav-button">Bedroom</a></div>
+            <div class="menu-item"style="height: 10vh" data-target="/pages/Living-Room.html">
+                <a href="../pages/Living-Room.html" class="nav-button">LivingRoom</a></div>
+            <div class="menu-item"style="height: 10vh" data-target="/pages/GymPage.html">
+                <a href="../pages/GymPage.html" class="nav-button">Gym</a></div>
+            <div class="menu-item"style="height: 10vh" data-target="/pages/Bathroom.html">
+                <a href="../pages/Bathroom.html" class="nav-button">Bathroom</a></div>
+            <div class="menu-item"style="height: 10vh" data-target="/pages/Kitchen.html">
+                <a href="../pages/Kitchen.html" class="nav-button">Kitchen</a></div>
         </div>
 
         <div class="main-box">
