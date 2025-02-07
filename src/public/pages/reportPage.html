@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,39 +6,42 @@
   <title>Homepage</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="/css/style.css">
-
+  <script defer src="/js/gemini.js"></script>
 </head>
 <body>
+
 <!-- Dark Mode Toggle Button -->
 <button id="darkModeToggle" class="toggle-button">S</button>
 
 <div class="sidebar">
   <div class="menu-item" data-target="homepage.html" onclick="window.location.href='homePage.html';">
-    <div class = ui-menu-icon>
+    <div class="ui-menu-icon">
       <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
     </div>
     <div class="menu-text">Homepage</div>
   </div>
-    <div class="menu-item" style="align-items:start">
-      <div class="bar">
+
+  <div class="menu-item" style="align-items:start">
+    <div class="bar">
       <div class="left">
         <div class="ui-menu-icon">
-        <img src="/icons/period.svg" alt="Vector Icon" width="50" height="50">
+          <img src="/icons/period.svg" alt="Vector Icon" width="50" height="50">
         </div>
         <div class="menu-text">Period</div>
       </div>
       <div class="right">
-    <div class="dropdown">
-      <button class="dropdown-btn" onclick="toggleDropdown()">▼</button>
-      <div class="dropdown-content" id="dropdownMenu">
-        <a href="#">Week</a>
-        <a href="#">Month</a>
-        <a href="#">Year</a>
+        <div class="dropdown">
+          <button class="dropdown-btn" onclick="toggleDropdown()">▼</button>
+          <div class="dropdown-content" id="dropdownMenu">
+            <a href="#">Week</a>
+            <a href="#">Month</a>
+            <a href="#">Year</a>
+          </div>
+        </div>
       </div>
     </div>
-      </div>
-      </div>
-    </div>
+  </div>
+
   <div class="menu-item">
     <div class="ui-menu-icon">
       <img src="/icons/device2.svg" alt="Vector Icon" width="50" height="50">
@@ -53,26 +55,27 @@
     <div class="menu-text">Chart Type</div>
   </div>
 </div>
-<div class="dashboard" style="text-align: left; font-size: 3vw; font-weight: bold;"> Energy Usage Report
+
+<div class="dashboard" style="text-align: left; font-size: 3vw; font-weight: bold;">
+  Energy Usage Report
   <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
-    <div class="item1" id = "weeklyReport">
-    <div class="normalCard" style="height: 120%">
-      <div id="chartSection1"></div>
+    <div class="item1" id="weeklyReport">
+      <div class="normalCard" style="height: 120%">
+        <div id="chartSection1"></div>
+      </div>
     </div>
+    <!-- Gemini -->
+    <div class="normalCard" style="height: 160%">
+      <label for="userPrompt"></label>
+      <input type="text" id="userPrompt" placeholder="Enter your question..." style="width: 80%; padding: 10px; border-radius: 5vw">
+      <button onclick="handleGeminiRequest()" style="padding: 10px; border-radius: 5vw">Ask ECOSPHERE</button>
+<!--      <button onclick="generateByJson()" style="padding: 10px;">Ask ECOSPHERE</button>-->
+      <p id="apiResponse" style="margin-top: 2vw; font-weight: bold; font-size: 0.5em;">...</p>
     </div>
-    <div class="item3">
-  <div class="normalCard" style="height: 120%">
-    <div class = "Tips"></div>
   </div>
-  </div>
-<!--    <div class="item2">-->
-<!--    <div class="normalCard">-->
-<!--      <div class="report">-->
-<!--      </div>-->
-<!--  </div>-->
-<!--    </div>-->
 </div>
-</div>
+
+
 
 <script src="/js/reportPage.js"></script>
 <script src="/js/darkMode.js"></script>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script defer src="/js/gemini.js"></script>
 </head>
 
 <body>
@@ -65,6 +66,12 @@
         </div>
         <div class="normalCard">
             <h3>Notifications</h3>
+        </div>
+        <div class="normalCard"><!-- ASK AI-->
+            <input type="text" id="userPrompt" placeholder="Enter your question..." style="width: 80%; padding: 10px; border-radius: 5vw">
+            <button onclick="handleGeminiRequest()" style="padding: 10px; border-radius: 5vw">Ask ECOSPHERE</button>
+            <!--      <button onclick="generateByJson()" style="padding: 10px;">Ask ECOSPHERE</button>-->
+            <p id="apiResponse" style="margin-top: 2vw; font-weight: bold; font-size: 0.5em;">...</p>
         </div>
         <div class="normalCard" style="width: 240%; text-align: left; padding-left: 1vw;">
             <div class="leftToRightList">
