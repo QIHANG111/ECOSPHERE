@@ -382,3 +382,26 @@ body {
 .toggle-button:hover {
     background-color: var(--button-hover);
 }
+
+
+
+
+.family-card, .add-card {
+    height: 20vw;
+    background-color: var(--sidebar-background);
+    border-radius: 2vw;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+.family-card:hover, .add-card:hover {
+    transform: translateY(-5px);
+}
+.family-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}

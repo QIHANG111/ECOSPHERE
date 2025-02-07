@@ -3,20 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Your Family</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-
 <body>
 <div class="sidebar">
     <div class="menu-item" data-target="/pages/usersPage.html">
-        <div class = ui-menu-icon>
+        <div class="ui-menu-icon">
             <img src="/icons/users.svg" alt="Vector Icon" width="70" height="70">
         </div>
         <div class="menu-text">Users</div>
     </div>
     <div class="menu-item" data-target="/pages/homepage.html">
-        <div class = ui-menu-icon>
+        <div class="ui-menu-icon">
             <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
         </div>
         <div class="menu-text">Homepage</div>
@@ -35,10 +34,83 @@
     </div>
 </div>
 
+<div class="dashboard">
+    <div class="dashboard-content">
+        <div class="family-card">
+            <h5>You</h5>
+            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User">
+            <p>Family organizer since: 2018</p>
+            <span class="badge bg-primary">Premium Subscriber</span>
+        </div>
+        <div class="add-card" onclick="openAddModal()">
+            <span>+</span>
+            <p>Add a family member</p>
+        </div>
+    </div>
+</div>
 
+<!-- Add Member Modal -->
+<div id="addMemberModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddModal()">&times;</span>
+        <h2>Add a Family Member</h2>
+        <form id="addMemberForm">
+            <label for="memberName">Name:</label>
+            <input type="text" id="memberName" name="memberName" required>
 
-<script src="/js/homepage.js"></script>
+            <label for="memberImage">Profile Image URL:</label>
+            <input type="text" id="memberImage" name="memberImage" placeholder="Enter image URL">
+
+            <label for="memberInfo">Additional Info:</label>
+            <input type="text" id="memberInfo" name="memberInfo" placeholder="E.g. Address, School">
+
+            <button type="submit">Add Member</button>
+        </form>
+    </div>
+</div>
+
 </body>
+<script src="/js/homepage.js"></script>
+<script src="/js/darkMode.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const addMemberForm = document.getElementById("addMemberForm");
+
+        addMemberForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Get form values
+            const memberName = document.getElementById("memberName").value;
+            const memberImage = document.getElementById("memberImage").value || "https://randomuser.me/api/portraits/lego/1.jpg";
+            const memberInfo = document.getElementById("memberInfo").value;
+
+            // Create new family card
+            const familyCard = document.createElement("div");
+            familyCard.classList.add("family-card");
+
+            familyCard.innerHTML = `
+                <h5>${memberName}</h5>
+                <img src="${memberImage}" alt="${memberName}">
+                <p>${memberInfo}</p>
+            `;
+
+            // Append to dashboard
+            const dashboardContent = document.querySelector(".dashboard-content");
+            dashboardContent.insertBefore(familyCard, document.querySelector(".add-card"));
+
+            // Close modal and reset form
+            closeAddModal();
+            addMemberForm.reset();
+        });
+    });
+
+    // Open and Close Modal Functions
+    function openAddModal() {
+        document.getElementById("addMemberModal").style.display = "block";
+    }
+
+    function closeAddModal() {
+        document.getElementById("addMemberModal").style.display = "none";
+    }
+</script>
 </html>
-
-
