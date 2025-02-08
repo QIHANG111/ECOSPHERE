@@ -68,16 +68,72 @@ async function generateByJson() {
 function handleGeminiRequest() {
     const userPrompt = document.getElementById("userPrompt").value;
     const responseElement = document.getElementById("apiResponse");
-    const preSettingText = "answer the question must be within 50 words:\n";
+    const aiCard = document.querySelector(".aiCard"); // Select `.aiCard`
+    const preSettingText = "Answer the question within 50 words:\n";
     const fullPrompt = preSettingText + userPrompt;
+
     if (userPrompt.trim() === "") {
         responseElement.innerText = "Please enter a question.";
         return;
     }
 
+    // Show loading message and expand `.aiCard`
     responseElement.innerText = "Fetching response...";
+    // aiCard.style.height = "10vh"; // Initial expansion
 
     fetchGeminiResponse(fullPrompt).then(responseText => {
-        responseElement.innerText = responseText;
+        responseElement.innerText = ""; // Clear placeholder text
+        // aiCard.style.height = "auto";
+
+        // Start the typing effect
+        typeTextEffect(responseElement, responseText, 50, aiCard);
     });
 }
+
+/**
+ * Typing effect with `.aiCard` expansion
+ * @param {HTMLElement} element - Text container
+ * @param {string} text - AI response text
+ * @param {number} speed - Typing speed in ms
+ * @param {HTMLElement} card - `.aiCard` that expands
+ */
+function typeTextEffect(element, text, speed, card) {
+    let i = 0;
+    element.innerHTML = ""; // Clear previous text
+    element.style.opacity = "1"; // Ensure text is visible
+
+    function type() {
+        if (i < text.length) {
+            let span = document.createElement("span");
+            span.textContent = text.charAt(i);
+            span.style.opacity = "0";
+            span.style.transition = "opacity 0.2s ease, font-size 0.2s ease";
+            span.style.fontSize = "1.5em";
+
+            element.appendChild(span);
+
+            setTimeout(() => {
+                span.style.opacity = "1"; // Fade in character
+                span.style.fontSize = "1.2em";
+                card.style.height = card.scrollHeight + "px"; // Dynamically expand height
+            }, 3);
+
+            i++;
+            setTimeout(type, speed);
+        }
+    }
+    type(); // Start typing effect
+}
+
+window.onload = function () {
+    document.addEventListener("click", function (event) {
+        const aiCard = document.querySelector(".aiCard");
+        const responseElement = document.getElementById("apiResponse");
+        if (!aiCard.contains(event.target)) {
+
+            aiCard.style.height = "8vh";
+            responseElement.innerText = "";
+
+        }
+    });
+};

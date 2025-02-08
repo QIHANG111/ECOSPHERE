@@ -20,6 +20,7 @@
     --c-bg-secondary: #d4d8dd;
     --c-bg-button: #fff;
     --c-bg-sidebar: rgba(255, 255, 255, 0.5);
+    --c-bg-card-hover: rgba(255, 255, 255, 0.6);
 }
 :root.dark-theme {
     --c-text-primary: #eee;
@@ -30,6 +31,7 @@
     --c-bg-secondary: #222128;
     --c-bg-button: #494a50;
     --c-bg-sidebar: rgba(35, 35, 35, 0.95);
+    --c-bg-card-hover: rgba(85, 85, 85, 0.6);
 }
 :root.black-theme {
     --c-text-primary: #edeeef;
@@ -40,6 +42,7 @@
     --c-bg-secondary: #000001;
     --c-bg-button: #343844;
     --c-bg-sidebar: rgba(35, 35, 35, 0.95);
+    --c-bg-card-hover: rgba(85, 85, 85, 0.6);
 }
 /* Default SVG color */
 .ui-menu-icon img {
@@ -152,7 +155,7 @@ body {
     width: calc(100% - 14vw); /* Adjust width dynamically */
     padding: 2vw;
     overflow-y: auto;
-    height: 92vh;
+    height: 200vh;
     transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
 }
 
@@ -163,6 +166,7 @@ body {
 }
 
 .dashboard-content {
+    margin-top: 2vw;
     width: 95%;
     display: grid;
     grid-gap: 10% 7%;
@@ -188,13 +192,14 @@ body {
 
 .normalCard {
     /*background-color: rgba(255, 255, 255, 0.4);*/
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--c-bg-sidebar);
+    color: var(--c-text-primary);
     box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(0.5vw);
     border-radius: 3vw;
     border: 0.1vw solid rgba(255, 255, 255, 0.5);
     height: 40vh;
-    width: 110%;
+    width: 115%;
     text-align: center;
     transition: all 0.3s ease;
     overflow: hidden;
@@ -205,7 +210,7 @@ body {
     transform: scale(1.03);
     height: 40vh;
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: var(--c-bg-card-hover);
     .upToDownList {
         height: 35vh; /* Set fixed height for overflow control */
     }
@@ -590,4 +595,129 @@ button:hover {
 }
 .theme-switcher input:nth-of-type(3):checked ~ .slider {
     transform: translateX(200%);
+}
+
+
+.chart-container {
+    width: 100%;  /* Make it stretch to fit the parent container */
+    max-width: 100%; /* Prevents overflow */
+    height: 30vh;  /* Adjust height based on viewport */
+    min-height: 150px; /* Ensures chart doesn't get too small */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+canvas {
+    width: 100% !important; /* Force canvas to fill its container */
+    height: 100% !important;
+}
+
+
+#apiResponse {
+    margin-top: 2vw;
+    font-weight: bold;
+    font-size: 1.2em;
+    font-family: "Courier New", monospace; /* AI-style font */
+    color: #3b3e40; /* Neon effect */
+    text-shadow: 0 0 10px rgb(217, 226, 217); /* Glow effect */
+    white-space: pre-wrap; /* Ensures line breaks are maintained */
+    line-height: 1.2; /* Better readability */
+    min-height: 50px; /* Prevents height jumping */
+}
+
+.aiCard {
+    width: 320%;
+    max-width: 100%;
+    overflow: visible; /* Allow text expansion */
+    transition: height 1s ease; /* Smooth expansion */
+    padding: 1vw;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 3vw;
+    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Keep input field at the top */
+    align-items: center;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+}
+
+/* Ensure the input field remains fully visible */
+.leftToRightList2 {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vw;
+}
+
+/* Adjust the input box styling */
+#userPrompt {
+    flex-grow: 1; /* Allow it to expand fully */
+    padding: 10px;
+    border-radius: 5vw;
+    font-size: 1em;
+}
+
+/* Prevent input from being cut off */
+#apiResponse {
+    color: var(--c-text-primary);
+    opacity: 0;
+    margin-top: 1vw;
+    font-weight: bold;
+    font-size: 1em;
+    white-space: pre-wrap;
+}
+
+
+
+#currentDateTime {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2b5e83, #2b5e83);
+    padding: 15px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 90%;
+    margin: auto;
+    transition: all 0.3s ease-in-out;
+}
+
+
+#currentDateTime .date {
+    font-size: 1.1em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+#currentDateTime .time {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 5px;
+    letter-spacing: 2px;
+    animation: fadeIn 1s ease-in-out infinite alternate;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.6;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.normalCard::-webkit-scrollbar {
+    display: none;
+}
+
+.dashboard::-webkit-scrollbar {
+    display: none;
 }

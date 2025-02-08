@@ -6,6 +6,7 @@
     <title>Homepage</title>
     <link rel="stylesheet" href="/css/style.css">
     <script defer src="/js/gemini.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -40,6 +41,23 @@
 </div>
 
 <div class="dashboard">
+    <div class="dashboard-content" style="margin-top: 0;">
+        <div class="leftToRightList" style="width: 370%;">
+            <div class="aiCard" style="width: 320%; height: 8vh;">
+                <div class="leftToRightList" style="width: 100%">
+                    <label for="userPrompt"></label>
+                    <input type="text" id="userPrompt" placeholder="Ask something..."
+                           style="width: 80%; padding: 10px; border-radius: 5vw">
+                    <button onclick="handleGeminiRequest()"
+                            style="padding: 10px; border-radius: 5vw; width: 15%; margin-right: 1vw">
+                        Ask
+                    </button>
+                </div>
+                <p id="apiResponse" style="margin-top: 1vw; font-weight: bold; font-size: 1em; opacity: 0;"></p>
+            </div>
+        </div>
+
+    </div>
     <div class="dashboard-content">
         <div class="normalCard">
             <h3>Status:</h3>
@@ -67,13 +85,16 @@
         <div class="normalCard">
             <h3>Notifications</h3>
         </div>
-        <div class="normalCard"><!-- ASK AI-->
-            <label for="userPrompt"></label><input type="text" id="userPrompt" placeholder="Enter your question..." style="width: 80%; padding: 10px; border-radius: 5vw">
-            <button onclick="handleGeminiRequest()" style="padding: 10px; border-radius: 5vw; width: 70%">Ask ECOSPHERE</button>
-            <!--      <button onclick="generateByJson()" style="padding: 10px;">Ask ECOSPHERE</button>-->
-            <p id="apiResponse" style="margin-top: 2vw; font-weight: bold; font-size: 0.5em;">...</p>
+        <div class="normalCard" style="    overflow-y: auto; ">
+            <p id="currentDateTime" style="font-size: 1em; font-weight: bold;"></p>
+
+            <a class="weatherwidget-io" href="https://forecast7.com/en/3d16101d71/federal-territory-of-kuala-lumpur/" data-label_1="KUALA LUMPUR" data-label_2="WEATHER" data-theme="original" >KUALA LUMPUR WEATHER</a>
         </div>
-        <div class="normalCard" style="width: 240%; text-align: left; padding-left: 1vw;">
+    </div>
+    <div class="dashboard-content">
+        <div class="normalCard">
+        </div>
+        <div class="normalCard" style="width: 230%; text-align: left; padding-left: 1vw;">
             <div class="leftToRightList">
                 <div><h3>Energy Usage Report</h3></div>
                 <div class="hButton" onclick="window.location.href='/pages/reportPage.html';">
@@ -83,6 +104,10 @@
                     </div>
                 </div>
             </div>
+            <!-- Canvas for Chart -->
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
         </div>
         </div>
     </div>
@@ -90,5 +115,10 @@
 <script src="/js/sidebar.js"></script>
 <script src="/js/darkMode.js"></script>
 <script src="/js/theme.js"></script>
+<script src="/js/chart.js"></script>
+<script src="/js/clock.js"></script>
+<script>
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+</script>
 </body>
 </html>
