@@ -68,7 +68,7 @@
             <h3>Notifications</h3>
         </div>
         <div class="normalCard"><!-- ASK AI-->
-            <input type="text" id="userPrompt" placeholder="Enter your question..." style="width: 80%; padding: 10px; border-radius: 5vw">
+            <label for="userPrompt"></label><input type="text" id="userPrompt" placeholder="Enter your question..." style="width: 80%; padding: 10px; border-radius: 5vw">
             <button onclick="handleGeminiRequest()" style="padding: 10px; border-radius: 5vw">Ask ECOSPHERE</button>
             <!--      <button onclick="generateByJson()" style="padding: 10px;">Ask ECOSPHERE</button>-->
             <p id="apiResponse" style="margin-top: 2vw; font-weight: bold; font-size: 0.5em;">...</p>
@@ -84,8 +84,8 @@
                 </div>
             </div>
         </div>
+        </div>
     </div>
-</div>
 
 <script src="/js/homepage.js"></script>
 <script src="/js/darkMode.js"></script>

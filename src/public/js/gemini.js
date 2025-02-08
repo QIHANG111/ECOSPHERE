@@ -45,9 +45,7 @@ async function generateByJson() {
             })
         }; // Fake response object for testing
 
-        if (!response.ok) {
-            throw new Error(`Failed to fetch data: ${response.statusText}`);
-        }
+
 
         const jsonData = await response.json();
         console.log("Fetched Data:", jsonData); // Debugging log
@@ -70,7 +68,8 @@ async function generateByJson() {
 function handleGeminiRequest() {
     const userPrompt = document.getElementById("userPrompt").value;
     const responseElement = document.getElementById("apiResponse");
-
+    const preSettingText = "answer the question must be within 50 words:\n";
+    const fullPrompt = preSettingText + userPrompt;
     if (userPrompt.trim() === "") {
         responseElement.innerText = "Please enter a question.";
         return;
@@ -78,7 +77,7 @@ function handleGeminiRequest() {
 
     responseElement.innerText = "Fetching response...";
 
-    fetchGeminiResponse(userPrompt).then(responseText => {
+    fetchGeminiResponse(fullPrompt).then(responseText => {
         responseElement.innerText = responseText;
     });
 }
