@@ -47,7 +47,10 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         button.style.color = "black";
     }
+
 });
+
+
 
 
 
