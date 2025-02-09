@@ -64,6 +64,12 @@
 :root.black-theme .ui-menu-icon img {
     filter: invert(1) brightness(1.2); /* Invert & slightly increase brightness */
 }
+.svg-icon {
+    width: 24px;
+    height: 24px;
+    fill: black;
+    filter: inherit;
+}
 
 
 
@@ -720,4 +726,30 @@ canvas {
 
 .dashboard::-webkit-scrollbar {
     display: none;
+}
+
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/*#userPrompt {*/
+/*    flex: 1;*/
+/*    padding: 10px;*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 5vw;*/
+/*    font-size: 16px;*/
+/*}*/
+
+.icon-button {
+    border-radius: 5vw;
+    width: 5%;
+    background: var(--c-bg-button);
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 5px;
 }

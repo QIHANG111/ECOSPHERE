@@ -1,69 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chart.js Example</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Speech to Text with Gemini AI</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
-    .chart-container {
-      width: 80%;
-      margin: auto;
-      padding: 20px;
+
+    .search-component {
+      border: 2px solid #777;
+      border-radius: 2rem;
+      height: 3.5rem;
+      width: clamp(15rem, 100%, 25rem);
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .search-component input {
+      flex: 1;
+      border: 0;
+      font-size: 1.25rem;
+      padding-left: 1.25rem;
+      outline: none;
+    }
+
+    .search-component button {
+      height: 3rem;
+      width: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 0;
+      color: white;
+      background: #777;
+      margin-right: 0.25rem;
+      outline: none;
+    }
+
+    .ai-response {
+      width: clamp(15rem, 100%, 25rem);
+      border: 1px solid #ddd;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      background: #f9f9f9;
+      display: none; /* 默认隐藏 */
     }
   </style>
 </head>
 <body>
 
-<!-- Canvas for Chart -->
-<div class="chart-container">
-  <canvas id="myChart"></canvas>
-</div>
+<form class="search-component" role="search">
+  <label>
+    <input type="search" id="searchInput" placeholder="Type or dictate to search" required />
+  </label>
+  <button type="button" id="voiceButton">🎤</button>
+  <button type="submit" id="searchButton">🔍</button>
+</form>
 
-<script>
-  // Get the chart canvas element
-  const ctx = document.getElementById('myChart').getContext('2d');
+<!-- AI Response Container -->
+<div id="apiResponse" class="ai-response"></div>
 
-  // Create a Chart
-  const myChart = new Chart(ctx, {
-    type: 'bar', // Chart type (bar, line, pie, doughnut, etc.)
-    data: {
-      labels: ['January', 'February', 'March', 'April', 'May', 'June'], // X-axis labels
-      datasets: [{
-        label: 'Monthly Sales ($)',
-        data: [12000, 15000, 8000, 18000, 22000, 25000], // Y-axis values
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.6)',
-          'rgba(54, 162, 235, 0.6)',
-          'rgba(255, 206, 86, 0.6)',
-          'rgba(75, 192, 192, 0.6)',
-          'rgba(153, 102, 255, 0.6)',
-          'rgba(255, 159, 64, 0.6)'
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
+<!-- 引入外部 JavaScript 文件 -->
+<script type="module">
+  import { fetchGeminiResponse } from "./gemini.js";
+
+  const searchInput = document.getElementById("searchInput");
+  const voiceButton = document.getElementById("voiceButton");
+  const searchButton = document.getElementById("searchButton");
+  const apiResponseDiv = document.getElementById("apiResponse");
+
+  let listening = false;
+
+  // **语音识别逻辑**
+  var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    voiceButton.addEventListener("click", function () {
+      if (!listening) {
+        const recognition = new SpeechRecognition();
+        recognition.lang = "zh-CN"; // 可改为 "en-US" 等
+        recognition.interimResults = false;
+
+        recognition.onspeechend = function () {
+          recognition.stop();
+          listening = false;
+          voiceButton.innerText = "🎤";
+        };
+
+        recognition.onerror = function () {
+          listening = false;
+          voiceButton.innerText = "🎤";
+        };
+
+        recognition.onresult = function (event) {
+          const transcript = event.results[0][0].transcript;
+          searchInput.value = transcript;
+          handleGeminiRequest(); // 语音识别后自动请求 Gemini
+        };
+
+        recognition.start();
+        listening = true;
+        voiceButton.innerText = "🎙️ Listening...";
       }
-    }
+    });
+  }
+
+  // **点击搜索按钮时，调用 Gemini API**
+  searchButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    handleGeminiRequest();
   });
+
+  // **调用 Gemini API**
+  function handleGeminiRequest() {
+    const userPrompt = searchInput.value.trim();
+    if (!userPrompt) {
+      apiResponseDiv.style.display = "none";
+      return;
+    }
+
+    apiResponseDiv.style.display = "block";
+    apiResponseDiv.innerText = "Fetching response...";
+
+    const fullPrompt = `User asked: "${userPrompt}". Provide a short, helpful response.`;
+
+    fetchGeminiResponse(fullPrompt).then(responseText => {
+      apiResponseDiv.innerText = responseText;
+    });
+  }
 </script>
 
 </body>

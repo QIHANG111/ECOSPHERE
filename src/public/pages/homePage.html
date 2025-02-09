@@ -44,14 +44,31 @@
     <div class="dashboard-content" style="margin-top: 0;">
         <div class="leftToRightList" style="width: 370%;">
             <div class="aiCard" style="width: 320%; height: 8vh;">
-                <div class="leftToRightList" style="width: 100%">
-                    <label for="userPrompt"></label>
-                    <input type="text" id="userPrompt" placeholder="Ask something..."
-                           style="width: 80%; padding: 10px; border-radius: 5vw">
-                    <button onclick="handleGeminiRequest()"
-                            style="padding: 10px; border-radius: 5vw; width: 15%; margin-right: 1vw">
-                        Ask
-                    </button>
+<!--                    <label for="userPrompt"></label>-->
+<!--                    <input type="text" id="userPrompt" placeholder="Ask something..."-->
+<!--                           style="width: 80%; padding: 10px; border-radius: 5vw">-->
+<!--                    <button onclick="handleGeminiRequest()"-->
+<!--                            style="padding: 10px; border-radius: 5vw; width: 15%; margin-right: 1vw">-->
+<!--                        Ask-->
+<!--                    </button>-->
+                    <div class="input-container">
+                        <div class="leftToRightList" style="width: 100%">
+                        <input type="text" id="userPrompt" placeholder="Ask something..."
+                               style="width: 80%; padding: 10px; border-radius: 5vw">
+                            <button id="micButton" class="icon-button ui-menu-icon" style="color: black;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2ZM19 11C19 14.87 15.87 18 12 18C8.13 18 5 14.87 5 11H3C3 15.42 6.58 19 11 19V22H13V19C17.42 19 21 15.42 21 11H19Z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                        <button id="clearButton" class="icon-button" style="display: none;">
+                            ❌
+                        </button>
+                            <button onclick="handleGeminiRequest()" class="icon-button ui-menu-icon" style="color: black;">
+                                <svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
+                                </svg>
+                            </button>
+                    </div>
                 </div>
                 <p id="apiResponse" style="margin-top: 1vw; font-weight: bold; font-size: 1em; opacity: 0;"></p>
             </div>
@@ -109,8 +126,8 @@
                 <canvas id="myChart"></canvas>
             </div>
         </div>
-        </div>
     </div>
+</div>
 
 <script src="/js/sidebar.js"></script>
 <script src="/js/darkMode.js"></script>
