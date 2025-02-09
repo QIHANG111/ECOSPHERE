@@ -122,7 +122,7 @@ AI Response:`;
             console.log(`Updating Device: ${deviceName}, Status: ${status}`);
 
             updateDeviceStatus(deviceName.toUpperCase(), status);
-            loadDevices();
+            // loadDevices();
         }
 
 // thheme control by AI
@@ -149,6 +149,7 @@ function typeTextEffect(element, text, speed) {
             span.style.opacity = "0";
             span.style.transition = "opacity 0.2s ease, font-size 0.2s ease";
             span.style.fontSize = "1.5em";
+            span.style.fontFamily = '"Arial", sans-serif';
 
             element.appendChild(span);
             setTimeout(() => {

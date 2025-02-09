@@ -5,11 +5,11 @@
     },
     {
         "name": "AC2",
-        "status": false
+        "status": true
     },
     {
         "name": "LIGHT1",
-        "status": false
+        "status": true
     },
     {
         "name": "LIGHT2",
