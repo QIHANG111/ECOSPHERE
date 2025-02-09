@@ -659,6 +659,7 @@ canvas {
 
 /* Adjust the input box styling */
 #userPrompt {
+    color: var(--c-text-primary);
     flex-grow: 1; /* Allow it to expand fully */
     padding: 10px;
     border-radius: 5vw;

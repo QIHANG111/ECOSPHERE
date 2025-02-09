@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
     <link rel="stylesheet" href="/css/style.css">
-    <script defer src="/js/gemini.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/gemini.js"></script>
 </head>
 
 <body>
@@ -44,29 +44,18 @@
     <div class="dashboard-content" style="margin-top: 0;">
         <div class="leftToRightList" style="width: 370%;">
             <div class="aiCard" style="width: 320%; height: 8vh;">
-<!--                    <label for="userPrompt"></label>-->
-<!--                    <input type="text" id="userPrompt" placeholder="Ask something..."-->
-<!--                           style="width: 80%; padding: 10px; border-radius: 5vw">-->
-<!--                    <button onclick="handleGeminiRequest()"-->
-<!--                            style="padding: 10px; border-radius: 5vw; width: 15%; margin-right: 1vw">-->
-<!--                        Ask-->
-<!--                    </button>-->
                     <div class="input-container">
                         <div class="leftToRightList" style="width: 100%">
-                        <input type="text" id="userPrompt" placeholder="Ask something..."
-                               style="width: 80%; padding: 10px; border-radius: 5vw">
-                            <button id="micButton" class="icon-button ui-menu-icon" style="color: black;">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2ZM19 11C19 14.87 15.87 18 12 18C8.13 18 5 14.87 5 11H3C3 15.42 6.58 19 11 19V22H13V19C17.42 19 21 15.42 21 11H19Z" fill="currentColor"/>
-                                </svg>
+                            <label for="userPrompt"></label><input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...(like 'Help me change to dark theme')"
+                                                                   style="width: 80%; border-radius: 5vw">
+                            <button id="clearButton" class="icon-button ui-menu-icon" style="display: none;">
+                                ❌
                             </button>
-                        <button id="clearButton" class="icon-button" style="display: none;">
-                            ❌
-                        </button>
-                            <button onclick="handleGeminiRequest()" class="icon-button ui-menu-icon" style="color: black;">
-                                <svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
-                                </svg>
+                            <button id="micButton" class="icon-button ui-menu-icon">
+                            🎤
+                            </button>
+                            <button onclick="handleGeminiRequest()" class="icon-button ui-menu-icon">
+                            🔍
                             </button>
                     </div>
                 </div>
@@ -78,25 +67,7 @@
     <div class="dashboard-content">
         <div class="normalCard">
             <h3>Status:</h3>
-            <div class="upToDownList">
-                <div class="hBar">
-                    <img src="/icons/devices.svg" alt="Vector Icon" width="30" height="30">
-                    <div class="device-name">AC1</div>
-                    <div class="device-status">
-                        <label>
-                            <input type="checkbox" class="mui-switch mui-switch-anim mui-switch-animbg" data-device="AC1">
-                        </label>
-                    </div>
-                </div>
-                <div class="hBar">
-                    <img src="/icons/devices.svg" alt="Vector Icon" width="30" height="30">
-                    <div class="device-name">AC2</div>
-                    <div class="device-status">
-                        <label>
-                            <input type="checkbox" class="mui-switch mui-switch-anim mui-switch-animbg" data-device="AC2">
-                        </label>
-                    </div>
-                </div>
+            <div class="upToDownList" id="deviceList">
             </div>
         </div>
         <div class="normalCard">
@@ -128,12 +99,12 @@
         </div>
     </div>
 </div>
-
 <script src="/js/sidebar.js"></script>
 <script src="/js/darkMode.js"></script>
 <script src="/js/theme.js"></script>
 <script src="/js/chart.js"></script>
 <script src="/js/clock.js"></script>
+
 <script>
     !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
 </script>
