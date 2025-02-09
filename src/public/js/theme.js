@@ -1,4 +1,4 @@
-// 📌 Apply saved theme immediately before page renders
+//Apply saved theme immediately before page renders
 (function () {
     const rootElement = document.documentElement;
     const savedTheme = localStorage.getItem("selectedTheme");
@@ -17,7 +17,7 @@
     });
 })();
 
-// 📌 Universal Theme Switching Function (Available to AI & Settings Page)
+
 function switchTheme(theme) {
     const rootElement = document.documentElement;
 
@@ -32,7 +32,7 @@ function switchTheme(theme) {
     console.log(`Theme switched to: ${theme}`);
 }
 
-// ✅ Make `switchTheme()` globally accessible
+
 window.switchTheme = switchTheme;
 
 
@@ -48,3 +48,20 @@ document.addEventListener("DOMContentLoaded", function () {
         button.style.color = "black";
     }
 });
+
+
+
+const ShinyText = ({ text, disabled = false, speed = 5, className = '' }) => {
+    const animationDuration = `${speed}s`;
+
+    return (
+        <div
+            className={`shiny-text ${disabled ? 'disabled' : ''} ${className}`}
+            style={{ animationDuration }}
+        >
+            {text}
+        </div>
+    );
+};
+
+export default ShinyText;

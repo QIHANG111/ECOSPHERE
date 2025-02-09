@@ -21,6 +21,7 @@
     --c-bg-button: #fff;
     --c-bg-sidebar: rgba(255, 255, 255, 0.5);
     --c-bg-card-hover: rgba(255, 255, 255, 0.6);
+    --c-glow: rgba(225, 225, 225, 0.7);
 }
 :root.dark-theme {
     --c-text-primary: #eee;
@@ -32,6 +33,7 @@
     --c-bg-button: #494a50;
     --c-bg-sidebar: rgba(35, 35, 35, 0.95);
     --c-bg-card-hover: rgba(85, 85, 85, 0.6);
+    --c-glow: rgba(255, 255, 255, 0.7);
 }
 :root.black-theme {
     --c-text-primary: #edeeef;
@@ -43,6 +45,7 @@
     --c-bg-button: #343844;
     --c-bg-sidebar: rgba(35, 35, 35, 0.95);
     --c-bg-card-hover: rgba(85, 85, 85, 0.6);
+    --c-glow: rgba(255, 255, 255, 0.7);
 }
 /* Default SVG color */
 .ui-menu-icon img {
@@ -160,9 +163,9 @@ body {
     margin-left: 12vw; /* Default offset for sidebar */
     width: calc(100% - 14vw); /* Adjust width dynamically */
     padding: 2vw;
-    overflow-y: auto;
     height: 200vh;
     transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
+    overflow: visible;
 }
 
 /* Adjust dashboard when sidebar expands */
@@ -633,20 +636,41 @@ canvas {
 }
 
 .aiCard {
+    height: 7vh;
     width: 320%;
     max-width: 100%;
     overflow: visible; /* Allow text expansion */
-    transition: height 1s ease; /* Smooth expansion */
     padding: 1vw;
+    flex-direction: column;
     background-color: var(--c-bg-sidebar);
     border-radius: 3vw;
     box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Keep input field at the top */
+    justify-content: start; /* Keep input field at the top */
     align-items: center;
     border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    transition: 0.3s ease;
 }
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 1vw var(--c-glow);
+    }
+    50% {
+        box-shadow: 0 0 1.5vw rgba(255, 255, 255, 0.9);
+    }
+    100% {
+        box-shadow: 0 0 1vw var(--c-glow);
+    }
+}
+
+.aiCard:hover {
+    transform: scale(1.03);
+    height: 40vh;
+    border: 0.3vw solid rgba(255, 255, 255, 0.5);
+    animation: glow 1.5s infinite alternate;
+}
+
 
 /* Ensure the input field remains fully visible */
 .leftToRightList2 {
@@ -754,3 +778,9 @@ canvas {
     font-size: 20px;
     margin-left: 5px;
 }
+
+
+
+
+
+

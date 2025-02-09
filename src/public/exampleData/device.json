@@ -9,7 +9,7 @@
     },
     {
         "name": "LIGHT1",
-        "status": false
+        "status": true
     },
     {
         "name": "LIGHT2",

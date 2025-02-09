@@ -7,12 +7,12 @@ router.use(express.json()); // Ensure JSON request body is parsed
 
 const devicesFile = path.join(__dirname, "../public/exampleData/device.json");
 
-// 1️⃣ Serve the main HTML page
+// 1️Serve the main HTML page
 router.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/pages/homePage.html"));
+    res.sendFile(path.join(__dirname, "../public/pages/loginPage.html"));
 });
 
-// 2️⃣ Example API endpoint to fetch mock user data
+// 2️Example API endpoint to fetch mock user data
 router.get("/api/users", (req, res) => {
     try {
         const users = require("../public/exampleData/data.json");
@@ -22,7 +22,7 @@ router.get("/api/users", (req, res) => {
     }
 });
 
-// 3️⃣ Get the list of devices and their status
+// Get the list of devices and their status
 router.get("/api/devices", (req, res) => {
     fs.readFile(devicesFile, "utf8", (err, data) => {
         if (err) {
@@ -37,7 +37,7 @@ router.get("/api/devices", (req, res) => {
     });
 });
 
-// 4️⃣ Update the status of a specific device
+// Update the status of a specific device
 router.post("/api/update-device", (req, res) => {
     console.log("Received request body:", req.body); // Debugging: Check if body is received
 
