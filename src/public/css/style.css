@@ -780,7 +780,33 @@ canvas {
 }
 
 
+.dragging {
+    opacity: 0.6;
+    background: rgba(200, 200, 200, 0.3);
+    border: 2px dashed #ccc;
+}
+
+
+.chosen {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+
+.normalCard {
+    transition: transform 0.3s ease-in-out;
+}
 
 
 
 
+
+.normalCard {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.dragging {
+    opacity: 0.5;
+}
+.chosen {
+    transform: scale(1.05);
+}

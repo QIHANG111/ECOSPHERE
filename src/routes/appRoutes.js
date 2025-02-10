@@ -9,7 +9,7 @@ const devicesFile = path.join(__dirname, "../public/exampleData/device.json");
 
 // 1️Serve the main HTML page
 router.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/pages/loginPage.html"));
+    res.sendFile(path.join(__dirname, "../public/pages/homePage.html"));
 });
 
 // 2️Example API endpoint to fetch mock user data
