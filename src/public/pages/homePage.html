@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homepage</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!--    <script src="/js/gemini.js"></script>-->
+    <script src="/js/gemini.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 </head>
 
 <body>
 <!-- Dark Mode Toggle Button -->
-<button id="darkModeToggle" class="toggle-button">S</button>
+<!--<button id="darkModeToggle" class="toggle-button">S</button>-->
 
 <div class="sidebar">
     <div class="menu-item" data-target="/pages/usersPage.html">
@@ -30,7 +34,7 @@
         </div>
         <div class="menu-text">Devices</div>
     </div>
-    <div class="menu-item" data-target="settings.html">
+    <div class="menu-item" data-target="/pages/settingPage.html">
         <div class="ui-menu-icon">
             <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
         </div>
@@ -39,36 +43,52 @@
 </div>
 
 <div class="dashboard">
-    <div class="dashboard-content">
-        <div class="normalCard">
-            <h3>Status:</h3>
-            <div class="upToDownList">
-                <div class="hBar">
-                    <img src="/icons/devices.svg" alt="Vector Icon" width="30" height="30">
-                    <div class="device-name">AC1</div>
-                    <div class="device-status">
-                        <label>
-                            <input type="checkbox" class="mui-switch mui-switch-anim mui-switch-animbg" data-device="AC1">
-                        </label>
+    <div class="dashboard-content" style="margin-top: 0.5vw;">
+        <div class="leftToRightList" style="width: 370%;">
+            <div class="aiCard" style="width: 320%; height: 8vh;">
+                    <div class="input-container">
+                        <div class="leftToRightList" style="width: 100%">
+                            <label for="userPrompt"></label><input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...(like 'Help me change to dark theme')"
+                                                                   style="width: 80%; border-radius: 5vw">
+                            <button id="clearButton" class="ui-menu-icon"
+                                    style="display: none; background-color: rgba(221,221,221,0); width: 3vw">
+                                ❌
+                            </button>
+                            <button id="micButton" class="icon-button ui-menu-icon">
+                            🎤
+                            </button>
+                            <button onclick="handleGeminiRequest()" class="icon-button ui-menu-icon">
+                            🔍
+                            </button>
                     </div>
                 </div>
-                <div class="hBar">
-                    <img src="/icons/devices.svg" alt="Vector Icon" width="30" height="30">
-                    <div class="device-name">AC2</div>
-                    <div class="device-status">
-                        <label>
-                            <input type="checkbox" class="mui-switch mui-switch-anim mui-switch-animbg" data-device="AC2">
-                        </label>
-                    </div>
-                </div>
+                <p id="apiResponse" style="margin-top: 1vw; font-weight: bold; font-size: 1em; opacity: 0;"></p>
             </div>
         </div>
+
+    </div>
+    <div class="dashboard-content" id="cardContainer1">
+            <div class="normalCard">
+                <h3>Status:</h3>
+                <div class="upToDownList" id="deviceList"></div>
+            </div>
+            <div class="normalCard">
+                <h3>Notifications</h3>
+            </div>
+            <div class="normalCard" style="overflow-y: auto;">
+                <p id="currentDateTime" style="font-size: 1em; font-weight: bold;"></p>
+                <a class="weatherwidget-io" href="https://forecast7.com/en/3d16101d71/federal-territory-of-kuala-lumpur/"
+                   data-label_1="KUALA LUMPUR" data-label_2="WEATHER" data-theme="original">
+                    KUALA LUMPUR WEATHER
+                </a>
+            </div>
+    </div>
+    <div class="dashboard-content" id="cardContainer2">
         <div class="normalCard">
-            <h3>Notifications</h3>
         </div>
-        <div class="normalCard" style="width: 240%; text-align: left; padding-left: 1vw;">
+        <div class="normalCard" style="text-align: left">
             <div class="leftToRightList">
-                <div><h3>Energy Usage Report</h3></div>
+                <h3>Energy Usage Report</h3>
                 <div class="hButton" onclick="window.location.href='/pages/reportPage.html';">
                     <div class="leftToRightList" style="display: flex; align-items: center; width: 100%;">
                         <img src="/icons/about.svg" alt="Vector Icon" width="20" height="20" style="flex: 1; text-align: center;">
@@ -76,11 +96,26 @@
                     </div>
                 </div>
             </div>
+            <!-- Canvas for Chart -->
+            <div class="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
         </div>
     </div>
-</div>
+    <div class="dashboard-content" id="cardContainer3">    </div>
 
-<script src="/js/homepage.js"></script>
+
+</div>
+<script src="/js/sidebar.js"></script>
 <script src="/js/darkMode.js"></script>
+<script src="/js/theme.js"></script>
+<script src="/js/chart.js"></script>
+<script src="/js/clock.js"></script>
+<script src="/js/dragLayout.js"></script>
+<script>
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+</script>
+
+
 </body>
 </html>

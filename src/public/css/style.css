@@ -8,25 +8,78 @@
     --button-hover: #0056b3;
     --input-border: #ccc;
     --input-shadow: rgba(0, 0, 0, 0.1);
-    --background-image: url("../images/background.jpg");
+
 }
 
-/* Define CSS variables for dark mode */
-.dark-mode {
-    --background-color: #121212;
-    --text-color: #ffffff;
-    --sidebar-background: rgba(30, 30, 30, 0.7);
-    --card-background: rgba(30, 30, 30, 0.7);
-    --button-background: #1e88e5;
-    --button-hover: #1565c0;
-    --input-border: #555;
-    --input-shadow: rgba(255, 255, 255, 0.2);
-    --background-image: url("../images/darkbackground.jpg");
+:root {
+    --c-text-primary: #191919;
+    --c-text-secondary: #737374;
+    --c-border-primary: #ccc;
+    --c-bg-body: rgb(250, 234, 211);
+    --c-bg-primary: #fff;
+    --c-bg-secondary: #d4d8dd;
+    --c-bg-button: #fff;
+    --c-bg-sidebar: rgba(255, 255, 255, 0.5);
+    --c-bg-card-hover: rgba(255, 255, 255, 0.6);
+    --c-glow: rgba(225, 225, 225, 0.7);
 }
+:root.dark-theme {
+    --c-text-primary: #eee;
+    --c-text-secondary: #d3d5db;
+    --c-border-primary: #454545;
+    --c-bg-body: #8595b6;
+    --c-bg-primary: #323339;
+    --c-bg-secondary: #222128;
+    --c-bg-button: #494a50;
+    --c-bg-sidebar: rgba(35, 35, 35, 0.95);
+    --c-bg-card-hover: rgba(85, 85, 85, 0.6);
+    --c-glow: rgba(255, 255, 255, 0.7);
+}
+:root.black-theme {
+    --c-text-primary: #edeeef;
+    --c-text-secondary: #d4d7e1;
+    --c-border-primary: #323232;
+    --c-bg-body: #000;
+    --c-bg-primary: #1b1d23;
+    --c-bg-secondary: #000001;
+    --c-bg-button: #343844;
+    --c-bg-sidebar: rgba(35, 35, 35, 0.95);
+    --c-bg-card-hover: rgba(85, 85, 85, 0.6);
+    --c-glow: rgba(255, 255, 255, 0.7);
+}
+/* Default SVG color */
+.ui-menu-icon img {
+    filter: invert(0); /* No inversion in light mode */
+    transition: filter 0.3s ease; /* Smooth transition */
+}
+
+/* Dark mode: Invert color (black to white) */
+:root.dark-theme .ui-menu-icon img {
+    filter: invert(1); /* Fully invert color */
+}
+:root.dark-theme .ui-menu-icon img {
+    filter: invert(1) brightness(1.2); /* Invert & slightly increase brightness */
+}
+
+:root.black-theme .ui-menu-icon img {
+    filter: invert(1); /* Fully invert color */
+}
+:root.black-theme .ui-menu-icon img {
+    filter: invert(1) brightness(1.2); /* Invert & slightly increase brightness */
+}
+.svg-icon {
+    width: 24px;
+    height: 24px;
+    fill: black;
+    filter: inherit;
+}
+
+
+
 
 body {
     margin: 0;
-    background-image: var(--background-image);
+    background-color: var(--c-bg-body);
     align-items: flex-start;
     justify-content: flex-start;
     display: flex;
@@ -35,9 +88,9 @@ body {
 
 /* Sidebar styling */
 .sidebar {
-    color: var(--text-color);
     border-radius: 2vw; /* Rounded corners on all sides */
-    background-color: var(--sidebar-background);
+    /*background-color: rgb(255, 255, 255,0.5); !* Semi-transparent background *!*/
+    background-color: var(--c-bg-sidebar);
     width: 7vw; /* Initial sidebar width */
     height: 92vh; /* Reduce height to leave space around edges */
     box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
@@ -82,6 +135,7 @@ body {
 
 /* Text styling */
 .menu-text {
+    color: var(--c-text-primary);
     font-size: 1.5vw;
     opacity: 0; /* Hidden initially */
     transition: opacity 0.3s ease; /* Smooth text reveal */
@@ -109,9 +163,9 @@ body {
     margin-left: 12vw; /* Default offset for sidebar */
     width: calc(100% - 14vw); /* Adjust width dynamically */
     padding: 2vw;
-    overflow-y: auto;
-    height: 92vh;
+    height: 200vh;
     transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
+    overflow: visible;
 }
 
 /* Adjust dashboard when sidebar expands */
@@ -121,10 +175,11 @@ body {
 }
 
 .dashboard-content {
+    margin-top: 2vw;
     width: 95%;
     display: grid;
-    grid-gap: 10% 15%;
-    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10% 7%;
+    grid-template-columns: repeat(3, 1fr);
 }
 
 .item1 {
@@ -145,13 +200,15 @@ body {
 
 
 .normalCard {
-    background-color: rgba(255, 255, 255, 0.4);
+    /*background-color: rgba(255, 255, 255, 0.4);*/
+    background-color: var(--c-bg-sidebar);
+    color: var(--c-text-primary);
     box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(0.5vw);
     border-radius: 3vw;
     border: 0.1vw solid rgba(255, 255, 255, 0.5);
     height: 40vh;
-    width: 110%;
+    width: 115%;
     text-align: center;
     transition: all 0.3s ease;
     overflow: hidden;
@@ -162,7 +219,7 @@ body {
     transform: scale(1.03);
     height: 40vh;
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: var(--c-bg-card-hover);
     .upToDownList {
         height: 35vh; /* Set fixed height for overflow control */
     }
@@ -381,4 +438,375 @@ body {
 /* Toggle button hover effect */
 .toggle-button:hover {
     background-color: var(--button-hover);
+}
+
+
+
+
+.family-card, .add-card {
+    height: 20vw;
+    background-color: var(--sidebar-background);
+    border-radius: 2vw;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+.family-card:hover, .add-card:hover {
+    transform: translateY(-5px);
+}
+.family-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+/* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2vw;
+    border-radius: 3vw;
+    width: 30vw;
+    max-width: 500px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65);
+    animation: fadeIn 0.3s ease-in-out;
+    transition: 0.3s;
+}
+.modal-content:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Close Button */
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: red;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    padding: 0.8vw;
+    margin-top: 0.5vw;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Button */
+button {
+    width: 100%;
+    padding: 1vw;
+    background-color: #889abb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #c2cde4;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 80%;
+    }
+}
+
+
+
+/* theme switcher */
+.theme-switcher input {
+    display: none;
+}
+
+.theme-switcher {
+    position: relative;
+    background-color: var(--c-bg-secondary);
+    border-radius: 10px;
+    display: flex;
+    padding: 0 3px;
+}
+
+.theme-switcher label {
+    position: relative;
+    z-index: 2;
+    width: calc(100% / 3);
+    color: var(--c-text-secondary);
+}
+
+.theme-switcher label span {
+    padding: 8px 0;
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.theme-switcher label span:hover {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.theme-switcher .slider {
+    position: absolute;
+    z-index: 1;
+    width: calc((100% - 6px) / 3);
+    top: 3px;
+    transform: translatex(-110%);
+    bottom: 3px;
+    border-radius: 8px;
+    transition: .30s ease, transform 0.25s ease-out;
+    background-color: var(--c-bg-button);
+}
+
+.theme-switcher input:nth-of-type(1):checked ~ .slider {
+    transform: translateX(0);
+}
+.theme-switcher input:nth-of-type(2):checked ~ .slider {
+    transform: translateX(100%);
+}
+.theme-switcher input:nth-of-type(3):checked ~ .slider {
+    transform: translateX(200%);
+}
+
+
+.chart-container {
+    width: 100%;  /* Make it stretch to fit the parent container */
+    max-width: 100%; /* Prevents overflow */
+    height: 30vh;  /* Adjust height based on viewport */
+    min-height: 150px; /* Ensures chart doesn't get too small */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+canvas {
+    width: 100% !important; /* Force canvas to fill its container */
+    height: 100% !important;
+}
+
+
+#apiResponse {
+    margin-top: 2vw;
+    font-weight: bold;
+    font-size: 1.2em;
+    font-family: "Courier New", monospace; /* AI-style font */
+    color: #3b3e40; /* Neon effect */
+    text-shadow: 0 0 10px rgb(217, 226, 217); /* Glow effect */
+    white-space: pre-wrap; /* Ensures line breaks are maintained */
+    line-height: 1.2; /* Better readability */
+    min-height: 50px; /* Prevents height jumping */
+}
+
+.aiCard {
+    height: 7vh;
+    width: 320%;
+    max-width: 100%;
+    overflow: visible; /* Allow text expansion */
+    padding: 1vw;
+    flex-direction: column;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 3vw;
+    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: start; /* Keep input field at the top */
+    align-items: center;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    transition: 0.3s ease;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 1vw var(--c-glow);
+    }
+    50% {
+        box-shadow: 0 0 1.5vw rgba(255, 255, 255, 0.9);
+    }
+    100% {
+        box-shadow: 0 0 1vw var(--c-glow);
+    }
+}
+
+.aiCard:hover {
+    transform: scale(1.03);
+    height: 40vh;
+    border: 0.3vw solid rgba(255, 255, 255, 0.5);
+    animation: glow 1.5s infinite alternate;
+}
+
+
+/* Ensure the input field remains fully visible */
+.leftToRightList2 {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vw;
+}
+
+/* Adjust the input box styling */
+#userPrompt {
+    color: var(--c-text-primary);
+    flex-grow: 1; /* Allow it to expand fully */
+    padding: 10px;
+    border-radius: 5vw;
+    font-size: 1em;
+}
+
+/* Prevent input from being cut off */
+#apiResponse {
+    color: var(--c-text-primary);
+    opacity: 0;
+    margin-top: 1vw;
+    font-weight: bold;
+    font-size: 1em;
+    white-space: pre-wrap;
+}
+
+
+
+#currentDateTime {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2b5e83, #2b5e83);
+    padding: 15px 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 90%;
+    margin: auto;
+    transition: all 0.3s ease-in-out;
+}
+
+
+#currentDateTime .date {
+    font-size: 1.1em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+#currentDateTime .time {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 5px;
+    letter-spacing: 2px;
+    animation: fadeIn 1s ease-in-out infinite alternate;
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.6;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.normalCard::-webkit-scrollbar {
+    display: none;
+}
+
+.dashboard::-webkit-scrollbar {
+    display: none;
+}
+
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/*#userPrompt {*/
+/*    flex: 1;*/
+/*    padding: 10px;*/
+/*    border: 1px solid #ccc;*/
+/*    border-radius: 5vw;*/
+/*    font-size: 16px;*/
+/*}*/
+
+.icon-button {
+    border-radius: 5vw;
+    width: 5%;
+    background: var(--c-bg-button);
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 5px;
+}
+
+
+.dragging {
+    opacity: 0.6;
+    background: rgba(200, 200, 200, 0.3);
+    border: 2px dashed #ccc;
+}
+
+
+.chosen {
+    transform: scale(1.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+
+.normalCard {
+    transition: transform 0.3s ease-in-out;
+}
+
+
+
+
+
+.normalCard {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.dragging {
+    opacity: 0.5;
+}
+.chosen {
+    transform: scale(1.05);
 }

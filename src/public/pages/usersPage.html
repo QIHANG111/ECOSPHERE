@@ -3,42 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Your Family</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
-
 <body>
+
+<!-- Sidebar -->
 <div class="sidebar">
     <div class="menu-item" data-target="/pages/usersPage.html">
-        <div class = ui-menu-icon>
-            <img src="/icons/users.svg" alt="Vector Icon" width="70" height="70">
+        <div class="ui-menu-icon">
+            <img src="/icons/users.svg" alt="Users Icon" width="70" height="70">
         </div>
         <div class="menu-text">Users</div>
     </div>
     <div class="menu-item" data-target="/pages/homepage.html">
-        <div class = ui-menu-icon>
-            <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
+        <div class="ui-menu-icon">
+            <img src="/icons/home.svg" alt="Home Icon" width="50" height="50">
         </div>
         <div class="menu-text">Homepage</div>
     </div>
     <div class="menu-item" data-target="/pages/devicesPage.html">
         <div class="ui-menu-icon">
-            <img src="/icons/devices.svg" alt="Vector Icon" width="50" height="50">
+            <img src="/icons/devices.svg" alt="Devices Icon" width="50" height="50">
         </div>
         <div class="menu-text">Devices</div>
     </div>
-    <div class="menu-item" data-target="settings.html">
+    <div class="menu-item" data-target="/pages/settingPage.html">
         <div class="ui-menu-icon">
-            <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
+            <img src="/icons/settings.svg" alt="Settings Icon" width="50" height="50">
         </div>
         <div class="menu-text">Settings</div>
     </div>
 </div>
 
+<!-- Main Content -->
+<div class="dashboard">
+    <div class="dashboard-content">
+        <div class="family-card">
+            <h5>You</h5>
+            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User">
+            <p>Family organizer since: 2018</p>
+            <span class="badge bg-primary">Premium Subscriber</span>
+        </div>
+        <div class="add-card" onclick="openAddModal()">
+            <span>+</span>
+            <p>Add a family member</p>
+        </div>
+    </div>
+</div>
 
+<!-- Add Member Modal -->
+<div id="addMemberModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeAddModal()">&times;</span>
+        <h2>Add a Family Member</h2>
+        <form id="addMemberForm">
+            <label for="memberName">Name:</label>
+            <input type="text" id="memberName" name="memberName" required>
 
-<script src="/js/homepage.js"></script>
+            <label for="memberImage">Email:</label>
+            <input type="text" id="memberImage" name="memberImage" placeholder="Enter image URL">
+
+            <label for="memberInfo">Additional Info:</label>
+            <input type="text" id="memberInfo" name="memberInfo" placeholder="E.g. Address, School">
+
+            <button type="submit">Sent Invite</button>
+        </form>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="/js/sidebar.js"></script>
+<script src="/js/theme.js"></script>
+<script src="/js/userPage.js"></script>
 </body>
 </html>
-
-
