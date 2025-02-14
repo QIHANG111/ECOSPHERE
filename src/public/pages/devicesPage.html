@@ -49,21 +49,85 @@
             transition: all 0.3s ease;
         }
 
+        /* Selection-bar style*/
         .content > div:nth-child(1) {
             height: 8vh;
             width: 70vw;
             border-radius: 2vw;
             flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1vw; /* Space between boxes */
+            padding: 1vh 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease-in-out;
         }
 
+        /* Hover effect for the entire child one box */
+        .content > div:nth-child(1):hover {
+            transform: scale(1.05); /* Slightly enlarge the container */
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.3); /* Add subtle shadow */
+        }
+
+        /* Styling the selection bar (inside child one) */
+        .selection-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Styling the navigation boxes */
+        .nav-box {
+            width: 10vw;
+            height: 6vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 2vw;
+            box-shadow: 0 0.2vw 0.5vw rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        /* Styling the links inside the boxes */
+        .nav-box a {
+            text-decoration: none;
+            color: #808080;
+            font-size: 1.3vw;
+            font-weight: bold;
+            text-align: center;
+            transition: color 0.3s ease-in-out;
+        }
+
+        /* Hover effect for nav-box */
+        .nav-box:hover {
+            transform: scale(1.1);
+            background-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0.5vw 1vw rgba(255, 255, 255, 0.3);
+        }
+
+        /* Hover effect for nav-button text */
+        .nav-box:hover a {
+            color: #000;
+        }
+
+
+        /* Start form second box */
         .content > div:nth-child(2) {
             height: 30vh;
             width: 60vw;
             border-radius: 2vw;
             flex-grow: 1;
             display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
             align-items: stretch;
             padding: 1vw;
             box-sizing: border-box;
@@ -80,6 +144,7 @@
             box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
             transform: scale(1.05);
         }
+
         .content > div:nth-child(2)::-webkit-scrollbar {
             width: 0.5vw;
         }
@@ -111,11 +176,93 @@
             box-sizing: border-box;
         }
 
-        .furniture { /*这里修改每个家具盒子的大小*/
-
+        /* Clickable text (Dropdown trigger) */
+        .clickable-text {
+            cursor: pointer;
+            font-size: 1.5vw;
+            font-weight: bold;
+            color: black;
+            text-decoration: underline;
+            display: inline-block;
         }
 
+
+        /* Modal (Dropdown-style) */
+        .modal {
+            display: none;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1); /* Semi-transparent background */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal content (Dropdown box) */
+        .modal-content {
+            background-color: white;
+            width: 50vw;
+            max-width: 300px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        /* Green section (Selected Home) */
+        .green-section {
+            background-color: #DFF7E0; /* Light green */
+            color: #18A558; /* Dark green */
+            padding: 15px;
+            font-size: 1.2vw;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            height: 1px;
+            background-color: #ccc;
+            margin: 5px 0;
+        }
+
+        /* Family Management Section */
+        .family-management {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            font-size: 1vw;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .family-management:hover {
+            background-color: #f0f0f0;
+        }
+
+
+        /* Furniture container (inside .content > div:nth-child(2)) */
+        .furniture {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 1vw;
+            width: 100%;
+            height: 100%;
+            padding: 1vw;
+            box-sizing: border-box;
+        }
+
+        /* Furniture items */
         .furniture > div {
+            width: 48%;
+            height: 45%;
             background-color: rgba(255, 255, 255, 0.5);
             border: 1px solid #ccc;
             border-radius: 2vw;
@@ -124,11 +271,17 @@
             align-items: center;
             font-size: 1vw;
             font-weight: bold;
-            height: 100%;
             box-shadow: 0.5vw 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
 
+        /* Hover effect */
+        .furniture > div:hover {
+            transform: scale(1.05);
+            background-color: rgba(255, 255, 255, 0.7);
+        }
 
+        /* Start form the third box  */
         .content > div:nth-child(3) {
             height: 7vh;
             width: 20vw;
@@ -144,43 +297,6 @@
             background-color: rgba(255, 255, 255, 0.5);
             box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
             transform: scale(1.05);
-        }
-
-        .selection-Bar {
-            display: flex;
-            gap: 3vw;
-            justify-content: center;
-            margin-bottom: 2vh;
-            background-color: rgba(255, 255, 255, 0.3);
-            padding: 1vw;
-            border-radius: 1vw;
-            border: 0.1vw solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-            box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-        }
-
-        .selection-Bar:hover {
-            gap: 4vw;
-            background-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 0.5vw 1.5vw rgba(0, 0, 0, 0.2);
-        }
-
-        .nav-button {
-            font-size: 1.5vw;
-            padding: 0.5vw;
-            color: rgba(169, 169, 169, 0.8);
-            text-shadow: 0.1vw 0.1vw 0 rgba(0, 0, 0, 0.4);
-            text-decoration: none;
-            transition: color 0.3s ease, background-color 0.3s ease;
-        }
-
-        .nav-button:hover {
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .nav-button:active {
-            color: rgba(255, 255, 255, 1);
-            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .add-button {
@@ -243,19 +359,32 @@
 
 
     <div class="content">
-        <div class="selection-Bar">
-            <a href="../pages/devicesPage.html" class="nav-button">All Devices</a>
-            <a href="../pages/Bedroom.html" class="nav-button">Bedroom</a>
-            <a href="../pages/Living-Room.html" class="nav-button">LivingRoom</a>
-            <a href="../pages/GymPage.html" class="nav-button">Gym</a>
-            <a href="../pages/Bathroom.html" class="nav-button">Bathroom</a>
-            <a href="../pages/Kitchen.html" class="nav-button">Kitchen</a>
+        <div class="selection-bar">
+            <div class="nav-box"><a href="../pages/devicesPage.html">All Devices</a></div>
+            <div class="nav-box"><a href="../pages/Bedroom.html">Bedroom</a></div>
+            <div class="nav-box"><a href="../pages/Living-Room.html">Living Room</a></div>
+            <div class="nav-box"><a href="../pages/GymPage.html">Gym</a></div>
+            <div class="nav-box"><a href="../pages/Bathroom.html">Bathroom</a></div>
+            <div class="nav-box"><a href="../pages/Kitchen.html">Kitchen</a></div>
         </div>
 
         <div class="main-box">
             <div class="Your-home">
-                <span class="line1">Your Home ></span> <br/>
-                <span class="line2">Morning! Sunshine Today, There are five devices running.</span>
+                <span class="clickable-text" onclick="showModal('Your Home>')">Your Home></span>
+            </div>
+
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+
+                <div class="green-section">
+                    <p id="dynamic-text"></p>
+                </div>
+
+                <hr class="divider">
+                <div class="family-management">Family Management</div>
+                </div>
+
             </div>
             <div class="furniture">
                 <div class="light">
@@ -306,6 +435,31 @@
     addButton.addEventListener('click', function () {
         window.location.href = '../terms-pages/addelectric.html';
     });
+
+    // Appear modal and update under green background word
+    function showModal(text) {
+        // Update the word under green background
+        document.getElementById("dynamic-text").textContent = text;
+
+        // Appear modal
+        var modal = document.getElementById("myModal");
+        modal.style.display = "block";
+    }
+
+    // Close modal
+    function closeModal() {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+
+    // Click outside modal for close
+    window.onclick = function(event) {
+        var modal = document.getElementById("myModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
     </script>
 </body>
 </html>
