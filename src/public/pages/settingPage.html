@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings Page</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="menu-item" data-target="/pages/usersPage.html">
+        <div class="ui-menu-icon">
+            <img src="/icons/users.svg" alt="Vector Icon" width="70" height="70">
+        </div>
+        <div class="menu-text">Users</div>
+    </div>
+    <div class="menu-item" data-target="/pages/homepage.html">
+        <div class="ui-menu-icon">
+            <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Homepage</div>
+    </div>
+    <div class="menu-item" data-target="/pages/devicesPage.html">
+        <div class="ui-menu-icon">
+            <img src="/icons/devices.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Devices</div>
+    </div>
+    <div class="menu-item" data-target="/pages/settingPage.html">
+        <div class="ui-menu-icon">
+            <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
+        </div>
+        <div class="menu-text">Settings</div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="dashboard">
+    <h1>Settings</h1>
+
+    <!-- Dark Mode Toggle -->
+    <div class="theme-switcher">
+        <input type="radio" id="light-theme" name="themes" checked />
+        <label for="light-theme">
+				<span>
+					<ion-icon name="sunny"></ion-icon> Light
+				</span>
+        </label>
+        <input type="radio" id="dark-theme" name="themes" />
+        <label for="dark-theme">
+				<span>
+					<ion-icon name="moon"></ion-icon> Dark
+				</span>
+        </label>
+        <input type="radio" id="black-theme" name="themes" />
+        <label for="black-theme">
+				<span>
+					<ion-icon name="contrast"></ion-icon> Black
+				</span>
+        </label>
+        <span class="slider"></span>
+    </div>
+
+    <!-- Account Settings -->
+    <div class="settings-card">
+        <h2>Account Settings</h2>
+        <form>
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="Enter your username">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter your email">
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Enter new password">
+
+            <button type="submit" class="save-btn">Save Changes</button>
+        </form>
+    </div>
+
+    <!-- Device Management -->
+    <div class="settings-card">
+        <h2>Device Management</h2>
+        <label for="device-list">Connected Devices:</label>
+        <select id="device-list">
+            <option value="device1">Smart Light</option>
+            <option value="device2">Thermostat</option>
+            <option value="device3">Security Camera</option>
+        </select>
+        <button class="manage-btn">Manage Device</button>
+    </div>
+
+    <!-- Automation Rules -->
+    <div class="settings-card">
+        <h2>Automation Rules</h2>
+        <label for="trigger">Trigger Event:</label>
+        <select id="trigger">
+            <option value="motion">Motion Detected</option>
+            <option value="temperature">Temperature Exceeds Limit</option>
+            <option value="door">Door Unlocked</option>
+        </select>
+
+        <label for="action">Action:</label>
+        <select id="action">
+            <option value="turn-light">Turn On Light</option>
+            <option value="notify">Send Notification</option>
+            <option value="lock-door">Lock Door</option>
+        </select>
+
+        <button class="add-rule-btn">Add Rule</button>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="settings-card">
+        <h2>Security Settings</h2>
+        <label>
+            <input type="checkbox" id="two-factor-auth"> Enable Two-Factor Authentication
+        </label>
+
+        <label>
+            <input type="checkbox" id="guest-access"> Enable Guest Access
+        </label>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="settings-card">
+        <h2>Notification Preferences</h2>
+        <label>
+            <input type="checkbox" id="push-notifications"> Enable Push Notifications
+        </label>
+
+        <label>
+            <input type="checkbox" id="email-alerts"> Receive Email Alerts
+        </label>
+    </div>
+
+    <!-- System Update -->
+    <div class="settings-card">
+        <h2>System Updates</h2>
+        <button class="check-update-btn">Check for Updates</button>
+    </div>
+
+    <!-- Reset Settings -->
+    <div class="settings-card">
+        <h2>Reset Settings</h2>
+        <button class="reset-btn">Factory Reset</button>
+    </div>
+</div>
+
+<script src="/js/sidebar.js"></script>
+<script src="/js/settingPage.js"></script>
+</body>
+</html>

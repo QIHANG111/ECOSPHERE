@@ -2,12 +2,17 @@ CREATE DATABASE ecosystem;
 
 USE ecosystem;
 
-CREATE TABLE Users (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+
+
+CREATE TABLE users (
+                    user_id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR() NOT NULL,
                     email VARCHAR(255) NOT NULL,
-                    password VARCHAR(255) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    phone INT NOT NULL,
+                    hashed_password VARCHAR(255) NOT NULL,
+                    role_id FOREIGN KEY NOT NULL
 );
+
 
 CREATE TABLE Devices (
                     device_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,13 +39,13 @@ CREATE TABLE Permission(
                     permission_id INT AUTO_INCREMENT PRIMARY KEY,
                     category VARCHAR(255),
                     name VARCHAR(255) NOT NULL,
-                    description VARCHAR(255),
+                    description VARCHAR(255)
 );
 
 CREATE TABLE RolePermission(
-                    role_id INT NOT NULL
-                    permission_id INT NOT NULL
+                    role_id INT NOT NULL,
+                    permission_id INT NOT NULL,
                     PRIMARY KEY (role_id, permission_id),
-                    FOREIGN KEY (role_id) REFERENCES Role(role_id)
+                    FOREIGN KEY (role_id) REFERENCES Role(role_id),
                     FOREIGN KEY (permission_id) REFERENCES Permission(permission_id)
 );
