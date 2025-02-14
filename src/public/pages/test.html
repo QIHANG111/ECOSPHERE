@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editable & Draggable Widgets</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #widget-container {
+            margin-top: 20px;
+        }
+
+        .widget {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: grab;
+        }
+
+        .widget-content {
+            flex: 1;
+            padding: 5px;
+            border: none;
+            outline: none;
+            background: none;
+        }
+
+        .widget-content:focus {
+            border-bottom: 1px solid blue;
+        }
+
+        .delete-widget {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .delete-widget:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Draggable & Editable Widgets</h2>
+    <button id="add-widget">Add Widget</button>
+    <div id="widget-container">
+        <div class="widget">
+            <div class="widget-content" contenteditable="true">Editable Content</div>
+            <button class="delete-widget">✖</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Add new widget
+        $('#add-widget').click(function() {
+            let newWidget = `
+            <div class="widget">
+                <div class="widget-content" contenteditable="true">New Widget</div>
+                <button class="delete-widget">✖</button>
+            </div>
+        `;
+            $('#widget-container').append(newWidget);
+        });
+
+        // Delete widget
+        $(document).on('click', '.delete-widget', function() {
+            $(this).parent('.widget').remove();
+        });
+
+        // Make widgets draggable
+        new Sortable(document.getElementById('widget-container'), {
+            animation: 150,
+            ghostClass: 'dragging',
+        });
+    });
+</script>
+</body>
+</html>
