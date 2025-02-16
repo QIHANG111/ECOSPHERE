@@ -13,7 +13,6 @@
 
         body {
             margin: 0;
-            background-image: url("../images/background.jpg");
             align-items: flex-start;
             justify-content: flex-start;
             display: flex;
@@ -243,6 +242,7 @@
 
         .family-management:hover {
             background-color: #f0f0f0;
+            font-size: 1.3vw;
         }
 
 
@@ -280,6 +280,112 @@
             transform: scale(1.05);
             background-color: rgba(255, 255, 255, 0.7);
         }
+
+        /* furniture item */
+        .furniture-item {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            padding: 1vw;
+            box-sizing: border-box;
+            align-items: center;
+        }
+
+        /* left side (occupy 50%) */
+        .furniture-icon {
+            width: 50%;
+            height: 100%;
+            background-color: transparent; /* change the image background color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2vw;
+        }
+
+        .icon-image {
+            width: 80%;
+            max-width: 110px; /* change the image size */
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* right side (occupy 50%) */
+        .furniture-content {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1vw;
+            text-align: left;
+        }
+
+        /* switch off */
+        .switch-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 20px;
+        }
+
+        .furniture-name {
+            font-size: 2vw;
+            font-weight: bold;
+        }
+
+        /* outside delete container */
+        .delete-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent;
+            padding: 5px 10px; /*change the outside container size */
+            border-radius: 30px;
+            box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: -15px; /* shift left 10px */
+            margin-top: 10px; /* shift down 10px */
+        }
+
+        /* button main area */
+        .delete-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delete-icon {
+            width: 32px; /*change the outside container size */
+            height: 32px;
+            background-color: transparent;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* delete icon img size */
+        .delete-icon img {
+            width: 30px; /* change the minus icon size */
+            height: 30px;
+        }
+
+        .delete-text {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .delete-container:hover {
+            background-color: #e5e5c5;
+            box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .delete-container:active {
+            transform: scale(0.95);
+        }
+
 
         /* Start form the third box  */
         .content > div:nth-child(3) {
@@ -375,48 +481,20 @@
 
             <div id="myModal" class="modal">
                 <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
+                    <span class="close" onclick="closeModal()">&times;</span>
 
-                <div class="green-section">
-                    <p id="dynamic-text"></p>
-                </div>
-
-                <hr class="divider">
-                <div class="family-management">Family Management</div>
-                </div>
-
-            </div>
-            <div class="furniture">
-                <div class="light">
-                    <div class="light-picture"></div>
-                    <div class="turn-on"></div>
-                    <div class="rest">
-                        <div class="setting"></div>
+                    <div class="green-section">
+                        <p id="dynamic-text"></p>
                     </div>
 
+                    <hr class="divider">
+                    <div class="family-management">Family Management</div>
                 </div>
-                <div class="door-lock"></div>
-                <div class="air-conditioner"></div>
-                <div class="socket"></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
 
             </div>
+            <div class="furniture" id="furnitureContainer"></div>
         </div>
+
         <div class="add">
                 <span class="add-button" id="addButton">
                     <img src="../icons/add-button.svg" alt="add-button">
@@ -453,13 +531,96 @@
     }
 
     // Click outside modal for close
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         var modal = document.getElementById("myModal");
         if (event.target == modal) {
             modal.style.display = "none";
         }
     }
 
-    </script>
+    // each furniture box index
+    const furnitureData = [
+        {id: "Lamp1", name: "Beside Lamp", icon: "../icons/device-page/light-svgrepo-com.svg", boxIndex: 0},
+        {
+            id: "Door-Lock1",
+            name: "Smart Door Lock",
+            icon: "../icons/device-page/door-lock-svgrepo-com.svg",
+            boxIndex: 1
+        },
+        {
+            id: "Air conditioner1",
+            name: "Air Conditioner",
+            icon: "../icons/device-page/air-conditioner.svg",
+            boxIndex: 2
+        },
+        {id: "Socket1", name: "Socket", icon: "../icons/device-page/socket-i-svgrepo-com.svg", boxIndex: 3}
+    ];
+
+    // get furniture container
+    const furnitureContainer = document.getElementById("furnitureContainer");
+
+    // create the empty furniture box
+    const totalBoxes = 4; // change the total furniture box count
+    for (let i = 0; i < totalBoxes; i++) {
+        const box = document.createElement("div");
+        box.classList.add("furniture-box");
+        box.dataset.index = i; // set fb index
+        furnitureContainer.appendChild(box);
+    }
+
+    // render furniture
+    function renderFurniture() {
+        furnitureData.forEach(furniture => {
+            // get the exactly one
+            const targetBox = document.querySelector(`.furniture-box[data-index="${furniture.boxIndex}"]`);
+
+            if (targetBox) {
+                // create the elements in furniture box
+                const furnitureItem = document.createElement("div");
+                furnitureItem.classList.add("furniture-item");
+                furnitureItem.innerHTML = `
+                <div class="furniture-icon">
+                    <img src="${furniture.icon}" alt="${furniture.name}" class="icon-image">
+                </div>
+                <div class="furniture-content">
+                <div class="furniture-name">${furniture.name}</div>
+                    <div></div>
+                    <div class="delete-container" onclick="deleteAndRedirect('${furniture.id}')">
+                <div class="delete-button">
+                <div class="delete-icon">
+                     <img src="../icons/device-page/minus-circle.svg" alt="delete-button">
+                 </div>
+                 <span class="delete-text">Delete</span>
+                 </div>
+</div>
+
+                </div>
+            `;
+                // add element into box
+                targetBox.appendChild(furnitureItem);
+            }
+        });
+    }
+
+    // for switch
+    // <div class="switch-container">
+    //<input type="checkbox" className="mui-switch" data-device-name="${furniture.id}">
+    //</div>
+
+    // delete furniture
+    function deleteFurniture(id) {
+        // Remove form data
+        const index = furnitureData.findIndex(item => item.id === id);
+        if (index !== -1) {
+            furnitureData.splice(index, 1); // remove the special element
+            document.getElementById("furnitureContainer").innerHTML = ""; // remove fc
+            renderFurniture();
+        }
+    }
+
+    // reset furniture
+    renderFurniture();
+
+</script>
 </body>
 </html>
