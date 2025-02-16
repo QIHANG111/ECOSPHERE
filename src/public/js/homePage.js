@@ -32,37 +32,53 @@ function toggleSaveButton() {
 // Save room data to localStorage
 function saveRoom() {
     let roomName = document.getElementById("roomName").value.trim();
-    document.querySelector(".image-selector img.selected").src;
+    let selectedImage = document.querySelector(".image-selector img.selected")?.src;
+
     if (!roomName) {
         alert("Please enter a room name.");
         return;
     }
 
-    // Read existing room data
+    if (!selectedImage) {
+        alert("Please select a wallpaper.");
+        return;
+    }
+
+    // Retrieve existing rooms from localStorage
     let rooms = JSON.parse(localStorage.getItem("rooms")) || [];
 
+    // Add new room
+    rooms.push({
+        name: roomName,
+        wallpaper: selectedImage,
+        timestamp: new Date().getTime()
+    });
 
-
-    // Sort by timestamp (newest first)
+    // Sort rooms by timestamp (newest first)
     rooms.sort((a, b) => b.timestamp - a.timestamp);
 
-
+    // Save updated rooms to localStorage
     localStorage.setItem("rooms", JSON.stringify(rooms));
 
-    // Close modal
+    // Close modal and refresh the room list
     closeModal();
-
-    // Re-render Automation Card
     renderRooms();
 }
 
+// Clear all rooms
+function clearRooms() {
+    if (confirm("Are you sure you want to delete all rooms?")) {
+        localStorage.removeItem("rooms"); // Remove stored data
+        renderRooms(); // Refresh UI
+    }
+}
 
-// Load room data and render to automation card
+// Load and render rooms in automationcard
 function renderRooms() {
     let rooms = JSON.parse(localStorage.getItem("rooms")) || [];
     let container = document.getElementById("automationcard");
 
-    // 清空原有内容
+    // Clear previous content
     container.innerHTML = `
         <div class='leftToRightList'> 
             <h3>Rooms</h3>
@@ -75,7 +91,7 @@ function renderRooms() {
 
     let roomList = document.getElementById("roomList");
 
-    // If no rooms, display a message
+    // If no rooms exist, show message
     if (rooms.length === 0) {
         let noRoomMessage = document.createElement("p");
         noRoomMessage.innerText = "No rooms added.";
@@ -85,18 +101,18 @@ function renderRooms() {
         return;
     }
 
-    // Iterate over room data and display in automation card
+    // Display each room in the automationcard
     rooms.forEach(room => {
         let roomDiv = document.createElement("div");
         roomDiv.className = "room-entry";
         roomDiv.style.backgroundImage = `url('${room.wallpaper}')`;
         roomDiv.style.backgroundSize = "cover";
 
-        // 房间名称
+        // Room name
         let roomNameSpan = document.createElement("span");
         roomNameSpan.innerText = room.name;
 
-        // 删除按钮
+        // Delete button for individual rooms
         let deleteButton = document.createElement("button");
         deleteButton.innerText = "❌";
         deleteButton.style.backgroundColor = "rgba(255,0,0,0)";
