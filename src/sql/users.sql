@@ -49,3 +49,23 @@ CREATE TABLE RolePermission(
                     FOREIGN KEY (role_id) REFERENCES Role(role_id),
                     FOREIGN KEY (permission_id) REFERENCES Permission(permission_id)
 );
+
+INSERT INTO Permission 
+VALUES ('user_management', 'create_user', 'Create new user accounts'),
+('user_management', 'delete_user', 'Delete user accounts'),
+('user_management', 'update_user', 'Update user accounts'),
+('user_management', 'view_user', 'View user accounts'),
+('user_management', 'assign_user', 'Assign role to user accounts'),
+('device_control', 'add_device', 'Add a device to the system');
+('device_control', 'delete_device', 'Remove a device from the system');
+('device_control', 'modify_device', 'Modify connected device setting');
+('device_control', 'view_device', 'View connected device');
+('device_control', 'control_device', 'Turn devices ON/OFF remotely');
+('device_control', 'schedule_device', 'Set automoation schedule');
+('energy_monitoring', 'view_energy', 'View energy consumption reports');
+('energy_monitoring', 'compare_energy', 'Compare energy usage trends');
+('energy_monitoring', 'rec_energy', 'Receive energy saving recommendations');
+('energy_monitoring', 'alert_energy', 'Get alerts for high energy usage');
+('system', 'system_backup', 'Perform system backup');
+('system', 'system_restore', 'Restore system from backup');
+('system', 'system_updates', 'Perform system updates');
