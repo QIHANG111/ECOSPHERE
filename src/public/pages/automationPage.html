@@ -4,15 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Homepage</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="/css/style.css">
-  <script defer src="/js/gemini.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/js/gemini.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 </head>
+
 <body>
-
-<!-- Dark Mode Toggle Button -->
-<!--<button id="darkModeToggle" class="toggle-button">S</button>-->
-
 <div class="sidebar">
   <div class="menu-item" data-target="/pages/usersPage.html">
     <div class="ui-menu-icon">
@@ -46,21 +44,16 @@
   </div>
 </div>
 
-<div class="dashboard" style="text-align: left; font-size: 3vw; font-weight: bold;">
-  Energy Usage Report
-  <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
-    <div class="item1" id="weeklyReport">
-      <div class="normalCard" style="height: 120%">
-        <div id="chartSection1"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-
-<script src="/js/reportPage.js"></script>
+<script src="/js/sidebar.js"></script>
 <script src="/js/theme.js"></script>
+<script src="/js/chart.js"></script>
+<script src="/js/clock.js"></script>
+<script src="/js/dragLayout.js"></script>
+<script src="/js/homePage.js"></script>
+<script>
+  !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+</script>
+
+
 </body>
 </html>

@@ -114,7 +114,7 @@ body {
 /* Menu item styling */
 .menu-item {
     width: 100%;
-    height: 25vh; /* Initial height */
+    height: 20vh; /* Initial height */
     color: #333;
     font-size: 2vw;
     display: flex;
@@ -143,7 +143,7 @@ body {
 
 /* Menu item hover effect */
 .menu-item:hover {
-    height: 33vh; /* Expanded height on hover */
+    height: 24vh; /* Expanded height on hover */
     border-radius: 3vw;
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
     background-color: rgba(255, 255, 255, 0.6);
