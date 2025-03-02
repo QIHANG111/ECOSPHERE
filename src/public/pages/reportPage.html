@@ -7,37 +7,51 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="/css/style.css">
   <script defer src="/js/gemini.js"></script>
+  <script defer src="/js/sidebar.js"></script>
 </head>
 <body>
 
-<!-- Dark Mode Toggle Button -->
-<!--<button id="darkModeToggle" class="toggle-button">S</button>-->
+
 
 <div class="sidebar">
-  <div class="menu-item" data-target="/pages/usersPage.html">
-    <div class="ui-menu-icon">
-      <img src="/icons/users.svg" alt="Vector Icon" width="70" height="70">
-    </div>
-    <div class="menu-text">Users</div>
+<div class="menu-item" data-target="homepage.html" onclick="window.location.href='homePage.html';">
+  <div class="ui-menu-icon">
+    <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
   </div>
-  <div class="menu-item" data-target="/pages/homepage.html">
-    <div class="ui-menu-icon">
-      <img src="/icons/home.svg" alt="Vector Icon" width="50" height="50">
-    </div>
-    <div class="menu-text">Homepage</div>
+  <div class="menu-text">Homepage</div>
+</div>
+
+<div class="menu-item" >
+
+  <div class="ui-menu-icon">
+    <img src="/icons/period.svg" alt="Vector Icon" width="50" height="50">
   </div>
-  <div class="menu-item" data-target="/pages/automationPage.html">
-    <div class="ui-menu-icon">
-      <img src="/icons/automation.svg" alt="Vector Icon" width="50" height="50">
+  <div class="menu-text">Period</div>
+
+  <div class="dropdown">
+    <button class="dropdown-btn" onclick="toggleDropdown()">▼</button>
+    <div class="dropdown-content" id="dropdownMenu">
+      <a href="#">Week</a>
+      <a href="#">Month</a>
+      <a href="#">Year</a>
     </div>
-    <div class="menu-text">Automation</div>
   </div>
-  <div class="menu-item" data-target="/pages/devicesPage.html">
-    <div class="ui-menu-icon">
-      <img src="/icons/devices.svg" alt="Vector Icon" width="50" height="50">
-    </div>
-    <div class="menu-text">Devices</div>
+
+
+</div>
+
+<div class="menu-item">
+  <div class="ui-menu-icon">
+    <img src="/icons/device2.svg" alt="Vector Icon" width="50" height="50">
   </div>
+  <div class="menu-text">Device</div>
+</div>
+<div class="menu-item">
+  <div class="ui-menu-icon">
+    <img src="/icons/chart.svg" alt="Vector Icon" width="50" height="50">
+  </div>
+  <div class="menu-text">Chart Type</div>
+</div>
   <div class="menu-item" data-target="/pages/settingPage.html">
     <div class="ui-menu-icon">
       <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
