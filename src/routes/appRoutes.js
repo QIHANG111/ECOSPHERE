@@ -1,11 +1,17 @@
-const express = require("express");
-const path = require("path");
-const fs = require("fs");
+import express  from 'express';
+import path from 'node:path';
+import * as fs from 'node:fs';
+
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const devicesFile = path.join(__dirname, "../public/exampleData/device.json");
 
 const router = express.Router();
 router.use(express.json()); // Ensure JSON request body is parsed
-
-const devicesFile = path.join(__dirname, "../public/exampleData/device.json");
 
 // 1️Serve the main HTML page
 router.get("/", (req, res) => {
@@ -75,4 +81,4 @@ router.post("/api/update-device", (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;
