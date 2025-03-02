@@ -86,16 +86,11 @@
     </div>
     <div class="dashboard-content" id="cardContainer2">
         <div class="normalCard" id = "automationcard">
-            <div class="leftToRightList">
-            <h3>Rooms</h3>
-            <div class="hButton" id = "automation" onclick="openPopout()">
-                <span style="flex: 1; text-align: center;">Edit</span>
-            </div>
-            </div>
+
         </div>
         <div class="normalCard" style="text-align: left">
             <div class="leftToRightList">
-                <h3>Energy Usage Report</h3>
+                <h3 style="padding-left: 5vw">Energy Usage Report</h3>
                 <div class="hButton" onclick="window.location.href='/pages/reportPage.html';">
                     <div class="leftToRightList" style="display: flex; align-items: center; width: 100%;">
                         <img src="/icons/about.svg" alt="Vector Icon" width="20" height="20" style="flex: 1; text-align: center;">
@@ -124,16 +119,17 @@
         </div>
         <div class="roomModal-body">
             <label for="roomName" >NAME</label>
-            <input type="text" style="width: 34vw" id="roomName" oninput="toggleSaveButton()">
-            <label>ROOM WALLPAPER</label>
+            <input type="text" style="padding-left: 0" id="roomName" oninput="toggleSaveButton()">
+               <label>WALLPAPER</label>
             <div class="image-selector">
                 <div class="image-list">
                     <img src="/images/wp1.jpg" class="selected" onclick="selectImage(this)" alt="">
                     <img src="/images/wp2.jpg" onclick="selectImage(this)" alt="">
                     <img src="/images/wp3.jpg" onclick="selectImage(this)" alt="">
                     <img src="/images/wp4.jpg" onclick="selectImage(this)" alt="">
+                    <img src="/images/wp5.jpg" onclick="selectImage(this)" alt="">
+                    <img src="/images/wp6.jpg" onclick="selectImage(this)" alt="">
                 </div>
-                <div class="scroll-bar"></div>
             </div>
         </div>
     </div>

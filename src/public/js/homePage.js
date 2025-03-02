@@ -81,7 +81,7 @@ function renderRooms() {
     // Clear previous content
     container.innerHTML = `
         <div class='leftToRightList'> 
-            <h3>Rooms</h3>
+            <h3 style="padding-left: 10vw">Rooms</h3>
             <div class="hButton" id="automation" onclick="openPopout()">
                 <span style="flex: 1; text-align: center;">Edit</span>
             </div>
@@ -94,7 +94,7 @@ function renderRooms() {
     // If no rooms exist, show message
     if (rooms.length === 0) {
         let noRoomMessage = document.createElement("p");
-        noRoomMessage.innerText = "No rooms added.";
+        noRoomMessage.innerText = "No rooms.";
         noRoomMessage.style.color = "gray";
         noRoomMessage.style.textAlign = "center";
         roomList.appendChild(noRoomMessage);
