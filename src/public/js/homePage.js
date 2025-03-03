@@ -82,7 +82,7 @@ function renderRooms() {
     container.innerHTML = `
         <div class='leftToRightList'> 
             <h3 style="padding-left: 10vw">Rooms</h3>
-            <button class="ui-menu-icon icon-button" style="width: 5vw; height: 3.5vw" id="automation" onclick="openPopout()">
+            <button class="hidden-button ui-menu-icon " style="width: 5vw; height: 3.5vw" id="automation" onclick="openPopout()">
              <img src="/icons/add-cross.svg" alt="Vector Icon" width="20" height="20">
             </buttonb>
         </div>

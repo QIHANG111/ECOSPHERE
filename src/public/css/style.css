@@ -20,7 +20,7 @@
     --c-bg-secondary: #d4d8dd;
     --c-bg-button: #fff;
     --c-bg-sidebar: rgba(255, 255, 255, 0.5);
-    --c-bg-card-hover: rgba(228, 215, 194, 0.47);
+    --c-bg-card-hover: rgba(200, 196, 186, 0.47);
     --c-glow: rgba(225, 225, 225, 0.7);
     --normal-card-border: rgba(255, 255, 255, 0.5);
 }
@@ -209,7 +209,7 @@ body {
     color: var(--c-text-primary);
     box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(0.5vw);
-    border-radius: 3vw;
+    border-radius: 2vw;
     border: 0.1vw solid var(--normal-card-border);
     height: 40vh;
     width: 115%;
@@ -566,18 +566,42 @@ input {
 button {
     width: 100%;
     padding: 1vw;
-    background-color: #889abb;
+    background-color: var(--button-background);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 1vw;
     cursor: pointer;
     transition:  0.3s;
 
 }
 
 button:hover {
-    background-color: rgba(231, 232, 234, 0.36);
+    background-color: var(--c-bg-card-hover);
 }
+
+.hidden-button {
+    background: none;
+    margin-left: auto;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+.hidden-button:hover {
+    background: none;
+}
+.hidden-button:hover::after {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background-color: var(--c-bg-card-hover);
+    border-radius: 1vw;
+    z-index: -1;
+}
+
+
 
 /* Responsive */
 @media screen and (max-width: 768px) {
