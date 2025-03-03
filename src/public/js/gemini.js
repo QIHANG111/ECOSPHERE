@@ -104,7 +104,7 @@ You are an AI assistant. Follow these instructions carefully:
 - if want to turn on or off devices, reply with "Ok, turned on/off the "+devicename.
 User Input: "${userPrompt}"
 AI Response:`;
-
+// - if want to see or check the report, reply with "Ok, this is the report "+reportname.(not usable right now)
     responseElement.innerText = "Fetching response...";
     fetchGeminiResponse(fullPrompt).then(responseText => {
         aiCard.style.height = "auto";
