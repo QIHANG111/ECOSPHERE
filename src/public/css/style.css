@@ -20,8 +20,9 @@
     --c-bg-secondary: #d4d8dd;
     --c-bg-button: #fff;
     --c-bg-sidebar: rgba(255, 255, 255, 0.5);
-    --c-bg-card-hover: rgba(255, 255, 255, 0.6);
+    --c-bg-card-hover: rgba(228, 215, 194, 0.47);
     --c-glow: rgba(225, 225, 225, 0.7);
+    --normal-card-border: rgba(255, 255, 255, 0.5);
 }
 :root.dark-theme {
     --c-text-primary: #eee;
@@ -31,21 +32,23 @@
     --c-bg-primary: #323339;
     --c-bg-secondary: #222128;
     --c-bg-button: #494a50;
-    --c-bg-sidebar: rgba(35, 35, 35, 0.95);
-    --c-bg-card-hover: rgba(85, 85, 85, 0.6);
+    --c-bg-sidebar: rgb(33, 38, 40);
+    --c-bg-card-hover: rgba(73, 82, 97, 0.94);
     --c-glow: rgba(255, 255, 255, 0.7);
+    --normal-card-border: rgb(175, 173, 173);
 }
 :root.black-theme {
     --c-text-primary: #edeeef;
     --c-text-secondary: #d4d7e1;
     --c-border-primary: #323232;
-    --c-bg-body: #000;
+    --c-bg-body: rgba(0, 0, 0, 0.89);
     --c-bg-primary: #1b1d23;
     --c-bg-secondary: #000001;
     --c-bg-button: #343844;
     --c-bg-sidebar: rgba(35, 35, 35, 0.95);
-    --c-bg-card-hover: rgba(85, 85, 85, 0.6);
+    --c-bg-card-hover: rgba(60, 60, 60, 0.6);
     --c-glow: rgba(255, 255, 255, 0.7);
+    --normal-card-border: rgba(255, 255, 255, 0.5);
 }
 /* Default SVG color */
 .ui-menu-icon img {
@@ -94,7 +97,7 @@ body {
     width: 7vw; /* Initial sidebar width */
     height: 92vh; /* Reduce height to leave space around edges */
     box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.1);
-    border: 0.1vw solid rgba(255, 255, 255, 0.2);
+    border: 0.1vw solid var(--normal-card-border);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -145,8 +148,8 @@ body {
 .menu-item:hover {
     height: 24vh; /* Expanded height on hover */
     border-radius: 3vw;
-    box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0.5vw 1.5vw var(--c-bg-card-hover);
+    background-color: var(--c-bg-card-hover);
 }
 
 /* Show text on sidebar hover */
@@ -160,6 +163,7 @@ body {
 }
 
 .dashboard {
+    color: var(--c-text-primary);
     margin-left: 12vw; /* Default offset for sidebar */
     width: calc(100% - 14vw); /* Adjust width dynamically */
     padding: 2vw;
@@ -206,7 +210,7 @@ body {
     box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(0.5vw);
     border-radius: 3vw;
-    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    border: 0.1vw solid var(--normal-card-border);
     height: 40vh;
     width: 115%;
     text-align: center;
@@ -219,7 +223,7 @@ body {
     transform: scale(1.03);
     height: 40vh;
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: var(--c-bg-card-hover);
+    /*background-color: var(--c-bg-card-hover);*/
     .upToDownList {
         height: 35vh; /* Set fixed height for overflow control */
     }
@@ -242,10 +246,11 @@ body {
 }
 
 .hBar {
+    color: var(--c-text-primary);
     margin: 1vw;
     display: flex;
     flex-direction: row;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--c-bg-sidebar);
     justify-content: space-between;
     padding: 0.8vw;
     border-radius: 1vw;
@@ -255,7 +260,7 @@ body {
 
 .hBar:hover {
     padding: 1.3vw;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: var(--c-bg-card-hover);
 }
 
 .hButton {
@@ -267,7 +272,7 @@ body {
     border-radius: 5vw;
     border: 0.1vw solid rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    width: 5vw;
+    width: 3vw;
     height: 1.2vw;
     transform-origin: center;
     transition: all 0.3s ease;
@@ -445,13 +450,34 @@ body {
 
 .family-card, .add-card {
     height: 20vw;
-    background-color: var(--sidebar-background);
-    border-radius: 2vw;
+    background-color: var(--c-bg-sidebar);
+    color: var(--c-text-primary);
+    border-radius: 3vw;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
     padding: 20px;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
+
+/*.normalCard {*/
+/*    !*background-color: rgba(255, 255, 255, 0.4);*!*/
+/*    background-color: var(--c-bg-sidebar);*/
+/*    color: var(--c-text-primary);*/
+/*    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);*/
+/*    backdrop-filter: blur(0.5vw);*/
+/*    border-radius: 3vw;*/
+/*    border: 0.1vw solid rgba(255, 255, 255, 0.5);*/
+/*    height: 40vh;*/
+/*    width: 115%;*/
+/*    text-align: center;*/
+/*    transition: all 0.3s ease;*/
+/*    overflow: hidden;*/
+/*    transform-origin: center;*/
+/*}*/
+
+
+
 .family-card:hover, .add-card:hover {
     transform: translateY(-5px);
 }
@@ -545,11 +571,12 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition:  0.3s;
+
 }
 
 button:hover {
-    background-color: #c2cde4;
+    background-color: rgba(231, 232, 234, 0.36);
 }
 
 /* Responsive */
@@ -838,7 +865,8 @@ canvas {
 }
 
 .roomModal-content {
-    background: #f7f7f7;
+    background: var(--c-bg-primary);
+    color: var(--c-text-primary);
     width: 450px;
     border-radius: 20px;
     padding: 20px;
@@ -848,11 +876,12 @@ canvas {
 
 .roomModal-header {
     display: flex;
+    color: var(--c-text-primary);
     justify-content: space-between;
     align-items: center;
     font-size: 18px;
     font-weight: bold;
-    color: #000;
+
 }
 
 
@@ -883,7 +912,8 @@ canvas {
 #roomName {
     width: 100%;
     padding: 10px;
-    border: 1px solid lightgray;
+    background: var(--c-bg-secondary);
+    border: 1px solid var(--c-border-primary);
     border-radius: 10px;
     margin-top: 5px;
     font-size: 16px;
@@ -891,7 +921,7 @@ canvas {
 
 
 .image-selector {
-    background: white;
+    background: var(--c-bg-secondary);
     border-radius: 15px;
     padding: 10px;
     display: flex;

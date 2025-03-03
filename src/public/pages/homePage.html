@@ -49,17 +49,17 @@
             <div class="aiCard" style="width: 320%; height: 8vh;">
                     <div class="input-container">
                         <div class="leftToRightList" style="width: 100%">
-                            <label for="userPrompt"></label><input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...(like 'Help me change to dark theme')"
+                            <label for="userPrompt"></label><input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...('Help me turn on the light1')"
                                                                    style="width: 80%; border-radius: 5vw">
-                            <button id="clearButton" class="ui-menu-icon"
+                            <button id="clearButton" class="icon-button ui-menu-icon"
                                     style="display: none; background-color: rgba(221,221,221,0); width: 3vw">
-                                ❌
+                                <img src="/icons/delete-1-svgrepo-com.svg" alt="Vector Icon" width="30" height="30">
                             </button>
                             <button id="micButton" class="icon-button ui-menu-icon">
-                            🎤
+                                <img src="/icons/microphone-svgrepo-com.svg" alt="Vector Icon" width="25" height="25">
                             </button>
                             <button onclick="handleGeminiRequest()" class="icon-button ui-menu-icon">
-                            🔍
+                                <img src="/icons/send-alt-2-svgrepo-com.svg" alt="Vector Icon" width="25" height="25">
                             </button>
                     </div>
                 </div>
@@ -91,12 +91,9 @@
         <div class="normalCard" style="text-align: left">
             <div class="leftToRightList">
                 <h3 style="padding-left: 5vw">Energy Usage Report</h3>
-                <div class="hButton" onclick="window.location.href='/pages/reportPage.html';">
-                    <div class="leftToRightList" style="display: flex; align-items: center; width: 100%;">
+                <button class="icon-button ui-menu-icon" style="width: 5vw; height: 3.5vw" onclick="window.location.href='/pages/reportPage.html';">
                         <img src="/icons/about.svg" alt="Vector Icon" width="20" height="20" style="flex: 1; text-align: center;">
-                        <span style="flex: 1; text-align: center;">More</span>
-                    </div>
-                </div>
+                </button>
             </div>
             <!-- Canvas for Chart -->
             <div class="chart-container">
