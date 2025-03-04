@@ -142,3 +142,54 @@ function removeRoom(roomName) {
 
 // Render rooms on page load
 document.addEventListener("DOMContentLoaded", renderRooms);
+
+//test
+
+    let temperature = 24;
+    const minTemp = 16;
+    const maxTemp = 30;
+
+    function drawGauge(temp) {
+    const canvas = document.getElementById('gaugeCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 80;
+
+
+    const startAngle = Math.PI * 0.75;
+    const endAngle = Math.PI * 2.25;
+    const range = maxTemp - minTemp;
+    const angle = startAngle + ((temp - minTemp) / range) * (endAngle - startAngle);
+
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = '#ddd';
+    ctx.stroke();
+
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, startAngle, angle);
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = '#007BFF';
+    ctx.stroke();
+}
+
+    function updateDisplay() {
+    document.getElementById('temperatureValue').innerText = `${temperature}°C`;
+    drawGauge(temperature);
+}
+
+    function changeTemperature(change) {
+    temperature += change;
+    if (temperature < minTemp) temperature = minTemp;
+    if (temperature > maxTemp) temperature = maxTemp;
+    updateDisplay();
+}
+
+
+    updateDisplay();

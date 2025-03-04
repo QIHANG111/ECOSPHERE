@@ -78,8 +78,21 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.error("Error updating device:", error));
     }
+    function updateDeviceTemperature(deviceName, temperature) {
+        fetch("/api/update-temperature", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: deviceName, temperature: temperature })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Updated ${deviceName} temperature to:`, temperature);
+            })
+            .catch(error => console.error("Error updating temperature:", error));
+    }
 
     window.updateDeviceStatus = updateDeviceStatus;
+    window.updateDeviceTemperature = updateDeviceTemperature;
     window.loadDevices = loadDevices;
     loadDevices();
 });
@@ -123,6 +136,14 @@ AI Response:`;
 
             updateDeviceStatus(deviceName.toUpperCase(), status);
             // loadDevices();
+        }
+        //temperature control by AI
+        const tempMatch = aiResponseText.match(/Set ([a-zA-Z0-9\s]+) to (\d+)°C/i);
+        if (tempMatch) {
+            const deviceName = tempMatch[1].trim();
+            const temperature = parseInt(tempMatch[2]);
+            console.log(`Updating ${deviceName} temperature to: ${temperature}`);
+            updateDeviceTemperature(deviceName, temperature);
         }
 
 // thheme control by AI

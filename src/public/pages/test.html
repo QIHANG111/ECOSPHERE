@@ -1,12 +1,100 @@
-<svg width="600" height="150">
-    <text x="50" y="100" font-size="80" font-family="Arial" font-weight="bold"
-          fill="url(#grad)">
-        Ecosphere
-    </text>
-    <defs>
-        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color:#ff0000; stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#0000ff; stop-opacity:1" />
-        </linearGradient>
-    </defs>
-</svg>
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .tempDashboard {
+            position: relative;
+            display: inline-block;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+        }
+        .temperature-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+
+    </style>
+    <title></title>
+</head>
+<body>
+
+<h1>temp</h1>
+
+<div class="tempDashboard">
+    <canvas id="gaugeCanvas" width="200" height="200"></canvas>
+    <div class="temperature-display" id="temperatureValue">24°C</div>
+</div>
+
+<div class="controls">
+    <button onclick="changeTemperature(-1)">➖</button>
+    <button onclick="changeTemperature(1)">➕</button>
+</div>
+
+<script>
+    let temperature = 24;
+    const minTemp = 16;
+    const maxTemp = 30;
+
+    function drawGauge(temp) {
+        const canvas = document.getElementById('gaugeCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = 80;
+
+
+        const startAngle = Math.PI * 0.75;
+        const endAngle = Math.PI * 2.25;
+        const range = maxTemp - minTemp;
+        const angle = startAngle + ((temp - minTemp) / range) * (endAngle - startAngle);
+
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = '#ddd';
+        ctx.stroke();
+
+        // 绘制当前温度指示
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, angle);
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = '#007BFF';
+        ctx.stroke();
+    }
+
+    function updateDisplay() {
+        document.getElementById('temperatureValue').innerText = `${temperature}°C`;
+        drawGauge(temperature);
+    }
+
+    function changeTemperature(change) {
+        temperature += change;
+        if (temperature < minTemp) temperature = minTemp;
+        if (temperature > maxTemp) temperature = maxTemp;
+        updateDisplay();
+    }
+
+
+    updateDisplay();
+</script>
+
+</body>
+</html>
