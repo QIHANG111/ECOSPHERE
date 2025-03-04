@@ -81,4 +81,42 @@ router.post("/api/update-device", (req, res) => {
     });
 });
 
+// Update the temperature of a specific AC device
+router.post("/api/update-temperature", (req, res) => {
+    console.log("Received temperature update request:", req.body);
+
+    if (!req.body || typeof req.body.name !== "string" || typeof req.body.temperature !== "number") {
+        return res.status(400).json({ error: "Invalid request format. 'name' must be a string and 'temperature' must be a number." });
+    }
+
+    const { name, temperature } = req.body;
+
+    fs.readFile(devicesFile, "utf8", (err, data) => {
+        if (err) {
+            return res.status(500).json({ error: "Failed to read devices.json" });
+        }
+
+        try {
+            let devices = JSON.parse(data);
+            let device = devices.find(d => d.name === name && d.type === "AC");
+            if (!device) {
+                return res.status(404).json({ error: "AC device not found" });
+            }
+
+            // Update the device temperature
+            device.temperature = temperature;
+
+            // Save the updated data back to the JSON file
+            fs.writeFile(devicesFile, JSON.stringify(devices, null, 4), (err) => {
+                if (err) {
+                    return res.status(500).json({ error: "Failed to update devices.json" });
+                }
+                res.json({ success: true, updatedDevice: device });
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Invalid JSON format in devices.json" });
+        }
+    });
+});
+
 export default router;

@@ -1,18 +1,24 @@
 [
     {
         "name": "AC1",
-        "status": true
+        "status": true,
+        "type": "AC",
+        "temperature": 24
     },
     {
         "name": "AC2",
-        "status": true
+        "status": true,
+        "type": "AC",
+        "temperature": 21
     },
     {
         "name": "LIGHT1",
-        "status": false
+        "status": false,
+        "type": "LIGHT"
     },
     {
         "name": "LIGHT2",
-        "status": false
+        "status": false,
+        "type": "LIGHT"
     }
 ]

@@ -43,19 +43,97 @@ document.addEventListener("DOMContentLoaded", function () {
                     nameSpan.textContent = device.name;
                     nameSpan.style.marginRight = "10px";
 
-                    const switchInput = document.createElement("input");
-                    switchInput.type = "checkbox";
-                    switchInput.checked = device.status;
-                    switchInput.classList.add("mui-switch", "mui-switch-anim");
-                    switchInput.dataset.deviceName = device.name;
+                    // Create status button instead of switch
+                    const statusBtn = document.createElement("button");
+                    statusBtn.classList.add("device-status-btn");
+                    if (device.status) {
+                        statusBtn.classList.add("device-status-on");
+                        statusBtn.textContent = "ON";
+                    } else {
+                        statusBtn.classList.add("device-status-off");
+                        statusBtn.textContent = "OFF";
+                    }
+                    statusBtn.dataset.deviceName = device.name;
 
-                    switchInput.addEventListener("change", function () {
-                        updateDeviceStatus(device.name, switchInput.checked);
+                    statusBtn.addEventListener("click", function () {
+                        const newStatus = !device.status;
+                        updateDeviceStatus(device.name, newStatus);
+                        
+                        // Update button appearance
+                        if (newStatus) {
+                            statusBtn.classList.remove("device-status-off");
+                            statusBtn.classList.add("device-status-on");
+                            statusBtn.textContent = "ON";
+                        } else {
+                            statusBtn.classList.remove("device-status-on");
+                            statusBtn.classList.add("device-status-off");
+                            statusBtn.textContent = "OFF";
+                        }
+                        
+                        // Show/hide temperature controls
+                        if (device.type === "AC") {
+                            tempControlContainer.style.display = newStatus ? "flex" : "none";
+                            tempDisplay.style.display = newStatus ? "block" : "none";
+                        }
+                        
+                        device.status = newStatus;
                     });
 
                     deviceItem.appendChild(nameSpan);
-                    deviceItem.appendChild(switchInput);
+                    deviceItem.appendChild(statusBtn);
                     deviceList.appendChild(deviceItem);
+                    
+                    // Add temperature controls for AC devices
+                    if (device.type === "AC") {
+                        const tempControlContainer = document.createElement("div");
+                        tempControlContainer.classList.add("temperature-control");
+                        tempControlContainer.style.display = device.status ? "flex" : "none";
+                        
+                        // Temperature display
+                        const tempDisplay = document.createElement("div");
+                        tempDisplay.classList.add("temperature-display");
+                        // Format temperature to always show 2 digits
+                        tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
+                        
+                        // Decrease temperature button
+                        const decreaseBtn = document.createElement("button");
+                        decreaseBtn.classList.add("temp-btn");
+                        decreaseBtn.textContent = "−";
+                        decreaseBtn.addEventListener("click", function() {
+                            if (device.temperature > 16) {
+                                device.temperature -= 1;
+                                updateDeviceTemperature(device.name, device.temperature);
+                                // Format temperature to always show 2 digits
+                                tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
+                            }
+                        });
+                        
+                        // Increase temperature button
+                        const increaseBtn = document.createElement("button");
+                        increaseBtn.classList.add("temp-btn");
+                        increaseBtn.textContent = "+";
+                        increaseBtn.addEventListener("click", function() {
+                            if (device.temperature < 30) {
+                                device.temperature += 1;
+                                updateDeviceTemperature(device.name, device.temperature);
+                                // Format temperature to always show 2 digits
+                                tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
+                            }
+                        });
+                        
+                        // Add elements in the correct order
+                        // Add decrease and increase buttons to the control container first (before temperature display)
+                        tempControlContainer.appendChild(decreaseBtn);
+                        tempControlContainer.appendChild(increaseBtn);
+                        
+                        // Add temperature display directly to the device item for absolute positioning
+                        deviceItem.appendChild(tempDisplay);
+                        // Set initial display based on device status
+                        tempDisplay.style.display = device.status ? "block" : "none";
+                        
+                        // Add temperature controls to device item
+                        deviceItem.appendChild(tempControlContainer);
+                    }
                 });
             })
             .catch(error => console.error("Error loading devices:", error));
@@ -70,11 +148,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 console.log("Updated:", data);
-                document.querySelectorAll("input[data-device-name]").forEach(input => {
-                    if (input.dataset.deviceName === deviceName) {
-                        input.checked = newStatus;
-                    }
-                });
+                // Immediately reload devices to update UI
+                loadDevices();
             })
             .catch(error => console.error("Error updating device:", error));
     }
@@ -87,6 +162,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 console.log(`Updated ${deviceName} temperature to:`, temperature);
+                // Immediately reload devices to update UI
+                loadDevices();
             })
             .catch(error => console.error("Error updating temperature:", error));
     }
@@ -140,10 +217,11 @@ AI Response:`;
         //temperature control by AI
         const tempMatch = aiResponseText.match(/Set ([a-zA-Z0-9\s]+) to (\d+)°C/i);
         if (tempMatch) {
-            const deviceName = tempMatch[1].trim();
+            const deviceName = tempMatch[1].trim().toUpperCase();
             const temperature = parseInt(tempMatch[2]);
             console.log(`Updating ${deviceName} temperature to: ${temperature}`);
             updateDeviceTemperature(deviceName, temperature);
+            // UI will be updated by the updateDeviceTemperature function
         }
 
 // thheme control by AI
