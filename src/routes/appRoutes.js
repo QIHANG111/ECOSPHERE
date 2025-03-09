@@ -1,7 +1,7 @@
 import express  from 'express';
 import path from 'node:path';
 import * as fs from 'node:fs';
-
+import EnergyUsage from "../models/EnergyUsage.js";
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,6 +17,7 @@ router.use(express.json()); // Ensure JSON request body is parsed
 router.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/pages/homePage.html"));
 });
+
 
 // 2️Example API endpoint to fetch mock user data
 router.get("/api/users", (req, res) => {
@@ -117,6 +118,20 @@ router.post("/api/update-temperature", (req, res) => {
             res.status(500).json({ error: "Invalid JSON format in devices.json" });
         }
     });
+});
+router.get("/api/energy-usage", async (req, res) => {
+    try {
+        const energyData = await EnergyUsage.find().sort({ date: 1 });
+
+        if (!energyData.length) {
+            return res.status(404).json({ error: "No energy usage data found" });
+        }
+
+        res.json(energyData);
+    } catch (error) {
+        console.error("Error fetching energy usage data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
 
 export default router;

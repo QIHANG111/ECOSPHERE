@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     const myChart = new Chart(ctx, {
-        type: 'bar',//'bar', 'pie', 'line', 'doughnut', 'radar', 'polarArea', 'bubble', 'scatter'
+        type: 'bar',//pie, bar, line
         data: {
             labels: [],
             datasets: [{
@@ -40,11 +40,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function fetchData() {
         try {
-            const response = await fetch('/exampleData/energy_usage.json');
+            const response = await fetch('/api/energy-usage'); // API
             const data = await response.json();
 
 
-            const labels = data.map(item => item.date);
+            const labels = data.map(item => item.date.split("T")[0]); // (YYYY-MM-DD)
             const energyUsage = data.map(item => item.energyusage);
 
 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
             myChart.data.datasets[0].data = energyUsage;
             myChart.update();
         } catch (error) {
-            console.error("Error:", error);
+            console.error("❌ Error fetching data:", error);
         }
     }
 

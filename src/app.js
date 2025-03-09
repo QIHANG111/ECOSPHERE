@@ -18,4 +18,5 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Use routes
 app.use('/', appRoutes);
 
+
 export default app;
