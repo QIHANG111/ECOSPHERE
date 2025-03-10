@@ -63,12 +63,22 @@
 <div class="dashboard" style="text-align: left; font-size: 3vw; font-weight: bold;">
   Energy Usage Report
   <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
-    <div class="item1" id="weeklyReport">
-      <div class="normalCard" style="height: 120%">
-        <div id="chartSection1"></div>
+    <div class="normalCard" style="text-align: left;width: 170%">
+      <div class="leftToRightList">
+        <button class="hidden-button ui-menu-icon " style="width: 5vw; height: 3.5vw" onclick="window.location.href='/pages/reportPage.html';">
+          <img src="/icons/about.svg" alt="Vector Icon" width="20" height="20" style="flex: 1; text-align: center;">
+        </button>
+      </div>
+      <!-- Canvas for Chart -->
+      <div class="chart-container">
+        <canvas id="myChart"></canvas>
       </div>
     </div>
+  </div>
+  <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
+    <div class="normalCard" style="text-align: left;width: 170%">
 
+    </div>
   </div>
 </div>
 

@@ -4,7 +4,8 @@ import * as fs from 'node:fs';
 import EnergyUsage from "../models/EnergyUsage.js";
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
+import  User  from "../models/user.model.js";
+import bcrypt from 'bcryptjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -133,5 +134,65 @@ router.get("/api/energy-usage", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+
+router.post("/api/signup", async (req, res) => {
+    try {
+        const { name, email, phone, password, role_id } = req.body;
+
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "This email is already registered" });
+        }
+
+        // hs psw
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // new user
+        const newUser = new User({
+            name,
+            email,
+            phone,
+            hashed_password: hashedPassword,
+            role_id
+        });
+        await newUser.save();
+        res.status(201).json({ message: "sign up successfully" });
+
+    } catch (error) {
+        console.error("error:", error);
+        res.status(500).json({ message: "server error" });
+    }
+});
+
+router.post("/api/signin", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+
+        const isMatch = await bcrypt.compare(password, user.hashed_password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Incorrect password" });
+        }
+
+        // jwt
+        const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: "1h" });
+
+        res.status(200).json({ message: "sign in successfully", token, user });
+
+    } catch (error) {
+        console.error("error:", error);
+        res.status(500).json({ message: "server error" });
+    }
+});
+
+
 
 export default router;

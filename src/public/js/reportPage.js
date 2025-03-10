@@ -46,56 +46,70 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Function to create a chart dynamically
-function createChart(containerId, chartTitle, labels, dataPoints) {
-    // Create a chart container
-    const container = document.createElement('div');
-    container.className = 'chart-container';
 
-    // Create a canvas element
-    const canvas = document.createElement('canvas');
-    canvas.id = `${containerId}-canvas`;
-    container.appendChild(canvas);
+document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById('myChart').getContext('2d');
 
-    // Append the container to the specified location
-    document.getElementById(containerId).appendChild(container);
 
-    // Configure the chart
-    const data = {
-        labels: labels,
-        datasets: [{
-            label: chartTitle,
-            data: dataPoints,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            tension: 0.4,
-            pointRadius: 5
-        }]
-    };
-
-    const config = {
+    const myChart = new Chart(ctx, {
         type: 'line',
-        data: data,
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Energy Usage (kWh)',
+                data: [],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                tension: 0.1
+            }]
+        },
         options: {
             responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                title: {
-                    display: true,
-                    text: chartTitle
-                }
-            },
+            maintainAspectRatio: false, // Ensure this is set to false
             scales: {
-                x: { title: { display: true, text: 'X-Axis' } },
-                y: { title: { display: true, text: 'Y-Axis' }, beginAtZero: true }
+                x: {
+                    type: 'category',
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Usage (kWh)'
+                    }
+                }
             }
         }
-    };
+    });
 
-    // Render the chart
-    const ctx = canvas.getContext('2d');
-    new Chart(ctx, config);
-}
+
+    async function fetchData() {
+        try {
+            const response = await fetch('/api/energy-usage'); // API
+            const data = await response.json();
+
+
+            const labels = data.map(item => item.date.split("T")[0]); // (YYYY-MM-DD)
+            const energyUsage = data.map(item => item.energyusage);
+
+
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = energyUsage;
+            myChart.update();
+        } catch (error) {
+            console.error("❌ Error fetching data:", error);
+        }
+    }
+
+
+    fetchData();
+});
+
+
 
 // Example usage
 document.addEventListener('DOMContentLoaded', async () => {

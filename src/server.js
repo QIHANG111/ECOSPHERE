@@ -1,7 +1,7 @@
 import app from './app.js';
 import { connectDB } from './database/db.js';
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8000;
 
 async function startServer() {
     try {
