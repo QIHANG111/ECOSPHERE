@@ -25,13 +25,13 @@ router.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/pages/homePage.html"));
 });
 
-// 2️Example API endpoint to fetch mock user data
-router.get("/api/users", (req, res) => {
+// 2️Example API endpoint to fetch from MongoDB
+router.get("/api/users", async (req, res) => {
     try {
-        const users = require("../public/exampleData/data.json");
-        res.json(users);
+        const users = await User.find(); //fetch all users from mongoDb, retrieve all documents from user with find()
+        res.json(users); //Return the users as a JSON response
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch user data" });
+        res.status(500).json({ error: "Failed to fetch user data from database" });
     }
 });
 
