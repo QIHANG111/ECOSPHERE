@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+import EnergyUsage from "./EnergyUsage.js";
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -98,6 +100,8 @@ const rolePermissionSchema = new mongoose.Schema({
     }
 });
 
+
+
 const User = mongoose.model('User', userSchema);
 const Device = mongoose.model('Device', deviceSchema);
 const Energy = mongoose.model('Energy', energySchema);
@@ -105,11 +109,4 @@ const Role = mongoose.model('Role', roleSchema);
 const Permission = mongoose.model('Permission', permissionSchema);
 const RolePermission = mongoose.model('RolePermission', rolePermissionSchema);
 
-module.exports = {
-    User,
-    Device,
-    Energy,
-    Role,
-    Permission,
-    RolePermission
-};
+export default User;
