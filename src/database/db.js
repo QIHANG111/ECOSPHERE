@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from "dotenv";
 import fs from 'fs';
 import EnergyUsage from '../models/energy.model.js';
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker'; 
 
 dotenv.config();
 
