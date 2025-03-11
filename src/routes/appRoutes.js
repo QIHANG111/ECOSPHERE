@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 import  User  from "../models/user.model.js";
 import Device from "../models/device.model.js"
 import bcrypt from 'bcryptjs';
+import Room from '../models/room.model.js';
+import mongoose from 'mongoose';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -229,13 +231,48 @@ router.post("/api/update-temperature", (req, res) => {
 /* Rooms config */
 
 //add room
+router.post("/api/rooms", async (req, res) => {
+    try {
+        const { room_name, room_type } = req.body;
+
+        if (!room_name || !room_type) {
+            return res.status(400).json({error: "All fields are required"});
+        }
+
+        const newRoom = new Room ({ room_name, room_type});
+        await newRoom.save();
+
+        res.status(201).json({message: "Room added successfully", room: newRoom});
+    } catch (error) {
+        res.status(500).json({error: "Failed to add room"});
+    }
+});
 
 //delete room 
+router.delete("/api/rooms/:id", async (req, res) =>{
+    try {
+        const { id } = req.params;
 
+        //check if room exists
+        const room = await Room.findById(id);
+        if(!room){
+            return res.status(404).json({error: "Room not found"});
+        }
+
+        await Room.findByIdAndDelete(id);
+        res.json({message: "Room deleted successfully"});
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete room"});
+    }
+});
 
 // get energy usage data
 router.get("/api/energy-usage", async (req, res) => {
     try {
+        if (mongoose.connection.readyState!==1){ //1 = connected
+            return res.status(500).json({error: "Database not connected"});
+        }
+
         const energyData = await EnergyUsage.find().sort({ date: 1 });
 
         if (!energyData.length) {
