@@ -2,30 +2,34 @@ import mongoose from 'mongoose';
 import dotenv from "dotenv";
 import fs from 'fs';
 import EnergyUsage from '../models/energy.model.js';
+import { faker } from '@faker-js/faker';
 
 dotenv.config();
 
 //function to insert data
-export const insertData = async () => {
+export const insertData = async (count = 60 ) => {
     try {
+        let energyData = [];
+
          // Clear existing data
         await EnergyUsage.deleteMany({});
         console.log("Existing data cleared!");
 
-        const json_data = fs.readFileSync('./src/database/energy_usage.json','utf-8');
-        let energyData = JSON.parse(json_data);
+        for (let i = 0; i<count; i++){
+            energyData.push({
+                date: faker.date.past(),
+                energyusage: faker.number.float({min: 70, max: 90, precision: 5})
+            });
+        }
 
-        energyData = energyData.map(entry=>({
-            date:new Date(entry.date), //convert string to date object
-            energyusage: entry.energyusage
-        }));
         await EnergyUsage.insertMany(energyData);
-        console.log("data inserted successfully!");
+          console.log(`${count} data inserted successfully!`);
 
-        mongoose.connection.close(); //close connection after inserting
     } catch (error) {
         console.error(`error inserting data: ${error.message}`);
         process.exit(1);
+    } finally {
+        mongoose.connection.close(); //close connection after inserting
     }
 };
 
