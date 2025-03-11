@@ -1,24 +1,29 @@
 import express  from 'express';
 import path from 'node:path';
 import * as fs from 'node:fs';
-import EnergyUsage from "../models/EnergyUsage.js";
+import EnergyUsage from "../models/energy.model.js";
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import  User  from "../models/user.model.js";
+import Device from "../models/device.model.js"
 import bcrypt from 'bcryptjs';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const devicesFile = path.join(__dirname, "../public/exampleData/device.json");
+const usersFile = path.join(__dirname, "../public/exampleData/user.json");
 
 const router = express.Router();
+
 router.use(express.json()); // Ensure JSON request body is parsed
+
+/*API endpoints. Have to make it so that it reads from mongodb, instead of the exampleData folder */
 
 // 1️Serve the main HTML page
 router.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/pages/homePage.html"));
 });
-
 
 // 2️Example API endpoint to fetch mock user data
 router.get("/api/users", (req, res) => {
@@ -29,6 +34,106 @@ router.get("/api/users", (req, res) => {
         res.status(500).json({ error: "Failed to fetch user data" });
     }
 });
+
+//sign up for an account
+router.post("/api/signup", async (req, res) => {
+    try {
+        const { name, email, phone, password, role_id } = req.body;
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "This email is already registered" });
+        }
+
+        // hs psw
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // new user
+        const newUser = new User({
+            name,
+            email,
+            phone,
+            hashed_password: hashedPassword,
+            role_id
+        });
+        await newUser.save();
+        res.status(201).json({ message: "sign up successful!" });
+
+    } catch (error) {
+        console.error("error:", error);
+        res.status(500).json({ message: "server error" });
+    }
+});
+
+//sign into user account
+router.post("/api/signin", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.hashed_password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Incorrect password" });
+        }
+
+        // jwt
+        const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: "1h" });
+
+        res.status(200).json({ message: "sign in successfully", token, user });
+
+    } catch (error) {
+        console.error("error:", error);
+        res.status(500).json({ message: "server error" });
+    }
+});
+
+/*user config(create, delete, get all users)*/
+
+//create new user
+router.post("/api/users", async (req,res) =>{
+    const user = req.body;
+
+    if(!user.name || !user.email || !user.phone || !user.hashed_password || !user.roleID) {
+        return res.status(400).json({ success:false, message: 'please enter all fields'});
+    }
+
+    const newUser = new User(user);
+
+    try{
+        await newUser.save();
+        res.status(201).json({ success: true, data: newUser});
+    }catch(error){
+        console.error("Error in creating user", error.message);
+        res.status(500).json({success: false, message: "Server Error"});
+    }
+});
+
+//delete user
+
+//get all users
+router.get("/api/users", (req, res) => {
+    fs.readFile(usersFile, "utf8", (err, data) => {
+        if (err) {
+            return res.status(500).json({ error: "Failed to read users.json" });
+        }
+        try {
+            const users = JSON.parse(data);
+            res.json(users);
+        } catch (error) {
+            res.status(500).json({ error: "Invalid JSON format in users.json" });
+        }
+    });
+});
+
+/* Devices config*/
+
+//add device
+
+//delete device
 
 // Get the list of devices and their status
 router.get("/api/devices", (req, res) => {
@@ -120,6 +225,15 @@ router.post("/api/update-temperature", (req, res) => {
         }
     });
 });
+
+/* Rooms config */
+
+//add room
+
+//delete room 
+
+
+// get energy usage data
 router.get("/api/energy-usage", async (req, res) => {
     try {
         const energyData = await EnergyUsage.find().sort({ date: 1 });
@@ -134,65 +248,5 @@ router.get("/api/energy-usage", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
-
-router.post("/api/signup", async (req, res) => {
-    try {
-        const { name, email, phone, password, role_id } = req.body;
-
-
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: "This email is already registered" });
-        }
-
-        // hs psw
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // new user
-        const newUser = new User({
-            name,
-            email,
-            phone,
-            hashed_password: hashedPassword,
-            role_id
-        });
-        await newUser.save();
-        res.status(201).json({ message: "sign up successfully" });
-
-    } catch (error) {
-        console.error("error:", error);
-        res.status(500).json({ message: "server error" });
-    }
-});
-
-router.post("/api/signin", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "User not found" });
-        }
-
-
-        const isMatch = await bcrypt.compare(password, user.hashed_password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Incorrect password" });
-        }
-
-        // jwt
-        const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: "1h" });
-
-        res.status(200).json({ message: "sign in successfully", token, user });
-
-    } catch (error) {
-        console.error("error:", error);
-        res.status(500).json({ message: "server error" });
-    }
-});
-
-
 
 export default router;

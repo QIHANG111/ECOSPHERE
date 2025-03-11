@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from "dotenv";
 import fs from 'fs';
-import EnergyUsage from '../models/EnergyUsage.js';
+import EnergyUsage from '../models/energy.model.js';
 
 dotenv.config();
 
