@@ -34,6 +34,11 @@ export const insertData = async (count = 60 ) => {
 };
 
 export const connectDB = async () => {
+    if(mongoose.connection.readyState!==0){ //if already connected, return
+        console.log("MongoDB already connected");
+        return;
+    }
+
     try {
         const conn = await mongoose.connect(process.env.MONGO_URI);
         console.log(`MongoDB connected: ${conn.connection.host}`);
