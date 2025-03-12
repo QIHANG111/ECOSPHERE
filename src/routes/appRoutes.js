@@ -5,7 +5,7 @@ import EnergyUsage from "../models/energy.model.js";
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import  User  from "../models/user.model.js";
-import Device from "../models/device.model.js"；
+import Device from "../models/device.model.js";
 import bcrypt from 'bcryptjs';
 import Room from '../models/room.model.js';
 import mongoose from 'mongoose';
@@ -215,7 +215,7 @@ router.get("/api/allusers", async (req, res) => {
 router.post("/api/device", async (req,res) =>{
     const device = req.body;
 
-    if(!device.device_name  !device.device_type  !device.status) {
+    if(!device.device_name  || !device.device_type || !device.status) {
         return res.status(400).json({ success:false, message: 'please enter all fields'});
     }
 
