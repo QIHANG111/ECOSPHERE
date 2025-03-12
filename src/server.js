@@ -1,7 +1,6 @@
 import express from "express";
 import app from './app.js';
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import appRoutes from "./routes/appRoutes.js"
 import { connectDB } from './database/db.js';
 import { insertData } from './database/db.js';
@@ -16,7 +15,6 @@ async function startServer() {
         await connectDB();
         console.log("Database connected. Setting up routes...");
         app.use(appRoutes); // Register routes after DB is connected
-        await insertData();
         app.listen(PORT, () => {
             console.log(`Server is running at http://localhost:${PORT}`);
         });
@@ -24,6 +22,7 @@ async function startServer() {
         console.error("Error starting server:", error);
         process.exit(1);
     }
+    await insertData();
 }
 
 startServer();
