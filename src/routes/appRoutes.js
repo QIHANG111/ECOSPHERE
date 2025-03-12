@@ -151,7 +151,7 @@ router.delete("/api/users/:id", async (req, res) => {
             await User.deleteMany({
                 $or: [
                     { _id: id },
-                    { parentUser: id } // Assuming subusers store the manager's _id in parentUser
+                    { parentUser: id } 
                 ]
             });
             return res.status(200).json({ success: true, message: "Manager and all associated dwellers have been deleted." });
