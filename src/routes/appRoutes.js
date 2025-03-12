@@ -5,7 +5,7 @@ import EnergyUsage from "../models/energy.model.js";
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import  User  from "../models/user.model.js";
-import Device from "../models/device.model.js"
+import Device from "../models/device.model.js"；
 import bcrypt from 'bcryptjs';
 import Room from '../models/room.model.js';
 import mongoose from 'mongoose';
@@ -212,8 +212,41 @@ router.get("/api/allusers", async (req, res) => {
 /* Devices config*/
 
 //add device
+router.post("/api/device", async (req,res) =>{
+    const device = req.body;
+
+    if(!device.device_name  !device.device_type  !device.status) {
+        return res.status(400).json({ success:false, message: 'please enter all fields'});
+    }
+
+    const newDevice = new Device(device);
+
+    try{
+        await newDevice.save();
+        res.status(201).json({ success: true, data: newDevice});
+    }catch(error){
+        console.error("Error in creating user", error.message);
+        res.status(500).json({success: false, message: "Server Error"});
+    }
+});
 
 //delete device
+router.delete("/api/device/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const device = await Device.findByIdAndDelete(id);
+
+        if (!device) {
+            return res.status(404).json({ success: false, message: "Device not found" });
+        }
+
+        res.status(200).json({ success: true, message: "Device deleted successfully" });
+    } catch (error) {
+        console.error("Error in deleting device", error.message);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+});
 
 // Get the list of devices and their status
 router.get("/api/devices", (req, res) => {
