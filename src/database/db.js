@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import dotenv from "dotenv";
-import fs from 'fs';
 import EnergyUsage from '../models/energy.model.js';
 import { faker } from '@faker-js/faker'; 
 
@@ -23,7 +22,7 @@ export const insertData = async (count = 60 ) => {
         }
 
         await EnergyUsage.insertMany(energyData);
-          console.log(`${count} data inserted successfully!`);
+        console.log(`${count} data inserted successfully!`);
 
     } catch (error) {
         console.error(`error inserting data: ${error.message}`);

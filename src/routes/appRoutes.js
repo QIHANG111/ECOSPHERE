@@ -14,7 +14,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const devicesFile = path.join(__dirname, "../public/exampleData/device.json");
-const usersFile = path.join(__dirname, "../public/exampleData/user.json");
 
 const router = express.Router();
 
@@ -95,41 +94,117 @@ router.post("/api/signin", async (req, res) => {
 
 /*user config(create, delete, get all users)*/
 
-//create new user
-router.post("/api/users", async (req,res) =>{
-    const user = req.body;
+// Add new user to an already registered account
+router.post("/api/subusers", async (req, res) => {
+    try {
+        const { name, phone, role_id, mainUserEmail } = req.body;
 
-    if(!user.name || !user.email || !user.phone || !user.hashed_password || !user.roleID) {
-        return res.status(400).json({ success:false, message: 'please enter all fields'});
-    }
+        // Validate required fields
+        if (!name || !phone || !role_id || !mainUserEmail) {
+            return res.status(400).json({ success: false, message: 'Please enter all fields: name, phone, roleID, and main user email' });
+        }
 
-    const newUser = new User(user);
+        // Verify that the main user exists in the database using the email field
+        const mainUser = await User.findOne({ email: mainUserEmail });
+        if (!mainUser) {
+            return res.status(400).json({ success: false, message: 'Main user not found' });
+        }
 
-    try{
-        await newUser.save();
-        res.status(201).json({ success: true, data: newUser});
-    }catch(error){
-        console.error("Error in creating user", error.message);
-        res.status(500).json({success: false, message: "Server Error"});
+        // Create a new sub-user instance, associating it with the main user's id
+        const newSubUser = new User({
+            name,
+            phone,
+            roleID,
+            parentUser: mainUser._id // Associate with main user's MongoDB id
+        });
+
+        // Save the new sub-user to the database
+        await newSubUser.save();
+        res.status(201).json({ success: true, message: 'Sub-user created successfully', data: newSubUser });
+    } catch (error) {
+        console.error("Error creating sub-user:", error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
-//delete user
+//delete user, if main, delete subs too, else delete just the user
+// TODO: make it so that only home managers can delete main user
+const mainRole = "manager";
+const subRole = "dweller";
 
-//get all users
-router.get("/api/users", (req, res) => {
-    fs.readFile(usersFile, "utf8", (err, data) => {
-        if (err) {
-            return res.status(500).json({ error: "Failed to read users.json" });
+router.delete("/api/users/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the user by the provided id
+        const userToDelete = await User.findById(id);
+        if (!userToDelete) {
+            return res.status(404).json({ success: false, message: "User not found" });
         }
-        try {
-            const users = JSON.parse(data);
-            res.json(users);
-        } catch (error) {
-            res.status(500).json({ error: "Invalid JSON format in users.json" });
+
+        // Check the roleID using the constants
+        if (userToDelete.role_id === mainRole) {
+            // Manager: delete the manager and all associated dwellers
+            await User.deleteMany({
+                $or: [
+                    { _id: id },
+                    { parentUser: id } // Assuming subusers store the manager's _id in parentUser
+                ]
+            });
+            return res.status(200).json({ success: true, message: "Manager and all associated dwellers have been deleted." });
+        } else if (userToDelete.role_id === subRole) {
+            // Dweller: delete only this subuser
+            await User.findByIdAndDelete(id);
+            return res.status(200).json({ success: true, message: "Dweller has been deleted." });
+        } else {
+            // Fallback: if roleID is not recognized, delete only the found user
+            await User.findByIdAndDelete(id);
+            return res.status(200).json({ success: true, message: "User has been deleted." });
         }
-    });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
 });
+
+//get all users under a certain manager
+router.get("/api/users/parent/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the parent user (manager) by id
+        const parentUser = await User.findById(id);
+        if (!parentUser) {
+            return res.status(404).json({ success: false, message: "Parent user not found" });
+        }
+
+        // Find all subusers (dwellers) associated with the parent user
+        const subUsers = await User.find({ parentUser: id });
+
+        // Return the parent user and its subusers
+        res.status(200).json({
+            success: true,
+            parent: parentUser,
+            subUsers
+        });
+    } catch (error) {
+        console.error("Error fetching users for parent:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+// get all users in database
+router.get("/api/allusers", async (req, res) => {
+    try {
+        // Retrieve all users from the database
+        const users = await User.find();
+        res.status(200).json({ success: true, users });
+    } catch (error) {
+        console.error("Error fetching all users:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
 
 /* Devices config*/
 
