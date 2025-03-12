@@ -128,23 +128,26 @@ router.post("/api/subusers", async (req, res) => {
 });
 
 //delete user, if main, delete subs too, else delete just the user
-// TODO: make it so that only home managers can delete main user
 const mainRole = "manager";
 const subRole = "dweller";
 
 router.delete("/api/users/:id", async (req, res) => {
     try {
         const { id } = req.params;
+        const requestingUserRole = req.user && req.user.roleID; // authenticated user's role
 
-        // Find the user by the provided id
+        // Find the user to be deleted by the provided id
         const userToDelete = await User.findById(id);
         if (!userToDelete) {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // Check the roleID using the constants
-        if (userToDelete.role_id === mainRole) {
-            // Manager: delete the manager and all associated dwellers
+        // If trying to delete a manager account, only allow if the requester is also a manager
+        if (userToDelete.roleID === mainRole) {
+            if (requestingUserRole !== mainRole) {
+                return res.status(403).json({ success: false, message: "Only managers can delete a manager account." });
+            }
+            // Delete the manager and all associated dwellers (subusers)
             await User.deleteMany({
                 $or: [
                     { _id: id },
@@ -152,12 +155,12 @@ router.delete("/api/users/:id", async (req, res) => {
                 ]
             });
             return res.status(200).json({ success: true, message: "Manager and all associated dwellers have been deleted." });
-        } else if (userToDelete.role_id === subRole) {
-            // Dweller: delete only this subuser
+        } else if (userToDelete.roleID === subRole) {
+            // If it's a dweller account, delete only that subuser
             await User.findByIdAndDelete(id);
             return res.status(200).json({ success: true, message: "Dweller has been deleted." });
         } else {
-            // Fallback: if roleID is not recognized, delete only the found user
+            // Fallback: if roleID is not recognized, simply delete the user
             await User.findByIdAndDelete(id);
             return res.status(200).json({ success: true, message: "User has been deleted." });
         }
