@@ -1,9 +1,8 @@
 import express from 'express';
-import path from 'node:path';
+import path, {dirname} from 'node:path';
 import * as fs from 'node:fs';
 import EnergyUsage from '../models/energy.model.js';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import {fileURLToPath} from 'node:url';
 import User from '../models/user.model.js';
 import Device from '../models/device.model.js';
 import bcrypt from 'bcryptjs';
@@ -42,7 +41,7 @@ function logDbState(routeLabel) {
 */
 router.get('/', (req, res) => {
     console.log('[DEBUG] GET / -> sending homePage.html');
-    res.sendFile(path.join(__dirname, '../public/pages/signinPage.html'));
+    res.sendFile(path.join(__dirname, '../public/pages/landingPage.html'));
 });
 
 /*
@@ -215,8 +214,7 @@ router.put('/api/update-user', async (req, res) => {
         if (name) updateData.name = name;
         if (email) updateData.email = email;
         if (password) {
-            const hashedPassword = await bcrypt.hash(password, 10);
-            updateData.hashed_password = hashedPassword;
+            updateData.hashed_password = await bcrypt.hash(password, 10);
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
