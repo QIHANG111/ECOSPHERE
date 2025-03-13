@@ -205,6 +205,9 @@ function handleGeminiRequest() {
     const fullPrompt = `
 You are an AI assistant. Follow these instructions carefully:
 - Do Not generate more than 100 words.
+- If the user wants to know the energy usage or reports, reply with "reportPage."
+- If the user wants to set profile settings or edit passward / email or log out, reply with "settingsPage."
+- Tf the user wants to add or delete a device, reply with "devicePage".
 - If the user's message wants to change to a specific theme mode, reply only with "Ok, changed to"+light/dark/black+theme.
 - If the message does not, respond normally.
 - If the message wants to know what you can do/who are you, reply with "I am ECOSPHERE AI, I can help you with energy reports, change settings, and more.".
@@ -248,6 +251,17 @@ AI Response:`;
             switchTheme("black-theme");
         } else if (aiResponseText.includes("Ok, changed to light theme")) {
             switchTheme("light-theme");
+        }
+
+        // AI page jump
+        if (aiResponseText.includes("reportPage")) {
+            window.location.href = "../pages/reportPage.html";
+        }
+        if (aiResponseText.includes("settingsPage")) {
+            window.location.href = "../pages/settingPage.html";
+        }
+        if (aiResponseText.includes("devicePage")) {
+            window.location.href = "../pages/devicesPage.html";
         }
     });
 }

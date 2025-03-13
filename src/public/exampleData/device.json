@@ -19,12 +19,12 @@
     },
     {
         "name": "LIGHT1",
-        "status": false,
+        "status": true,
         "type": "LIGHT"
     },
     {
         "name": "LIGHT2",
-        "status": true,
+        "status": false,
         "type": "LIGHT"
     }
 ]
