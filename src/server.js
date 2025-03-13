@@ -8,7 +8,7 @@ import { insertData } from './database/db.js';
 dotenv.config();
 app.use(express.json())
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 4000;
 
 async function startServer() {
     try {
