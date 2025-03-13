@@ -3,11 +3,11 @@
         "name": "AC1",
         "status": true,
         "type": "AC",
-        "temperature": 16
+        "temperature": 22
     },
     {
         "name": "AC2",
-        "status": true,
+        "status": false,
         "type": "AC",
         "temperature": 16
     },
