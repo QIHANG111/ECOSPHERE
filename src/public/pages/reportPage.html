@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homepage</title>
+  <title>Report</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="/css/style.css">
 
@@ -31,9 +31,9 @@
   <div class="dropdown">
     <button class="dropdown-btn" onclick="toggleDropdown()">▼</button>
     <div class="dropdown-content" id="dropdownMenu">
-      <a href="#">Week</a>
-      <a href="#">Month</a>
-      <a href="#">Year</a>
+      <a href="#" data-range="weekly">Week</a>
+      <a href="#" data-range="monthly">Month</a>
+      <a href="#" data-range="yearly">Year</a>
     </div>
   </div>
 
@@ -46,12 +46,20 @@
   </div>
   <div class="menu-text">Device</div>
 </div>
-<div class="menu-item">
-  <div class="ui-menu-icon">
-    <img src="/icons/chart.svg" alt="Vector Icon" width="50" height="50">
+  <div class="menu-item">
+    <div class="ui-menu-icon">
+      <img src="/icons/chart.svg" alt="Vector Icon" width="50" height="50">
+    </div>
+    <div class="menu-text">Chart Type</div>
+    <div class="dropdown">
+      <button class="dropdown-btn" onclick="toggleDropdownChart()">▼</button>
+      <div class="dropdown-content" id="dropdownMenu2">
+        <a href="#" data-chart="line">Line</a>
+        <a href="#" data-chart="bar">Bar</a>
+        <a href="#" data-chart="bubble">Bubble</a>
+      </div>
+    </div>
   </div>
-  <div class="menu-text">Chart Type</div>
-</div>
   <div class="menu-item" data-target="/pages/settingPage.html">
     <div class="ui-menu-icon">
       <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
@@ -61,7 +69,13 @@
 </div>
 
 <div class="dashboard" style="text-align: left; font-size: 3vw; font-weight: bold;">
-  Energy Usage Report
+  <div id="weeklyReport" class="report-section"style="font-family: 'Andale Mono',sans-serif">Weekly Energy Usage Report</div>
+  <div id="monthlyReport" class="report-section" style="display: none;font-family: 'Andale Mono',sans-serif">Monthly Energy Usage Report</div>
+  <div id="yearlyReport" class="report-section" style="display: none;font-family: 'Andale Mono',sans-serif">Yearly Energy Usage Report</div>
+<!--  <div id="dateSelectorContainer">-->
+<!--    <label for="dateRange">Select Date: <span id="selectedDate"></span></label>-->
+<!--    <input type="range" id="dateRange" min="0" max="30" value="0">-->
+<!--  </div>-->
   <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
     <div class="normalCard" style="text-align: left;width: 170%">
       <div class="leftToRightList">
@@ -76,9 +90,10 @@
     </div>
   </div>
   <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
-    <div class="normalCard" style="text-align: left; width: 170%">
-      <!-- This is where the generated report will appear -->
-      <div id="reportCard" style="padding: 0.1em; font-size: 0.5em; line-height: 1.4;">
+    <div class="normalCard" style="text-align: left; width: 170%;">
+<!--      <h2 style="font-size: 0.5em; margin-bottom: 10px;">Today's Energy Report</h2>-->
+      <div id="reportCard"style="font-family: 'Academy Engraved LET',sans-serif;font-size: 1.5vw;   line-height: 1.6;margin-top: 5vh;margin-left: 1vw;
+    word-wrap: break-word;">
         <!-- Will be filled dynamically by JS -->
       </div>
     </div>

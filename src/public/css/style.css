@@ -410,6 +410,7 @@ body {
 
 /* Dropdown container */
 .dropdown {
+    backdrop-filter: blur(0.5vw);
     position: relative;
     display: inline-block;
 }
@@ -417,12 +418,14 @@ body {
 /* Dropdown content */
 .dropdown-content {
     opacity: 0;
+    backdrop-filter: blur(0.5vw);
     transform: scaleY(0);
     position: absolute;
     z-index: 9999;
+    color: var(--c-text-primary);
     border-radius: 2vw;
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: var(--c-bg-sidebar);
     transform-origin: top;
     transition: opacity 0.3s ease, transform 0.3s ease;
     pointer-events: none;
@@ -435,7 +438,7 @@ body {
 }
 
 .dropdown-content a {
-    color: black;
+    color: var(--c-text-primary);
     padding: 0.5vw 2vw;
     text-decoration: none;
     display: block;
@@ -445,7 +448,7 @@ body {
 
 .dropdown-content a:hover {
     transform: scale(1.05);
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: var(--c-bg-card-hover);
 }
 
 .bar {

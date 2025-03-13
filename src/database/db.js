@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import dotenv from "dotenv";
 import EnergyUsage from '../models/energy.model.js';
 import { faker } from '@faker-js/faker';
-
+import fs from 'fs';
 dotenv.config();
 
 /**
@@ -35,29 +35,59 @@ export const connectDB = async () => {
  *
  * @param {number} count - how many records to insert (default: 60)
  */
-export const insertData = async (count = 60) => {
+export const insertData = async (count = 365) => {
     try {
         // Clear existing data
         await EnergyUsage.deleteMany({});
         console.log("Existing data cleared!");
 
-        // Create an array of fake docs
-        const energyData = [];
-        for (let i = 0; i < count; i++) {
-            energyData.push({
-                date: faker.date.past(),
-                energyusage: faker.number.float({ min: 70, max: 90, precision: 5 })
-            });
-        }
 
-        // Insert them in one go
-        await EnergyUsage.insertMany(energyData);
-        console.log(`${count} data inserted successfully!`);
+        /*use the fake data at energy_usage.json first*/
+
+        //
+        // // Create an array of fake docs
+        // const energyData = [];
+        // for (let i = 0; i < count; i++) {
+        //     energyData.push({
+        //         date: faker.date.past(),
+        //         energyusage: faker.number.float({ min: 70, max: 90, precision: 5 })
+        //     });
+        // }
+        //
+        // // Insert them in one go
+        // await EnergyUsage.insertMany(energyData);
+        // console.log(`${count} data inserted successfully!`);
     } catch (error) {
         console.error(`Error inserting data: ${error.message}`);
         process.exit(1);
     }
 };
+//365days mock data
+export const insertDataFromJSON = async (filePath) => {
+    try {
+
+        const rawData = fs.readFileSync(filePath, 'utf8');
+        const jsonData = JSON.parse(rawData);
+
+        if (!Array.isArray(jsonData) || jsonData.length === 0) {
+            throw new Error("Invalid JSON data: Must be a non-empty array.");
+        }
+
+        const formattedData = jsonData.map(item => ({
+            date: new Date(item.date),
+            energyusage: parseFloat(item.energyusage)
+        }));
+
+
+        await EnergyUsage.insertMany(formattedData);
+        console.log(`${formattedData.length} records inserted from JSON file.`);
+    } catch (error) {
+        console.error(`Error inserting data from JSON: ${error.message}`);
+        process.exit(1);
+    }
+};
+
+
 
 /**
  * Optional function to close the connection.
