@@ -9,6 +9,7 @@ import Device from '../models/device.model.js';
 import bcrypt from 'bcryptjs';
 import Room from '../models/room.model.js';
 import mongoose from 'mongoose';
+import Role from '../models/role.model.js'
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
 // And have SECRET_KEY either from env or config
@@ -37,7 +38,7 @@ function logDbState(routeLabel) {
 */
 router.get('/', (req, res) => {
     console.log('[DEBUG] GET / -> sending homePage.html');
-    res.sendFile(path.join(__dirname, '../public/pages/homePage.html'));
+    res.sendFile(path.join(__dirname, '../public/pages/signinPage.html'));
 });
 
 /*
@@ -60,39 +61,75 @@ router.get('/api/users', async (req, res) => {
   Sign up
 */
 router.post('/api/signup', async (req, res) => {
-    console.log('[DEBUG] POST /api/signup -> req.body:', req.body);
-    logDbState('/api/signup');
     try {
-        const { name, email, phone, password, role_id } = req.body;
+        let { name, email, phone, password, role_id } = req.body;
+        console.log("[DEBUG] Received signup data:", req.body);
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            console.log('[DEBUG] Email already registered:', email);
-            return res.status(400).json({ message: 'This email is already registered' });
+        if (!role_id || role_id.length !== 24) {
+            console.error("[ERROR] Invalid role_id:", role_id);
+            return res.status(400).json({ message: "Invalid role_id" });
         }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // **默认 phone**
+        if (!phone) {
+            phone = "1234567890";
+        }
 
-        // Create new user
+
+        const role = await Role.findById(role_id);
+        if (!role) {
+            console.error("[ERROR] Role ID not found:", role_id);
+            return res.status(400).json({ message: "Role ID not found" });
+        }
+
+        console.log("[DEBUG] Role ID is valid, proceeding with signup...");
+
+
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: "Email already registered" });
+        }
+
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("[DEBUG] Hashed password:", hashedPassword);
+
+
         const newUser = new User({
             name,
             email,
             phone,
             hashed_password: hashedPassword,
-            role_id
+            role_id: role._id
         });
 
         await newUser.save();
-        console.log('[DEBUG] New user created:', newUser._id);
-        res.status(201).json({ message: 'Sign up successful!' });
+        res.status(201).json({ message: "User registered successfully" });
+
     } catch (error) {
-        console.error('[ERROR] POST /api/signup ->', error);
-        res.status(500).json({ message: 'server error' });
+        console.error("[ERROR] POST /api/signup ->", error);
+        res.status(500).json({ message: "Server error" });
     }
 });
+router.get('/api/getRoleId/:roleName', async (req, res) => {
+    try {
+        const roleName = req.params.roleName;
+        console.log(`[DEBUG] Fetching role_id for: ${roleName}`); // Debugging log
 
+        const role = await Role.findOne({ role_name: roleName });
+
+        if (!role) {
+            console.log("[ERROR] Role not found");
+            return res.status(404).json({ message: "Role not found" });
+        }
+
+        console.log(`[DEBUG] Found role_id: ${role._id}`);
+        res.json({ role_id: role._id });
+    } catch (error) {
+        console.error("[ERROR] Fetching role ID:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
 /*
   Sign in
   NOTE: requires jwt & SECRET_KEY if you truly use token logic
