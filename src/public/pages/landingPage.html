@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>landingPage</title>
+  <style>
+    .text-gray-600 {
+      font-size: 1rem;
+    }
+
+    .text-yellow-500 {
+      margin-top: 30px;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<!-- 头部导航栏 -->
+<nav class="bg-white shadow-md p-4 flex justify-between items-center">
+  <div class="text-xl font-bold text-green-600">ECOSPHERE</div>
+  <div class="space-x-4">
+    <button onclick="window.location.href='../pages/signinPage.html'" class="bg-green-500 text-white px-4 py-2 rounded">Login / Sign up</button>
+  </div>
+</nav>
+
+<div class="flex-grow">
+<!-- Banner -->
+<section id="iot" class="text-center py-16 bg-white">
+  <h1 class="text-4xl font-bold">The world's leading smart home platform</h1>
+  <p class="text-gray-600 mt-2">Brand and equipment industry most complete, perfect function, all kinds of needs can be met</p>
+  <img src="../images/banner.jpg" alt="Smart Home" class="mx-auto mt-6 rounded-lg shadow-lg">
+</section>
+
+<!-- 设备展示 -->
+<section id="official" class="py-16 bg-gray-100 text-center">
+  <h2 class="text-3xl font-bold">Cover multiple ends, consistent use</h2>
+  <p class="text-gray-600 mt-2">Support mobile phones, tablets, home smart screen and other multi-terminal devices</p>
+  <div class="flex justify-center space-x-4 mt-6">
+    <img src="../images/phone.png" alt="equipment1" class="rounded-lg shadow">
+    <img src="../images/paid.png" alt="equipment2" class="rounded-lg shadow">
+  </div>
+</section>
+
+
+  <!-- 设备控制 -->
+  <section class="py-16 bg-gray-100 text-center">
+    <h2 class="text-3xl font-bold">Effortless Device Control, Seamless Living</h2>
+    <p class="text-gray-600 mt-2">One App to Control and Manage All Your Devices</p>
+
+    <div class="space-y-16 max-w-6xl mx-auto">
+      <!-- 回家 -->
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8 bg-white rounded-lg shadow-lg overflow-hidden p-8">
+        <!-- 左侧图片 -->
+        <div class="w-full md:w-1/2">
+          <img src="../images/go-home.png" alt="Home Scene" class="w-full h-auto rounded-lg">
+        </div>
+        <!-- 右侧内容 -->
+        <div class="w-full md:w-1/2 px-8 text-left">
+          <h2 class="text-3xl font-bold text-center mb-24">
+            <span class="text-yellow-500">Go Home <br> can be a ritual of comfort</span>
+          </h2>
+          <div class="flex justify-center space-x-12">
+            <div class="text-center">
+              <img src="../icons/device-page/door-lock-svgrepo-com.svg" alt="door-lock" class="w-16 h-16 mx-auto">
+              <p class="text-gray-700 mt-2">Fingerprint, scan face<br>Open Safety</p>
+            </div>
+            <div class="text-center">
+              <img src="../icons/device-page/light-svgrepo-com.svg" alt="auto-light" class="w-16 h-16 mx-auto">
+              <p class="text-gray-700 mt-2">Open the Door<br>Lights Turn On Automatically</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 离家 -->
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8 bg-white rounded-lg shadow-lg overflow-hidden p-8">
+        <!-- 左侧内容 -->
+        <div class="w-full md:w-1/2 px-8 text-left">
+          <h2 class="text-3xl font-bold text-center mb-24">
+            <span class="text-blue-500">Leaving Home <br> let ECOSPHERE handle the rest</span>
+          </h2>
+          <div class="flex justify-center space-x-12">
+            <div class="text-center">
+              <img src="../icons/device-page/vacuum-robot.svg" alt="robot vacuum cleaner" class="w-16 h-16 mx-auto">
+              <p class="text-gray-700 mt-2">After going out<br>Automatic cleaning</p>
+            </div>
+            <div class="text-center">
+              <img src="../icons/device-page/cctv.svg" alt="cctv" class="w-16 h-16 mx-auto">
+              <p class="text-gray-700 mt-2">Monitor at any time<br>Report an anomaly</p>
+            </div>
+          </div>
+        </div>
+        <!-- 右侧图片 -->
+        <div class="w-full md:w-1/2">
+          <img src="../images/leave-home.png" alt="Home Scene" class="w-full h-auto rounded-lg">
+        </div>
+      </div>
+
+      <!-- 其他功能（如果有） -->
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8 bg-white rounded-lg shadow-lg overflow-hidden p-8">
+        <!-- 左侧图片 -->
+        <div class="w-full md:w-1/2">
+          <img src="../images/home-environment.png" alt="Home Scene" class="w-full h-auto rounded-lg">
+        </div>
+        <!-- 右侧内容 -->
+        <div class="w-full md:w-1/2 px-8 text-left">
+          <h2 class="text-3xl font-bold text-center mb-24">
+            <span class="text-green-500">Home Environment <br>Ecosphere cares more than you</span>
+          </h2>
+          <div class="flex justify-center space-x-12">
+            <div class="text-center">
+              <img src="../icons/device-page/condicioner.svg" alt="condicioner" class="w-16 h-16 mx-auto">
+              <p class="text-gray-700 mt-2">Check the house environment<br>constant temperature and humidity</p>
+            </div>
+            <div class="text-center">
+              <img src="../icons/device-page/humidifier.svg" alt="humidifier" class="w-16 h-16 mx-auto">
+              <p class="text-gray-700 mt-2">High efficiency purification<br>Healthy breathing</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+<!-- 智能语音控制 -->
+<section class="py-16 bg-white text-center">
+  <h2 class="text-3xl font-bold">智能生活，一句话的事</h2>
+  <p class="text-gray-600 mt-2">支持语音控制 3000+ 款智能家电</p>
+  <div class="flex justify-center space-x-8 mt-6">
+    <div class="p-6 border rounded-lg shadow-lg">
+      <p class="text-lg font-bold">"小爱同学，打开空调并调至24℃"</p>
+    </div>
+    <div class="p-6 border rounded-lg shadow-lg">
+      <p class="text-lg font-bold">"小爱同学，我要睡了，关闭所有灯"</p>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- 扩展底部 -->
+<footer id="download" class="bg-gray-900 text-white text-center py-12">
+  <div class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div>
+      <h3 class="font-bold text-lg">了解更多</h3>
+      <p class="text-gray-400 mt-2">小米官网</p>
+      <p class="text-gray-400">小米澎湃 OS</p>
+    </div>
+    <div>
+      <h3 class="font-bold text-lg">服务支持</h3>
+      <p class="text-gray-400 mt-2">帮助中心</p>
+      <p class="text-gray-400">售后政策</p>
+      <p class="text-gray-400">常见问题</p>
+    </div>
+    <div>
+      <h3 class="font-bold text-lg">关注我们</h3>
+      <div class="flex justify-center space-x-4 mt-2">
+        <div>
+          <img src="https://via.placeholder.com/100x100" alt="微信二维码" class="mx-auto">
+          <p class="text-gray-400 text-sm">微信公众号</p>
+        </div>
+        <div>
+          <img src="https://via.placeholder.com/100x100" alt="微博二维码" class="mx-auto">
+          <p class="text-gray-400 text-sm">微博</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="border-t border-gray-700 mt-6 pt-4">
+    <p class="text-gray-400">© mi.com 京ICP证110507号 | 京ICP备10046444号 | 京公网安备11010802020134号</p>
+    <p class="text-gray-400">违法和不良信息举报方式：400-100-5678</p>
+    <p class="text-gray-400">本网站所列数据，除特殊说明，所有数据均出自实验室测试</p>
+  </div>
+</footer>
+</body>
+</html>
