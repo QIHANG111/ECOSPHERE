@@ -10,11 +10,3 @@ menuItems.forEach((item) => {
         }
     });
 });
-
-
-fetch('/exampleData/data.json')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('text-content').innerText = data;
-    })
-    .catch(error => console.error('Error fetching the text file:', error));

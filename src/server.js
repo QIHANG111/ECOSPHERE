@@ -1,28 +1,33 @@
-import express from "express";
+// server.js
+import dotenv from 'dotenv';
 import app from './app.js';
-import dotenv from "dotenv";
-import appRoutes from "./routes/appRoutes.js"
-import { connectDB } from './database/db.js';
-import { insertData } from './database/db.js';
+import { connectDB, insertData } from './database/db.js';
 
 dotenv.config();
-app.use(express.json())
 
 const PORT = process.env.PORT || 4000;
 
 async function startServer() {
     try {
+        console.log('[DEBUG] Starting server...');
+
+        // Connect to the database
         await connectDB();
-        console.log("Database connected. Setting up routes...");
-        app.use(appRoutes); // Register routes after DB is connected
+        console.log('[DEBUG] Database connected successfully.');
+
+        // Optional: Insert some initial data if you want
+        await insertData();
+        console.log('[DEBUG] Initial data inserted (if needed).');
+
+        // Finally, start listening on the specified port
         app.listen(PORT, () => {
-            console.log(`Server is running at http://localhost:${PORT}`);
+            console.log(`[DEBUG] Server is running at http://localhost:${PORT}`);
         });
+
     } catch (error) {
-        console.error("Error starting server:", error);
+        console.error('[ERROR] Error starting server:', error);
         process.exit(1);
     }
-    await insertData();
 }
 
 startServer();

@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Create clouds texture for more realism
-    const cloudTexture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds.png', undefined, undefined, function() {
+    const cloudTexture = new THREE.TextureLoader().load('/images/1200px-Earth-clouds.png', undefined, undefined, function() {
         console.error('Failed to load cloud texture');
     });
     

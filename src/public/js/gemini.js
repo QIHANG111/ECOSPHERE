@@ -311,7 +311,6 @@ window.onload = function () {
         }
     });
 
-    setupVoiceRecognition();
 };
 
 // Voice Recognition
