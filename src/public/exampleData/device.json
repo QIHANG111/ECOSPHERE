@@ -3,19 +3,19 @@
         "name": "AC1",
         "status": true,
         "type": "AC",
-        "temperature": 20
+        "temperature": 16
     },
     {
         "name": "AC2",
         "status": true,
         "type": "AC",
-        "temperature": 17
+        "temperature": 16
     },
     {
         "name": "AC3",
         "status": true,
         "type": "AC",
-        "temperature": 17
+        "temperature": 18
     },
     {
         "name": "LIGHT1",
@@ -24,7 +24,7 @@
     },
     {
         "name": "LIGHT2",
-        "status": false,
+        "status": true,
         "type": "LIGHT"
     }
 ]

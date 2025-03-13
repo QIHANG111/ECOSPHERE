@@ -8,6 +8,7 @@
 </head>
 <body>
 
+
 <!-- Sidebar -->
 <div class="sidebar">
     <div class="menu-item" data-target="/pages/usersPage.html">
@@ -46,11 +47,12 @@
 <div class="dashboard">
     <div class="dashboard-content">
         <div class="family-card">
-            <h5>You</h5>
+            <div class="profile-container">
+            <div id="userInfo" style="font-size: 18px; font-weight: bold; padding: 10px;"></div>
             <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User">
-            <p>Family organizer since: 2018</p>
-            <span class="badge bg-primary">Premium Subscriber</span>
-        </div>
+
+                <span class="badge premium-badge">Premium Subscriber</span>
+        </div></div>
         <div class="add-card" onclick="openAddModal()">
             <span>+</span>
             <p>Add a family member</p>

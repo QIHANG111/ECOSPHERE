@@ -10,6 +10,8 @@ import bcrypt from 'bcryptjs';
 import Room from '../models/room.model.js';
 import mongoose from 'mongoose';
 import Role from '../models/role.model.js'
+import jwt from 'jsonwebtoken';
+
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
 // And have SECRET_KEY either from env or config
@@ -20,6 +22,8 @@ const __dirname = dirname(__filename);
 const devicesFile = path.join(__dirname, '../public/exampleData/device.json');
 
 const router = express.Router();
+let notifications = [];
+const SECRET_KEY = "your_secret_key";
 
 // Enable JSON body parsing
 router.use(express.json());
@@ -130,13 +134,38 @@ router.get('/api/getRoleId/:roleName', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+
+router.get('/api/user', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const user = await User.findById(userId).select("-hashed_password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error("[ERROR] GET /api/user ->", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
 /*
   Sign in
   NOTE: requires jwt & SECRET_KEY if you truly use token logic
 */
 router.post('/api/signin', async (req, res) => {
     console.log('[DEBUG] POST /api/signin -> req.body:', req.body);
-    logDbState('/api/signin');
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
@@ -152,12 +181,12 @@ router.post('/api/signin', async (req, res) => {
             return res.status(400).json({ message: 'Incorrect password' });
         }
 
-        // If using JWT, ensure these are defined:
-        // const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, {
-        //   expiresIn: '1h'
-        // });
-        // For now, just pretend we have a token:
-        const token = 'FAKE_TOKEN';
+        // ✅ JWT Token
+        const token = jwt.sign(
+            { userId: user._id, email: user.email, role: user.role_id },
+            SECRET_KEY,
+            { expiresIn: '2h' } // 2h
+        );
 
         console.log(`[DEBUG] User signed in successfully: ${user.email}`);
         res.status(200).json({ message: 'Sign in successfully', token, user });
@@ -166,10 +195,44 @@ router.post('/api/signin', async (req, res) => {
         res.status(500).json({ message: 'server error' });
     }
 });
-
 /* ============================================================
    USER CONFIG
 ============================================================ */
+
+router.put('/api/update-user', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const { name, email, password } = req.body;
+
+        let updateData = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateData.hashed_password = hashedPassword;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ message: "User updated successfully", user: updatedUser });
+    } catch (error) {
+        console.error("[ERROR] PUT /api/update-user ->", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
 
 /*
   Add new sub-user
@@ -457,6 +520,10 @@ router.post('/api/update-temperature', (req, res) => {
             device.temperature = temperature;
             console.log(`[DEBUG] Updated AC device '${name}' temperature to: ${temperature}`);
 
+            // Store notification
+            const notificationMessage = `Updated AC device '${name}' temperature to: ${temperature}`;
+            notifications.push(notificationMessage);
+
             // Save the updated data back to JSON
             fs.writeFile(devicesFile, JSON.stringify(devices, null, 4), err => {
                 if (err) {
@@ -560,8 +627,11 @@ router.get('/api/energy-usage', async (req, res) => {
     }
 });
 
-
+router.get('/api/notifications', (req, res) => {
+    res.json({ notifications }); // Ensuring it's an object with an array
+});
 
 
 
 export default router;
+

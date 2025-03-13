@@ -71,9 +71,10 @@
     </div>
 
     <!-- Account Settings -->
+
     <div class="settings-card">
         <h2>Account Settings</h2>
-        <form>
+        <form id="accountForm">
             <label for="username">Username:</label>
             <input type="text" id="username" placeholder="Enter your username">
 
@@ -81,10 +82,15 @@
             <input type="email" id="email" placeholder="Enter your email">
 
             <label for="password">Password:</label>
-            <input type="password" id="password" placeholder="Enter new password">
+            <input type="password" id="password" placeholder="Enter new password (optional)">
 
             <button type="submit" class="save-btn">Save Changes</button>
         </form>
+        <!-- Logout Button -->
+        <div class="settings-card">
+            <h2>Logout</h2>
+            <button id="logout-btn" class="logout-btn">Logout</button>
+        </div>
     </div>
 
     <!-- Device Management -->
@@ -100,24 +106,7 @@
     </div>
 
     <!-- Automation Rules -->
-    <div class="settings-card">
-        <h2>Automation Rules</h2>
-        <label for="trigger">Trigger Event:</label>
-        <select id="trigger">
-            <option value="motion">Motion Detected</option>
-            <option value="temperature">Temperature Exceeds Limit</option>
-            <option value="door">Door Unlocked</option>
-        </select>
 
-        <label for="action">Action:</label>
-        <select id="action">
-            <option value="turn-light">Turn On Light</option>
-            <option value="notify">Send Notification</option>
-            <option value="lock-door">Lock Door</option>
-        </select>
-
-        <button class="add-rule-btn">Add Rule</button>
-    </div>
 
     <!-- Security Settings -->
     <div class="settings-card">
@@ -143,11 +132,7 @@
         </label>
     </div>
 
-    <!-- System Update -->
-    <div class="settings-card">
-        <h2>System Updates</h2>
-        <button class="check-update-btn">Check for Updates</button>
-    </div>
+
 
     <!-- Reset Settings -->
     <div class="settings-card">

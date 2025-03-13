@@ -4,7 +4,7 @@
     --text-color: black;
     --sidebar-background: rgba(255, 255, 255, 0.5);
     --card-background: rgba(255, 255, 255, 0.4);
-    --button-background: #007bff;
+    --button-background: #c6ae9c;
     --button-hover: #0056b3;
     --input-border: #ccc;
     --input-shadow: rgba(0, 0, 0, 0.1);
@@ -32,12 +32,14 @@
     --c-bg-primary: #323339;
     --c-bg-secondary: #222128;
     --c-bg-button: #494a50;
+    --button-background: #2c2a26;
     --c-bg-sidebar: rgb(33, 38, 40);
     --c-bg-card-hover: rgba(73, 82, 97, 0.94);
     --c-glow: rgba(255, 255, 255, 0.7);
     --normal-card-border: rgb(175, 173, 173);
 }
 :root.black-theme {
+    --button-background: #2c2a26;
     --c-text-primary: #edeeef;
     --c-text-secondary: #d4d7e1;
     --c-border-primary: #323232;
@@ -81,6 +83,7 @@
 
 
 body {
+    font-family: "Arial", sans-serif;
     margin: 0;
     background-color: var(--c-bg-body);
     align-items: flex-start;
@@ -543,7 +546,90 @@ body {
 /*    overflow: hidden;*/
 /*    transform-origin: center;*/
 /*}*/
+/* Family Card Styling */
+.family-card {
+    background: var(--c-bg-sidebar);
+    color: var(--c-text-primary);
+    border-radius: 2vw;
+    padding: 2vw;
+    text-align: center;
+    box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+}
 
+.family-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 1vw 2vw rgba(255, 255, 255, 0.3);
+}
+
+/* Profile Image Styling */
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-image {
+    width: 6vw;
+    height: 6vw;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 0.3vw solid var(--c-bg-card-hover);
+    transition: transform 0.3s ease;
+}
+
+.profile-image:hover {
+    transform: scale(1.1);
+}
+
+/* Profile Name */
+.profile-name {
+    font-size: 1.8vw;
+    font-weight: bold;
+    margin-top: 1vw;
+}
+
+/* Badge */
+.premium-badge {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: white;
+    padding: 0.5vw 1.2vw;
+    border-radius: 1vw;
+    font-size: 1.2vw;
+    margin-top: 0.5vw;
+    font-weight: bold;
+}
+
+/* Add Card Styling */
+.add-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 10vw;
+    width: 10vw;
+    background: var(--c-bg-sidebar);
+    border-radius: 50%;
+    border: 0.3vw dashed var(--c-bg-card-hover);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.add-card:hover {
+    background: var(--c-bg-card-hover);
+    transform: scale(1.1);
+}
+
+.add-icon {
+    font-size: 3vw;
+    font-weight: bold;
+    color: var(--c-text-primary);
+}
 
 
 .family-card:hover, .add-card:hover {
@@ -582,7 +668,7 @@ body {
 
 /* Modal Content */
 .modal-content {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: var(--c-bg-sidebar);
     padding: 2vw;
     border-radius: 3vw;
     width: 200vw;
@@ -595,7 +681,7 @@ body {
 .modal-content:hover {
     transform: scale(1.03);
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: var(--c-bg-card-hover);
 }
 
 /* Close Button */
@@ -644,7 +730,7 @@ button {
 }
 
 button:hover {
-    background-color: var(--c-bg-card-hover);
+    background-color: rgb(237, 101, 101);
 }
 
 .hidden-button {

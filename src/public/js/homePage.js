@@ -150,7 +150,43 @@ document.addEventListener("DOMContentLoaded", renderRooms);
     const maxTemp = 30;
 
 
+async function fetchNotifications() {
+    try {
+        const response = await fetch('/api/notifications');
+        const data = await response.json();
 
+        // Ensure notifications is an array
+        if (!data.notifications || !Array.isArray(data.notifications)) {
+            console.error("Invalid notifications format:", data);
+            return;
+        }
+
+        const notificationsContainer = [...document.querySelectorAll('.dashboard-content h3')]
+            .find(el => el.textContent.includes("Notifications"))?.parentElement;
+
+        if (!notificationsContainer) {
+            console.error("Notifications container not found.");
+            return;
+        }
+
+        notificationsContainer.innerHTML = "<h3>Notifications</h3>"; // Clear old content
+
+        data.notifications.forEach(notification => {
+            const notificationElement = document.createElement("p");
+            notificationElement.textContent = notification;
+            notificationsContainer.appendChild(notificationElement);
+        });
+
+    } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+    }
+}
+
+// Refresh notifications every 5 seconds
+
+
+
+setInterval(fetchNotifications, 5000);
 
 
 

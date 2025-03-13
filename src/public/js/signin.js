@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const response = await fetch("/api/signin", {
+            const response = await fetch("http://localhost:4000/api/signin", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -92,8 +92,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const result = await response.json();
 
             if (response.ok) {
+                console.log("[DEBUG] Received token:", result.token); // token
+                localStorage.setItem("token", result.token); //localStorage
                 alert("Login successful! Redirecting to home page...");
-                localStorage.setItem("token", result.token);
                 window.location.href = "../pages/homePage.html";
             } else {
                 console.error("[ERROR] Login failed:", result.message);
