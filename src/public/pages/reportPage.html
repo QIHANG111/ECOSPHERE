@@ -6,7 +6,7 @@
   <title>Homepage</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="/css/style.css">
-  <script defer src="/js/gemini.js"></script>
+
   <script defer src="/js/sidebar.js"></script>
 </head>
 <body>
@@ -76,8 +76,11 @@
     </div>
   </div>
   <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
-    <div class="normalCard" style="text-align: left;width: 170%">
-
+    <div class="normalCard" style="text-align: left; width: 170%">
+      <!-- This is where the generated report will appear -->
+      <div id="reportCard" style="padding: 0.1em; font-size: 0.5em; line-height: 1.4;">
+        <!-- Will be filled dynamically by JS -->
+      </div>
     </div>
   </div>
 </div>

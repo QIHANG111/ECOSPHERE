@@ -2,6 +2,23 @@
 const API_KEY = "AIzaSyDoSgt53bNbO6Rlqs0QMJjCr9zHofxLtwA"; // Replace with a secure environment variable
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
 
+//fetchData from API(energy-usage)
+async function fetchData() {
+    try {
+        const response = await fetch('/api/energy-usage'); // API
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+            throw new TypeError('Expected an array but received ' + typeof data);
+        }
+
+        return data;
+    } catch (error) {
+        console.error("❌ Error fetching data:", error);
+    }
+}
+
+
 // Fetch AI Response from Gemini API
 async function fetchGeminiResponse(prompt) {
     try {
@@ -224,7 +241,7 @@ AI Response:`;
             // UI will be updated by the updateDeviceTemperature function
         }
 
-// thheme control by AI
+// theme control by AI
         if (aiResponseText.includes("Ok, changed to dark theme")) {
             switchTheme("dark-theme");
         } else if (aiResponseText.includes("Ok, changed to black theme")) {
@@ -234,6 +251,8 @@ AI Response:`;
         }
     });
 }
+
+
 
 // Typing Effect
 function typeTextEffect(element, text, speed) {
@@ -311,7 +330,6 @@ window.onload = function () {
         }
     });
 
-    setupVoiceRecognition();
 };
 
 // Voice Recognition
