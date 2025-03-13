@@ -1,246 +1,1466 @@
 [
- {
-   "date": "2025-03-06",
-   "energyusage": 21.45
- },
- {
-   "date": "2025-03-07",
-   "energyusage": 20.56
- },
- {
-   "date": "2025-03-08",
-   "energyusage": 20.74
- },
- {
-   "date": "2025-03-09",
-   "energyusage": 28.8
- },
- {
-   "date": "2025-03-10",
-   "energyusage": 20.14
- },
- {
-   "date": "2025-03-11",
-   "energyusage": 26.06
- },
- {
-   "date": "2025-03-12",
-   "energyusage": 21.81
- },
- {
-   "date": "2025-03-13",
-   "energyusage": 20.81
- },
- {
-   "date": "2025-03-14",
-   "energyusage": 21.07
- },
- {
-   "date": "2025-03-15",
-   "energyusage": 27.36
- },
- {
-   "date": "2025-03-16",
-   "energyusage": 29.91
- },
- {
-   "date": "2025-03-17",
-   "energyusage": 26.89
- },
- {
-   "date": "2025-03-18",
-   "energyusage": 26.05
- },
- {
-   "date": "2025-03-19",
-   "energyusage": 23.53
- },
- {
-   "date": "2025-03-20",
-   "energyusage": 26.64
- },
- {
-   "date": "2025-03-21",
-   "energyusage": 21.06
- },
- {
-   "date": "2025-03-22",
-   "energyusage": 21.8
- },
- {
-   "date": "2025-03-23",
-   "energyusage": 26.19
- },
- {
-   "date": "2025-03-24",
-   "energyusage": 28.39
- },
- {
-   "date": "2025-03-25",
-   "energyusage": 23.96
- },
- {
-   "date": "2025-03-26",
-   "energyusage": 30.53
- },
- {
-   "date": "2025-03-27",
-   "energyusage": 21.15
- },
- {
-   "date": "2025-03-28",
-   "energyusage": 23.04
- },
- {
-   "date": "2025-03-29",
-   "energyusage": 23.03
- },
- {
-   "date": "2025-03-30",
-   "energyusage": 23.05
- },
- {
-   "date": "2025-03-31",
-   "energyusage": 23.04
- },
- {
-   "date": "2025-04-01",
-   "energyusage": 23.03
- },
- {
-   "date": "2025-04-02",
-   "energyusage": 23.03
- },
- {
-   "date": "2025-04-03",
-   "energyusage": 25.91
- },
- {
-   "date": "2025-04-04",
-   "energyusage": 24.67
- },
- {
-   "date": "2025-04-05",
-   "energyusage": 24.72
- },
- {
-   "date": "2025-04-06",
-   "energyusage": 25.92
- },
- {
-   "date": "2025-04-07",
-   "energyusage": 25.78
- },
- {
-   "date": "2025-04-08",
-   "energyusage": 25.91
- },
- {
-   "date": "2025-04-09",
-   "energyusage": 25.92
- },
- {
-   "date": "2025-04-10",
-   "energyusage": 35.53
- },
- {
-   "date": "2025-04-11",
-   "energyusage": 25.96
- },
- {
-   "date": "2025-04-12",
-   "energyusage": 40.48
- },
- {
-   "date": "2025-03-06",
-   "energyusage": 42.43
- },
- {
-   "date": "2025-04-14",
-   "energyusage": 42.97
- },
- {
-   "date": "2025-04-15",
-   "energyusage": 42.82
- },
- {
-   "date": "2025-04-16",
-   "energyusage": 43.03
- },
- {
-   "date": "2025-04-17",
-   "energyusage": 42.37
- },
- {
-   "date": "2025-04-18",
-   "energyusage": 42.1
- },
- {
-   "date": "2025-04-19",
-   "energyusage": 37.22
- },
- {
-   "date": "2025-04-20",
-   "energyusage": 58.56
- },
- {
-   "date": "2025-04-21",
-   "energyusage": 48.88
- },
- {
-   "date": "2025-04-22",
-   "energyusage": 48.65
- },
- {
-   "date": "2025-04-23",
-   "energyusage": 44.81
- },
- {
-   "date": "2025-04-24",
-   "energyusage": 40.75
- },
- {
-   "date": "2025-04-25",
-   "energyusage": 40.99
- },
- {
-   "date": "2025-04-26",
-   "energyusage": 47.58
- },
- {
-   "date": "2025-04-27",
-   "energyusage": 45.37
- },
- {
-   "date": "2025-04-28",
-   "energyusage": 43.24
- },
- {
-   "date": "2025-04-29",
-   "energyusage": 46.17
- },
- {
-   "date": "2025-04-30",
-   "energyusage": 45.57
- },
- {
-   "date": "2025-05-01",
-   "energyusage": 46.29
- },
- {
-   "date": "2025-05-02",
-   "energyusage": 48.78
- },
- {
-   "date": "2025-05-03",
-   "energyusage": 48.96
- },
- {
-   "date": "2025-05-04",
-   "energyusage": 47.26
- },
- {
-   "date": "2025-05-05",
-   "energyusage": 40.73
- }
+  {
+    "date": "2024-03-13",
+    "energyusage": 35.23
+  },
+  {
+    "date": "2024-03-14",
+    "energyusage": 41.32
+  },
+  {
+    "date": "2024-03-15",
+    "energyusage": 29.7
+  },
+  {
+    "date": "2024-03-16",
+    "energyusage": 50.51
+  },
+  {
+    "date": "2024-03-17",
+    "energyusage": 57.1
+  },
+  {
+    "date": "2024-03-18",
+    "energyusage": 53.31
+  },
+  {
+    "date": "2024-03-19",
+    "energyusage": 33.23
+  },
+  {
+    "date": "2024-03-20",
+    "energyusage": 37.35
+  },
+  {
+    "date": "2024-03-21",
+    "energyusage": 39.65
+  },
+  {
+    "date": "2024-03-22",
+    "energyusage": 42.53
+  },
+  {
+    "date": "2024-03-23",
+    "energyusage": 42.69
+  },
+  {
+    "date": "2024-03-24",
+    "energyusage": 51.65
+  },
+  {
+    "date": "2024-03-25",
+    "energyusage": 41.53
+  },
+  {
+    "date": "2024-03-26",
+    "energyusage": 23.35
+  },
+  {
+    "date": "2024-03-27",
+    "energyusage": 46.52
+  },
+  {
+    "date": "2024-03-28",
+    "energyusage": 26.08
+  },
+  {
+    "date": "2024-03-29",
+    "energyusage": 24.24
+  },
+  {
+    "date": "2024-03-30",
+    "energyusage": 29.63
+  },
+  {
+    "date": "2024-03-31",
+    "energyusage": 23.34
+  },
+  {
+    "date": "2024-04-01",
+    "energyusage": 53.46
+  },
+  {
+    "date": "2024-04-02",
+    "energyusage": 39.05
+  },
+  {
+    "date": "2024-04-03",
+    "energyusage": 23.35
+  },
+  {
+    "date": "2024-04-04",
+    "energyusage": 23.33
+  },
+  {
+    "date": "2024-04-05",
+    "energyusage": 30.74
+  },
+  {
+    "date": "2024-04-06",
+    "energyusage": 44.38
+  },
+  {
+    "date": "2024-04-07",
+    "energyusage": 20.93
+  },
+  {
+    "date": "2024-04-08",
+    "energyusage": 56.27
+  },
+  {
+    "date": "2024-04-09",
+    "energyusage": 50.89
+  },
+  {
+    "date": "2024-04-10",
+    "energyusage": 53.14
+  },
+  {
+    "date": "2024-04-11",
+    "energyusage": 55.59
+  },
+  {
+    "date": "2024-04-12",
+    "energyusage": 21.31
+  },
+  {
+    "date": "2024-04-13",
+    "energyusage": 48.79
+  },
+  {
+    "date": "2024-04-14",
+    "energyusage": 51.88
+  },
+  {
+    "date": "2024-04-15",
+    "energyusage": 59.04
+  },
+  {
+    "date": "2024-04-16",
+    "energyusage": 54.76
+  },
+  {
+    "date": "2024-04-17",
+    "energyusage": 24.17
+  },
+  {
+    "date": "2024-04-18",
+    "energyusage": 33.24
+  },
+  {
+    "date": "2024-04-19",
+    "energyusage": 37.6
+  },
+  {
+    "date": "2024-04-20",
+    "energyusage": 58.96
+  },
+  {
+    "date": "2024-04-21",
+    "energyusage": 36.04
+  },
+  {
+    "date": "2024-04-22",
+    "energyusage": 26.62
+  },
+  {
+    "date": "2024-04-23",
+    "energyusage": 43.46
+  },
+  {
+    "date": "2024-04-24",
+    "energyusage": 41.47
+  },
+  {
+    "date": "2024-04-25",
+    "energyusage": 46.96
+  },
+  {
+    "date": "2024-04-26",
+    "energyusage": 24.29
+  },
+  {
+    "date": "2024-04-27",
+    "energyusage": 29.61
+  },
+  {
+    "date": "2024-04-28",
+    "energyusage": 42.75
+  },
+  {
+    "date": "2024-04-29",
+    "energyusage": 59.35
+  },
+  {
+    "date": "2024-04-30",
+    "energyusage": 48.29
+  },
+  {
+    "date": "2024-05-01",
+    "energyusage": 59.74
+  },
+  {
+    "date": "2024-05-02",
+    "energyusage": 28.32
+  },
+  {
+    "date": "2024-05-03",
+    "energyusage": 51.01
+  },
+  {
+    "date": "2024-05-04",
+    "energyusage": 50.22
+  },
+  {
+    "date": "2024-05-05",
+    "energyusage": 45.3
+  },
+  {
+    "date": "2024-05-06",
+    "energyusage": 47.45
+  },
+  {
+    "date": "2024-05-07",
+    "energyusage": 53.12
+  },
+  {
+    "date": "2024-05-08",
+    "energyusage": 20.43
+  },
+  {
+    "date": "2024-05-09",
+    "energyusage": 59.98
+  },
+  {
+    "date": "2024-05-10",
+    "energyusage": 24.77
+  },
+  {
+    "date": "2024-05-11",
+    "energyusage": 37.79
+  },
+  {
+    "date": "2024-05-12",
+    "energyusage": 35.71
+  },
+  {
+    "date": "2024-05-13",
+    "energyusage": 24.92
+  },
+  {
+    "date": "2024-05-14",
+    "energyusage": 44.74
+  },
+  {
+    "date": "2024-05-15",
+    "energyusage": 23.59
+  },
+  {
+    "date": "2024-05-16",
+    "energyusage": 20.43
+  },
+  {
+    "date": "2024-05-17",
+    "energyusage": 48.61
+  },
+  {
+    "date": "2024-05-18",
+    "energyusage": 55.59
+  },
+  {
+    "date": "2024-05-19",
+    "energyusage": 30.62
+  },
+  {
+    "date": "2024-05-20",
+    "energyusage": 52.66
+  },
+  {
+    "date": "2024-05-21",
+    "energyusage": 21.83
+  },
+  {
+    "date": "2024-05-22",
+    "energyusage": 33.87
+  },
+  {
+    "date": "2024-05-23",
+    "energyusage": 59.93
+  },
+  {
+    "date": "2024-05-24",
+    "energyusage": 27.02
+  },
+  {
+    "date": "2024-05-25",
+    "energyusage": 28.94
+  },
+  {
+    "date": "2024-05-26",
+    "energyusage": 50.25
+  },
+  {
+    "date": "2024-05-27",
+    "energyusage": 59.55
+  },
+  {
+    "date": "2024-05-28",
+    "energyusage": 31.37
+  },
+  {
+    "date": "2024-05-29",
+    "energyusage": 25.16
+  },
+  {
+    "date": "2024-05-30",
+    "energyusage": 53.92
+  },
+  {
+    "date": "2024-05-31",
+    "energyusage": 54.38
+  },
+  {
+    "date": "2024-06-01",
+    "energyusage": 57.51
+  },
+  {
+    "date": "2024-06-02",
+    "energyusage": 45.67
+  },
+  {
+    "date": "2024-06-03",
+    "energyusage": 24.26
+  },
+  {
+    "date": "2024-06-04",
+    "energyusage": 28.44
+  },
+  {
+    "date": "2024-06-05",
+    "energyusage": 31.53
+  },
+  {
+    "date": "2024-06-06",
+    "energyusage": 59.36
+  },
+  {
+    "date": "2024-06-07",
+    "energyusage": 59.98
+  },
+  {
+    "date": "2024-06-08",
+    "energyusage": 25.86
+  },
+  {
+    "date": "2024-06-09",
+    "energyusage": 45.14
+  },
+  {
+    "date": "2024-06-10",
+    "energyusage": 39.62
+  },
+  {
+    "date": "2024-06-11",
+    "energyusage": 29.69
+  },
+  {
+    "date": "2024-06-12",
+    "energyusage": 33.93
+  },
+  {
+    "date": "2024-06-13",
+    "energyusage": 20.25
+  },
+  {
+    "date": "2024-06-14",
+    "energyusage": 38.46
+  },
+  {
+    "date": "2024-06-15",
+    "energyusage": 26.99
+  },
+  {
+    "date": "2024-06-16",
+    "energyusage": 38.08
+  },
+  {
+    "date": "2024-06-17",
+    "energyusage": 30.69
+  },
+  {
+    "date": "2024-06-18",
+    "energyusage": 21.64
+  },
+  {
+    "date": "2024-06-19",
+    "energyusage": 58.61
+  },
+  {
+    "date": "2024-06-20",
+    "energyusage": 46.01
+  },
+  {
+    "date": "2024-06-21",
+    "energyusage": 29.47
+  },
+  {
+    "date": "2024-06-22",
+    "energyusage": 45.68
+  },
+  {
+    "date": "2024-06-23",
+    "energyusage": 55.42
+  },
+  {
+    "date": "2024-06-24",
+    "energyusage": 59.01
+  },
+  {
+    "date": "2024-06-25",
+    "energyusage": 21.01
+  },
+  {
+    "date": "2024-06-26",
+    "energyusage": 25.29
+  },
+  {
+    "date": "2024-06-27",
+    "energyusage": 44.45
+  },
+  {
+    "date": "2024-06-28",
+    "energyusage": 26.2
+  },
+  {
+    "date": "2024-06-29",
+    "energyusage": 26.92
+  },
+  {
+    "date": "2024-06-30",
+    "energyusage": 58.24
+  },
+  {
+    "date": "2024-07-01",
+    "energyusage": 56.29
+  },
+  {
+    "date": "2024-07-02",
+    "energyusage": 27.43
+  },
+  {
+    "date": "2024-07-03",
+    "energyusage": 25.68
+  },
+  {
+    "date": "2024-07-04",
+    "energyusage": 33.27
+  },
+  {
+    "date": "2024-07-05",
+    "energyusage": 54.15
+  },
+  {
+    "date": "2024-07-06",
+    "energyusage": 49.41
+  },
+  {
+    "date": "2024-07-07",
+    "energyusage": 21.91
+  },
+  {
+    "date": "2024-07-08",
+    "energyusage": 58.87
+  },
+  {
+    "date": "2024-07-09",
+    "energyusage": 57.49
+  },
+  {
+    "date": "2024-07-10",
+    "energyusage": 59.23
+  },
+  {
+    "date": "2024-07-11",
+    "energyusage": 31.19
+  },
+  {
+    "date": "2024-07-12",
+    "energyusage": 58.53
+  },
+  {
+    "date": "2024-07-13",
+    "energyusage": 33.99
+  },
+  {
+    "date": "2024-07-14",
+    "energyusage": 22.19
+  },
+  {
+    "date": "2024-07-15",
+    "energyusage": 22.27
+  },
+  {
+    "date": "2024-07-16",
+    "energyusage": 41.4
+  },
+  {
+    "date": "2024-07-17",
+    "energyusage": 21.35
+  },
+  {
+    "date": "2024-07-18",
+    "energyusage": 49.4
+  },
+  {
+    "date": "2024-07-19",
+    "energyusage": 26.79
+  },
+  {
+    "date": "2024-07-20",
+    "energyusage": 42.17
+  },
+  {
+    "date": "2024-07-21",
+    "energyusage": 57.15
+  },
+  {
+    "date": "2024-07-22",
+    "energyusage": 21.83
+  },
+  {
+    "date": "2024-07-23",
+    "energyusage": 40.31
+  },
+  {
+    "date": "2024-07-24",
+    "energyusage": 22.63
+  },
+  {
+    "date": "2024-07-25",
+    "energyusage": 24.31
+  },
+  {
+    "date": "2024-07-26",
+    "energyusage": 53.37
+  },
+  {
+    "date": "2024-07-27",
+    "energyusage": 23.79
+  },
+  {
+    "date": "2024-07-28",
+    "energyusage": 23.18
+  },
+  {
+    "date": "2024-07-29",
+    "energyusage": 25.84
+  },
+  {
+    "date": "2024-07-30",
+    "energyusage": 28.88
+  },
+  {
+    "date": "2024-07-31",
+    "energyusage": 26.74
+  },
+  {
+    "date": "2024-08-01",
+    "energyusage": 44.9
+  },
+  {
+    "date": "2024-08-02",
+    "energyusage": 28.84
+  },
+  {
+    "date": "2024-08-03",
+    "energyusage": 22.68
+  },
+  {
+    "date": "2024-08-04",
+    "energyusage": 53.2
+  },
+  {
+    "date": "2024-08-05",
+    "energyusage": 41.37
+  },
+  {
+    "date": "2024-08-06",
+    "energyusage": 47.78
+  },
+  {
+    "date": "2024-08-07",
+    "energyusage": 21.39
+  },
+  {
+    "date": "2024-08-08",
+    "energyusage": 51.79
+  },
+  {
+    "date": "2024-08-09",
+    "energyusage": 56.43
+  },
+  {
+    "date": "2024-08-10",
+    "energyusage": 56.94
+  },
+  {
+    "date": "2024-08-11",
+    "energyusage": 24.58
+  },
+  {
+    "date": "2024-08-12",
+    "energyusage": 27.75
+  },
+  {
+    "date": "2024-08-13",
+    "energyusage": 32.62
+  },
+  {
+    "date": "2024-08-14",
+    "energyusage": 50.34
+  },
+  {
+    "date": "2024-08-15",
+    "energyusage": 24.36
+  },
+  {
+    "date": "2024-08-16",
+    "energyusage": 52.52
+  },
+  {
+    "date": "2024-08-17",
+    "energyusage": 20.14
+  },
+  {
+    "date": "2024-08-18",
+    "energyusage": 29.5
+  },
+  {
+    "date": "2024-08-19",
+    "energyusage": 29.47
+  },
+  {
+    "date": "2024-08-20",
+    "energyusage": 29.7
+  },
+  {
+    "date": "2024-08-21",
+    "energyusage": 55.58
+  },
+  {
+    "date": "2024-08-22",
+    "energyusage": 25.48
+  },
+  {
+    "date": "2024-08-23",
+    "energyusage": 46.76
+  },
+  {
+    "date": "2024-08-24",
+    "energyusage": 41.06
+  },
+  {
+    "date": "2024-08-25",
+    "energyusage": 39.05
+  },
+  {
+    "date": "2024-08-26",
+    "energyusage": 39.42
+  },
+  {
+    "date": "2024-08-27",
+    "energyusage": 57.51
+  },
+  {
+    "date": "2024-08-28",
+    "energyusage": 50.88
+  },
+  {
+    "date": "2024-08-29",
+    "energyusage": 56.65
+  },
+  {
+    "date": "2024-08-30",
+    "energyusage": 22.39
+  },
+  {
+    "date": "2024-08-31",
+    "energyusage": 53.94
+  },
+  {
+    "date": "2024-09-01",
+    "energyusage": 47.03
+  },
+  {
+    "date": "2024-09-02",
+    "energyusage": 47.73
+  },
+  {
+    "date": "2024-09-03",
+    "energyusage": 48.1
+  },
+  {
+    "date": "2024-09-04",
+    "energyusage": 41.34
+  },
+  {
+    "date": "2024-09-05",
+    "energyusage": 23.27
+  },
+  {
+    "date": "2024-09-06",
+    "energyusage": 21.2
+  },
+  {
+    "date": "2024-09-07",
+    "energyusage": 25.05
+  },
+  {
+    "date": "2024-09-08",
+    "energyusage": 26.26
+  },
+  {
+    "date": "2024-09-09",
+    "energyusage": 45.06
+  },
+  {
+    "date": "2024-09-10",
+    "energyusage": 26.1
+  },
+  {
+    "date": "2024-09-11",
+    "energyusage": 29.1
+  },
+  {
+    "date": "2024-09-12",
+    "energyusage": 20.47
+  },
+  {
+    "date": "2024-09-13",
+    "energyusage": 38.2
+  },
+  {
+    "date": "2024-09-14",
+    "energyusage": 54.79
+  },
+  {
+    "date": "2024-09-15",
+    "energyusage": 58.99
+  },
+  {
+    "date": "2024-09-16",
+    "energyusage": 37.55
+  },
+  {
+    "date": "2024-09-17",
+    "energyusage": 30.82
+  },
+  {
+    "date": "2024-09-18",
+    "energyusage": 41.84
+  },
+  {
+    "date": "2024-09-19",
+    "energyusage": 36.3
+  },
+  {
+    "date": "2024-09-20",
+    "energyusage": 46.48
+  },
+  {
+    "date": "2024-09-21",
+    "energyusage": 20.73
+  },
+  {
+    "date": "2024-09-22",
+    "energyusage": 28.41
+  },
+  {
+    "date": "2024-09-23",
+    "energyusage": 21.21
+  },
+  {
+    "date": "2024-09-24",
+    "energyusage": 29.93
+  },
+  {
+    "date": "2024-09-25",
+    "energyusage": 48.43
+  },
+  {
+    "date": "2024-09-26",
+    "energyusage": 48.88
+  },
+  {
+    "date": "2024-09-27",
+    "energyusage": 48.98
+  },
+  {
+    "date": "2024-09-28",
+    "energyusage": 32.14
+  },
+  {
+    "date": "2024-09-29",
+    "energyusage": 26.72
+  },
+  {
+    "date": "2024-09-30",
+    "energyusage": 36.53
+  },
+  {
+    "date": "2024-10-01",
+    "energyusage": 45.19
+  },
+  {
+    "date": "2024-10-02",
+    "energyusage": 55.55
+  },
+  {
+    "date": "2024-10-03",
+    "energyusage": 21.23
+  },
+  {
+    "date": "2024-10-04",
+    "energyusage": 58.05
+  },
+  {
+    "date": "2024-10-05",
+    "energyusage": 39.52
+  },
+  {
+    "date": "2024-10-06",
+    "energyusage": 32.17
+  },
+  {
+    "date": "2024-10-07",
+    "energyusage": 55.71
+  },
+  {
+    "date": "2024-10-08",
+    "energyusage": 39.22
+  },
+  {
+    "date": "2024-10-09",
+    "energyusage": 47.87
+  },
+  {
+    "date": "2024-10-10",
+    "energyusage": 51.07
+  },
+  {
+    "date": "2024-10-11",
+    "energyusage": 31.01
+  },
+  {
+    "date": "2024-10-12",
+    "energyusage": 45.05
+  },
+  {
+    "date": "2024-10-13",
+    "energyusage": 43.5
+  },
+  {
+    "date": "2024-10-14",
+    "energyusage": 42.68
+  },
+  {
+    "date": "2024-10-15",
+    "energyusage": 44.03
+  },
+  {
+    "date": "2024-10-16",
+    "energyusage": 55.55
+  },
+  {
+    "date": "2024-10-17",
+    "energyusage": 46.5
+  },
+  {
+    "date": "2024-10-18",
+    "energyusage": 28.69
+  },
+  {
+    "date": "2024-10-19",
+    "energyusage": 39.59
+  },
+  {
+    "date": "2024-10-20",
+    "energyusage": 56.6
+  },
+  {
+    "date": "2024-10-21",
+    "energyusage": 49.43
+  },
+  {
+    "date": "2024-10-22",
+    "energyusage": 57.42
+  },
+  {
+    "date": "2024-10-23",
+    "energyusage": 30.57
+  },
+  {
+    "date": "2024-10-24",
+    "energyusage": 44.26
+  },
+  {
+    "date": "2024-10-25",
+    "energyusage": 29.19
+  },
+  {
+    "date": "2024-10-26",
+    "energyusage": 31.59
+  },
+  {
+    "date": "2024-10-27",
+    "energyusage": 34.25
+  },
+  {
+    "date": "2024-10-28",
+    "energyusage": 22.25
+  },
+  {
+    "date": "2024-10-29",
+    "energyusage": 35.98
+  },
+  {
+    "date": "2024-10-30",
+    "energyusage": 35.86
+  },
+  {
+    "date": "2024-10-31",
+    "energyusage": 27.58
+  },
+  {
+    "date": "2024-11-01",
+    "energyusage": 22.12
+  },
+  {
+    "date": "2024-11-02",
+    "energyusage": 44.84
+  },
+  {
+    "date": "2024-11-03",
+    "energyusage": 44.35
+  },
+  {
+    "date": "2024-11-04",
+    "energyusage": 25.17
+  },
+  {
+    "date": "2024-11-05",
+    "energyusage": 23.35
+  },
+  {
+    "date": "2024-11-06",
+    "energyusage": 35.55
+  },
+  {
+    "date": "2024-11-07",
+    "energyusage": 39.2
+  },
+  {
+    "date": "2024-11-08",
+    "energyusage": 23.52
+  },
+  {
+    "date": "2024-11-09",
+    "energyusage": 32.81
+  },
+  {
+    "date": "2024-11-10",
+    "energyusage": 54.84
+  },
+  {
+    "date": "2024-11-11",
+    "energyusage": 23.41
+  },
+  {
+    "date": "2024-11-12",
+    "energyusage": 57.45
+  },
+  {
+    "date": "2024-11-13",
+    "energyusage": 29.07
+  },
+  {
+    "date": "2024-11-14",
+    "energyusage": 54.53
+  },
+  {
+    "date": "2024-11-15",
+    "energyusage": 32.19
+  },
+  {
+    "date": "2024-11-16",
+    "energyusage": 54.32
+  },
+  {
+    "date": "2024-11-17",
+    "energyusage": 27.39
+  },
+  {
+    "date": "2024-11-18",
+    "energyusage": 36.28
+  },
+  {
+    "date": "2024-11-19",
+    "energyusage": 38.12
+  },
+  {
+    "date": "2024-11-20",
+    "energyusage": 41.78
+  },
+  {
+    "date": "2024-11-21",
+    "energyusage": 20.71
+  },
+  {
+    "date": "2024-11-22",
+    "energyusage": 25.04
+  },
+  {
+    "date": "2024-11-23",
+    "energyusage": 55.96
+  },
+  {
+    "date": "2024-11-24",
+    "energyusage": 47.55
+  },
+  {
+    "date": "2024-11-25",
+    "energyusage": 27.47
+  },
+  {
+    "date": "2024-11-26",
+    "energyusage": 43.48
+  },
+  {
+    "date": "2024-11-27",
+    "energyusage": 58.86
+  },
+  {
+    "date": "2024-11-28",
+    "energyusage": 26.74
+  },
+  {
+    "date": "2024-11-29",
+    "energyusage": 29.12
+  },
+  {
+    "date": "2024-11-30",
+    "energyusage": 32.65
+  },
+  {
+    "date": "2024-12-01",
+    "energyusage": 42.9
+  },
+  {
+    "date": "2024-12-02",
+    "energyusage": 27.17
+  },
+  {
+    "date": "2024-12-03",
+    "energyusage": 32.71
+  },
+  {
+    "date": "2024-12-04",
+    "energyusage": 59.33
+  },
+  {
+    "date": "2024-12-05",
+    "energyusage": 31.09
+  },
+  {
+    "date": "2024-12-06",
+    "energyusage": 50.93
+  },
+  {
+    "date": "2024-12-07",
+    "energyusage": 31.99
+  },
+  {
+    "date": "2024-12-08",
+    "energyusage": 29.57
+  },
+  {
+    "date": "2024-12-09",
+    "energyusage": 40.23
+  },
+  {
+    "date": "2024-12-10",
+    "energyusage": 57.22
+  },
+  {
+    "date": "2024-12-11",
+    "energyusage": 43.99
+  },
+  {
+    "date": "2024-12-12",
+    "energyusage": 44.0
+  },
+  {
+    "date": "2024-12-13",
+    "energyusage": 53.23
+  },
+  {
+    "date": "2024-12-14",
+    "energyusage": 39.42
+  },
+  {
+    "date": "2024-12-15",
+    "energyusage": 57.85
+  },
+  {
+    "date": "2024-12-16",
+    "energyusage": 28.39
+  },
+  {
+    "date": "2024-12-17",
+    "energyusage": 59.23
+  },
+  {
+    "date": "2024-12-18",
+    "energyusage": 47.15
+  },
+  {
+    "date": "2024-12-19",
+    "energyusage": 31.2
+  },
+  {
+    "date": "2024-12-20",
+    "energyusage": 20.3
+  },
+  {
+    "date": "2024-12-21",
+    "energyusage": 20.76
+  },
+  {
+    "date": "2024-12-22",
+    "energyusage": 37.47
+  },
+  {
+    "date": "2024-12-23",
+    "energyusage": 27.89
+  },
+  {
+    "date": "2024-12-24",
+    "energyusage": 42.84
+  },
+  {
+    "date": "2024-12-25",
+    "energyusage": 58.79
+  },
+  {
+    "date": "2024-12-26",
+    "energyusage": 49.91
+  },
+  {
+    "date": "2024-12-27",
+    "energyusage": 27.77
+  },
+  {
+    "date": "2024-12-28",
+    "energyusage": 57.09
+  },
+  {
+    "date": "2024-12-29",
+    "energyusage": 44.88
+  },
+  {
+    "date": "2024-12-30",
+    "energyusage": 56.58
+  },
+  {
+    "date": "2024-12-31",
+    "energyusage": 28.34
+  },
+  {
+    "date": "2025-01-01",
+    "energyusage": 50.57
+  },
+  {
+    "date": "2025-01-02",
+    "energyusage": 26.26
+  },
+  {
+    "date": "2025-01-03",
+    "energyusage": 23.96
+  },
+  {
+    "date": "2025-01-04",
+    "energyusage": 51.06
+  },
+  {
+    "date": "2025-01-05",
+    "energyusage": 35.26
+  },
+  {
+    "date": "2025-01-06",
+    "energyusage": 41.12
+  },
+  {
+    "date": "2025-01-07",
+    "energyusage": 31.36
+  },
+  {
+    "date": "2025-01-08",
+    "energyusage": 47.09
+  },
+  {
+    "date": "2025-01-09",
+    "energyusage": 49.68
+  },
+  {
+    "date": "2025-01-10",
+    "energyusage": 29.41
+  },
+  {
+    "date": "2025-01-11",
+    "energyusage": 20.26
+  },
+  {
+    "date": "2025-01-12",
+    "energyusage": 42.24
+  },
+  {
+    "date": "2025-01-13",
+    "energyusage": 32.06
+  },
+  {
+    "date": "2025-01-14",
+    "energyusage": 29.05
+  },
+  {
+    "date": "2025-01-15",
+    "energyusage": 40.24
+  },
+  {
+    "date": "2025-01-16",
+    "energyusage": 29.12
+  },
+  {
+    "date": "2025-01-17",
+    "energyusage": 59.92
+  },
+  {
+    "date": "2025-01-18",
+    "energyusage": 35.89
+  },
+  {
+    "date": "2025-01-19",
+    "energyusage": 42.07
+  },
+  {
+    "date": "2025-01-20",
+    "energyusage": 52.42
+  },
+  {
+    "date": "2025-01-21",
+    "energyusage": 37.26
+  },
+  {
+    "date": "2025-01-22",
+    "energyusage": 50.2
+  },
+  {
+    "date": "2025-01-23",
+    "energyusage": 52.38
+  },
+  {
+    "date": "2025-01-24",
+    "energyusage": 40.88
+  },
+  {
+    "date": "2025-01-25",
+    "energyusage": 26.24
+  },
+  {
+    "date": "2025-01-26",
+    "energyusage": 20.51
+  },
+  {
+    "date": "2025-01-27",
+    "energyusage": 57.02
+  },
+  {
+    "date": "2025-01-28",
+    "energyusage": 33.94
+  },
+  {
+    "date": "2025-01-29",
+    "energyusage": 58.03
+  },
+  {
+    "date": "2025-01-30",
+    "energyusage": 45.9
+  },
+  {
+    "date": "2025-01-31",
+    "energyusage": 59.75
+  },
+  {
+    "date": "2025-02-01",
+    "energyusage": 43.02
+  },
+  {
+    "date": "2025-02-02",
+    "energyusage": 20.0
+  },
+  {
+    "date": "2025-02-03",
+    "energyusage": 28.81
+  },
+  {
+    "date": "2025-02-04",
+    "energyusage": 32.34
+  },
+  {
+    "date": "2025-02-05",
+    "energyusage": 20.45
+  },
+  {
+    "date": "2025-02-06",
+    "energyusage": 33.28
+  },
+  {
+    "date": "2025-02-07",
+    "energyusage": 28.61
+  },
+  {
+    "date": "2025-02-08",
+    "energyusage": 32.69
+  },
+  {
+    "date": "2025-02-09",
+    "energyusage": 36.53
+  },
+  {
+    "date": "2025-02-10",
+    "energyusage": 52.81
+  },
+  {
+    "date": "2025-02-11",
+    "energyusage": 22.13
+  },
+  {
+    "date": "2025-02-12",
+    "energyusage": 48.35
+  },
+  {
+    "date": "2025-02-13",
+    "energyusage": 39.57
+  },
+  {
+    "date": "2025-02-14",
+    "energyusage": 29.81
+  },
+  {
+    "date": "2025-02-15",
+    "energyusage": 49.31
+  },
+  {
+    "date": "2025-02-16",
+    "energyusage": 29.95
+  },
+  {
+    "date": "2025-02-17",
+    "energyusage": 26.37
+  },
+  {
+    "date": "2025-02-18",
+    "energyusage": 51.66
+  },
+  {
+    "date": "2025-02-19",
+    "energyusage": 31.05
+  },
+  {
+    "date": "2025-02-20",
+    "energyusage": 35.62
+  },
+  {
+    "date": "2025-02-21",
+    "energyusage": 28.92
+  },
+  {
+    "date": "2025-02-22",
+    "energyusage": 48.69
+  },
+  {
+    "date": "2025-02-23",
+    "energyusage": 25.68
+  },
+  {
+    "date": "2025-02-24",
+    "energyusage": 39.69
+  },
+  {
+    "date": "2025-02-25",
+    "energyusage": 59.49
+  },
+  {
+    "date": "2025-02-26",
+    "energyusage": 39.07
+  },
+  {
+    "date": "2025-02-27",
+    "energyusage": 32.84
+  },
+  {
+    "date": "2025-02-28",
+    "energyusage": 40.11
+  },
+  {
+    "date": "2025-03-01",
+    "energyusage": 45.58
+  },
+  {
+    "date": "2025-03-02",
+    "energyusage": 47.4
+  },
+  {
+    "date": "2025-03-03",
+    "energyusage": 38.31
+  },
+  {
+    "date": "2025-03-04",
+    "energyusage": 29.54
+  },
+  {
+    "date": "2025-03-05",
+    "energyusage": 59.71
+  },
+  {
+    "date": "2025-03-06",
+    "energyusage": 59.25
+  },
+  {
+    "date": "2025-03-07",
+    "energyusage": 27.41
+  },
+  {
+    "date": "2025-03-08",
+    "energyusage": 42.81
+  },
+  {
+    "date": "2025-03-09",
+    "energyusage": 26.61
+  },
+  {
+    "date": "2025-03-10",
+    "energyusage": 21.4
+  },
+  {
+    "date": "2025-03-11",
+    "energyusage": 40.41
+  },
+  {
+    "date": "2025-03-12",
+    "energyusage": 51.19
+  },
+  {
+    "date": "2025-03-13",
+    "energyusage": 59.19
+  }
 ]

@@ -487,34 +487,44 @@ router.delete('/api/rooms/:id', async (req, res) => {
     }
 });
 
-/*
-  Get energy usage data
-*/
+//do not modify this function!!
 router.get('/api/energy-usage', async (req, res) => {
     console.log('[DEBUG] GET /api/energy-usage');
     logDbState('/api/energy-usage');
+
     try {
-        // Check if Mongoose is connected
+
         if (mongoose.connection.readyState !== 1) {
             console.log('[DEBUG] Mongoose not connected, returning 500');
             return res.status(500).json({ error: 'Database not connected' });
         }
 
-        // Fetch all documents from EnergyUsage
-        const energyData = await EnergyUsage.find().sort({ date: 1 });
-        console.log(`[DEBUG] Fetched ${energyData.length} energy records`);
 
-        if (!Array.isArray(energyData) || !energyData.length) {
+        const range = req.query.range || 'weekly';
+        let limit = 7;
+
+        if (range === 'monthly') limit = 30;
+        else if (range === 'yearly') limit = 365;
+
+
+        const energyData = await EnergyUsage.find().sort({ date: -1 }).limit(limit);
+
+        console.log(`[DEBUG] Fetched ${energyData.length} energy records for range: ${range}`);
+
+        if (!Array.isArray(energyData) || energyData.length === 0) {
             console.log('[DEBUG] No energy usage data found in the collection');
             return res.status(404).json({ error: 'No energy usage data found' });
         }
 
-        // Return them as JSON
-        res.json(energyData);
+        res.json(energyData.reverse());
     } catch (error) {
         console.error('[ERROR] GET /api/energy-usage ->', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+
+
+
 
 export default router;

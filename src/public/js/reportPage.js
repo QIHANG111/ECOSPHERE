@@ -1,9 +1,14 @@
 // Secure API Key (Store it securely, don't expose publicly)
 const API_KEY = "AIzaSyDoSgt53bNbO6Rlqs0QMJjCr9zHofxLtwA"; // Replace with a secure environment variable
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
+let type = 'line';
 // Toggle dropdown
 function toggleDropdown() {
     const dropdown = document.getElementById("dropdownMenu");
+    dropdown.classList.toggle("show");
+}
+function toggleDropdownChart() {
+    const dropdown = document.getElementById("dropdownMenu2");
     dropdown.classList.toggle("show");
 }
 
@@ -17,146 +22,158 @@ window.onclick = function (event) {
     }
 };
 
+let selectedTimeRange = 'weekly';
+
 // Handle option selection
 document.addEventListener('DOMContentLoaded', () => {
-    const dropdownContent = document.querySelectorAll('.dropdown-content a');
-    const weeklyReport = document.getElementById('weeklyReport');
-    const monthlyReport = document.getElementById('monthlyReport');
-    const yearlyReport = document.getElementById('yearlyReport');
-
+    // "Select Range" dropdown
+    const dropdownContent = document.querySelectorAll('#dropdownMenu a');
     dropdownContent.forEach(option => {
-        option.addEventListener('click', function (event) {
-            const selectedOption = event.target.textContent;
+        option.addEventListener('click', async function (event) {
+            selectedTimeRange = event.target.getAttribute('data-range');
+            console.log("Selected range:", selectedTimeRange);
+            // show/hide the weekly/monthly/yearly sections (if you have them)
+            weeklyReport.style.display = selectedTimeRange === 'weekly' ? 'block' : 'none';
+            monthlyReport.style.display = selectedTimeRange === 'monthly' ? 'block' : 'none';
+            yearlyReport.style.display = selectedTimeRange === 'yearly' ? 'block' : 'none';
 
-            // Check which option is selected
-            if (selectedOption === 'Week') {
-                weeklyReport.style.display = 'block'; // Show weeklyReport
-                monthlyReport.style.display = 'none';
-                yearlyReport.style.display = 'none';
-            } else if (selectedOption === 'Month') {
-                weeklyReport.style.display = 'none';
-                monthlyReport.style.display = 'block'; // Show monthlyReport
-                yearlyReport.style.display = 'none';
-            } else if (selectedOption === 'Year') {
-                weeklyReport.style.display = 'none';
-                monthlyReport.style.display = 'none';
-                yearlyReport.style.display = 'block'; // Show yearlyReport
-            }
+            // fetch new data & generate new report
+            await updateChartAndReport();
         });
     });
+
+    // "Chart Type" dropdown
+    const chartTypeOptions = document.querySelectorAll('#dropdownMenu2 a');
+    chartTypeOptions.forEach(option => {
+        option.addEventListener('click', function (event) {
+            const selectedType = event.target.getAttribute('data-chart');
+            console.log("Selected chart type:", selectedType);
+            changeChartType(selectedType);
+        });
+    });
+
+    // initial load
+    updateChartAndReport();
 });
 
-// =============================================
-// Main DOMContentLoaded for Chart + Report
-// =============================================
-document.addEventListener("DOMContentLoaded", async function () {
-    // 1) Initialize the Chart.js chart
-    const ctx = document.getElementById('myChart').getContext('2d');
-    const myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Energy Usage (kWh)',
-                data: [],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 2,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false, // Ensure chart scales properly
-            scales: {
-                x: {
-                    type: 'category',
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                },
-                y: {
-                    beginAtZero: false,
-                    title: {
-                        display: true,
-                        text: 'Usage (kWh)'
-                    }
+
+const ctx = document.getElementById('myChart').getContext('2d');
+const myChart = new Chart(ctx, {
+    type: type,
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Energy Usage (kWh)',
+            data: [],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2,
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                type: 'category',
+                title: {
+                    display: true,
+                    text: 'Date'
+                }
+            },
+            y: {
+                beginAtZero: false,
+                title: {
+                    display: true,
+                    text: 'Usage (kWh)'
                 }
             }
         }
-    });
-
-    // 2) Fetch data for the chart
+    }
+});
+async function changeChartType(newType) {
     try {
-        const response = await fetch('/api/energy-usage'); // Your backend endpoint
-        const data = await response.json();
+        const energyData = await fetchData(selectedTimeRange);
 
-        if (Array.isArray(data)) {
-            const labels = data.map(item => item.date.split("T")[0]); // e.g. "YYYY-MM-DD"
-            const usageData = data.map(item => item.energyusage);
+        if (energyData.length > 0) {
 
+            const labels = energyData.map(item => item.date.split("T")[0]);
+            const usageData = energyData.map(item => item.energyusage);
+
+
+            myChart.config.type = newType;
             myChart.data.labels = labels;
             myChart.data.datasets[0].data = usageData;
             myChart.update();
         } else {
-            console.error("❌ Fetched data is not an array:", data);
+            console.warn("⚠ No data available for selected range:", selectedTimeRange);
         }
     } catch (error) {
-        console.error("❌ Error fetching data:", error);
+        console.error("Error updating chart and report:", error);
     }
+}
 
-    // 3) Generate and display the usage report
+
+async function updateChartAndReport() {
     try {
-        // generateEnergyUsageReport is your function that uses fetchData() + fetchGeminiResponse()
-        const reportText = await generateEnergyUsageReport();
+        const energyData = await fetchData(selectedTimeRange);
 
-        // Insert the returned text into the "reportCard" element
-        const reportCard = document.getElementById('reportCard');
-        reportCard.textContent = reportText;
-    } catch (err) {
-        console.error("Error generating usage report:", err);
-        document.getElementById('reportCard').textContent = "Error generating the report.";
+        if (energyData.length > 0) {
+
+            const labels = energyData.map(item => item.date.split("T")[0]);
+            const usageData = energyData.map(item => item.energyusage);
+
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = usageData;
+            myChart.update();
+
+
+            document.getElementById('reportCard').textContent = await generateEnergyUsageReport(energyData);
+        } else {
+            console.warn("⚠ No data available for selected range:", selectedTimeRange);
+            document.getElementById('reportCard').textContent = "No data available.";
+        }
+    } catch (error) {
+        console.error("Error updating chart and report:", error);
+        document.getElementById('reportCard').textContent = "Error loading data.";
     }
-});
+}
 
-// =============================================
-// The function that fetches data from /api/energy-usage
-// and returns an array (currently used by generateEnergyUsageReport)
-// =============================================
-async function fetchData() {
+
+async function fetchData(timeRange) {
     try {
-        const response = await fetch('/api/energy-usage');
+        const response = await fetch(`/api/energy-usage?range=${timeRange}`);
         const data = await response.json();
 
         if (!Array.isArray(data)) {
-            throw new TypeError('Expected an array but received ' + typeof data);
+            throw new TypeError(`Expected an array but received ${typeof data}`);
         }
-        return data;
+
+
+        let limit = 7; // 7
+        if (timeRange === 'monthly') limit = 30;
+        else if (timeRange === 'yearly') limit = 365;
+
+        return data.slice(-limit); //  N
     } catch (error) {
-        console.error("❌ Error fetching data in fetchData():", error);
+        console.error(`❌ Error fetching ${timeRange} data:`, error);
         return [];
     }
 }
 
 // =============================================
-// Generate a short usage report via Gemini
-// using the data from fetchData()
+//Gemini
 // =============================================
-async function generateEnergyUsageReport() {
+async function generateEnergyUsageReport(energyData) {
     try {
-        // Step 1: Fetch energy usage data
-        const energyData = await fetchData();
-        if (!energyData || !Array.isArray(energyData) || energyData.length === 0) {
+        if (!energyData || energyData.length === 0) {
             throw new Error('Invalid or empty energy usage data');
         }
 
-        // Step 2: Construct a prompt for the Gemini API
-        const prompt = `Generate a brief report on the following energy usage data within 150 words\n\n${JSON.stringify(energyData, null, 2)}`;
-
-        // Step 3: Fetch the report from the Gemini API
+        const prompt = `Generate a brief report on the following ${selectedTimeRange} energy usage data within 150 words\n\n${JSON.stringify(energyData, null, 2)}`;
         const report = await fetchGeminiResponse(prompt);
-        console.log("Energy Usage Report:", report);
+        console.log("Generated Report:", report);
         return report;
     } catch (error) {
         console.error("Error generating energy usage report:", error);
@@ -164,7 +181,9 @@ async function generateEnergyUsageReport() {
     }
 }
 
-// Fetch AI Response from Gemini API
+// =============================================
+// Gemini API
+// =============================================
 async function fetchGeminiResponse(prompt) {
     try {
         const response = await fetch(API_URL, {
@@ -174,7 +193,7 @@ async function fetchGeminiResponse(prompt) {
         });
 
         const data = await response.json();
-        console.log("API Response:", data);
+        console.log("Gemini API Response:", data);
 
         if (data?.candidates?.length > 0) {
             return data.candidates[0].content.parts[0].text;
@@ -182,8 +201,10 @@ async function fetchGeminiResponse(prompt) {
             return "No valid response from Gemini API.";
         }
     } catch (error) {
-        console.error("Error:", error);
+        console.error("Error fetching response:", error);
         return "Error fetching response.";
     }
 }
+
+
 
