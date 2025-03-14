@@ -418,6 +418,9 @@ router.delete('/api/device/:id', async (req, res) => {
     }
 });
 
+//temporarily use the local data
+
+
 /*
   Get the list of devices from a JSON file
 */
