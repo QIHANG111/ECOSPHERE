@@ -145,7 +145,9 @@ router.get('/api/user', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const user = await User.findById(userId).select("-hashed_password");
+        const user = await User.findById(userId)
+            .select("name email phone role_id user_avatar")
+            .populate("role_id", "role_name");
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -275,6 +277,11 @@ router.post('/api/subusers', async (req, res) => {
 
 const mainRole = 'manager';
 const subRole = 'dweller';
+
+/*
+  Add a new sub-user under an existing parent user
+*/
+
 
 /*
   Delete user by ID
@@ -421,12 +428,12 @@ router.delete('/api/device/:id', async (req, res) => {
 });
 
 /*
-  Get the list of devices 
+  Get the list of devices
 */
 router.get('/api/devices', async (req, res) => {
     console.log('[DEBUG] GET /api/devices -> Fetching devices from MongoDB');
     try {
-        const devices = await Device.find(); 
+        const devices = await Device.find();
         if (!devices || devices.length === 0) {
             console.error('[ERROR] Finding devices in the database ->', error);
             return res.status(404).json({ error: 'No devices found' });
@@ -455,9 +462,9 @@ router.post('/api/update-device', async (req, res) => {
 
     try {
         const updatedDevice = await Device.findOneAndUpdate(
-            { device_name: name }, 
-            { status: status }, 
-            { new: true } 
+            { device_name: name },
+            { status: status },
+            { new: true }
         );
         if (!updatedDevice) {
             console.log(`[DEBUG] Device not found with name: ${name}`);
@@ -490,9 +497,9 @@ router.post('/api/update-temperature', async (req, res) => {
         // Find and update the AC device in MongoDB
         console.log(`[DEBUG] Finding AC device of name: ${name}`);
         const updatedDevice = await Device.findOneAndUpdate(
-            { device_name: name, device_type: 'AC' }, 
+            { device_name: name, device_type: 'AC' },
             { temperature: temperature },             // Update temperature field
-            { new: true }                             
+            { new: true }
         );
 
         if (!updatedDevice) {
@@ -648,3 +655,4 @@ router.get('/api/notifications', (req, res) => {
 
 export default router;
 
+        // Removed placeholder
