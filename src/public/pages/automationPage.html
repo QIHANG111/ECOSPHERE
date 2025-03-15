@@ -44,6 +44,34 @@
   </div>
 </div>
 
+<div class="dashboard">
+  <!-- Add Button -->
+  <div class="dashboardDesign">
+    <button id="addFunctionBtn" class="addFunctionButton">
+      <img src="/icons/add.svg" alt="Add" width="20" height="20">
+      Add Function
+    </button>
+  </div>
+
+
+
+  <!-- Container for Added Functions -->
+  <div class="dashboard-content" id="functionContainer">
+  </div>
+
+  <!-- Standby Functions Modal (Hidden by Default) -->
+  <div id="standbyModal" class="standbyModalCP">
+    <div class="standbyModalCp-content">
+      <button class="closeButton" onclick="closeModal()">
+        <img src="/icons/close-button.svg" alt="close" width="25px" height="25px">
+      </button>
+      <h3 class="h3Button">Available Functions</h3>
+      <div id="standbyList"></div>
+    </div>
+  </div>
+
+
+<script src="/js/automationPage.js"></script>
 <script src="/js/sidebar.js"></script>
 <script src="/js/theme.js"></script>
 <script src="/js/chart.js"></script>
