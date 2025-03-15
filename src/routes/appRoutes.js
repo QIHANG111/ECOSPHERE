@@ -1,6 +1,5 @@
 import express from 'express';
 import path, {dirname} from 'node:path';
-import * as fs from 'node:fs';
 import EnergyUsage from '../models/energy.model.js';
 import {fileURLToPath} from 'node:url';
 import User from '../models/user.model.js';
@@ -19,7 +18,6 @@ import { error } from 'node:console';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const devicesFile = path.join(__dirname, '../public/exampleData/device.json');
 
 const router = express.Router();
 let notifications = [];
@@ -585,7 +583,7 @@ router.post("/api/device/reset", (req, res) => {
     res.json(deviceController.resetDevice(req.body.id));
 });
 
-module.exports = router;
+
 
 /* ============================================================
    ROOMS CONFIG
@@ -683,4 +681,3 @@ router.get('/api/notifications', (req, res) => {
 
 export default router;
 
-        // Removed placeholder
