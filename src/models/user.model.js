@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema({
         ref: role,
         required: true
     },
+    parentUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null
+    }
 });
 
 const User = mongoose.model('User', userSchema);

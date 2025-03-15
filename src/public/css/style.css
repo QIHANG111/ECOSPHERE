@@ -1433,3 +1433,81 @@ canvas {
     display: flex;
     flex-wrap: wrap;
 }
+
+.circle-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 50px auto;
+}
+
+
+.big-circle {
+    width: 14vw;
+    height: 14vw;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.big-circle:hover {
+    width: 15vw;
+    height: 15vw;
+    transition: 0.3s;
+}
+
+
+
+.big-circle img {
+    width: 8vw;
+    height: 8vw;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.big-circle img:hover {
+    width: 9vw;
+    height: 9vw;
+    transition: 0.3s;
+}
+
+.profile-name {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+.small-circle {
+    width: 75px;
+    height: 75px;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.5s;
+}
+.small-circle:hover {
+    width: 80px;
+    height: 80px;
+    transition: 0.3s;
+}
+
+.small-circle img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
