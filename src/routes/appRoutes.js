@@ -565,10 +565,6 @@ router.post("/api/device/toggle", (req, res) => {
     res.json(deviceController.toggleStatus(req.body.id));
 });
 
-// ✅ 这里不要再加 `/api/device/set-temperature`，避免重复！
-router.post("/api/device/brightness", (req, res) => {
-    res.json(deviceController.setBrightness(req.body.id, req.body.brightness));
-});
 
 router.post("/api/device/fanSpeed", (req, res) => {
     res.json(deviceController.setFanSpeed(req.body.id, req.body.fanSpeed));

@@ -48,19 +48,6 @@ function toggleStatus(deviceId) {
 }
 
 
-// 6️⃣ 设置设备亮度（仅适用于灯）
-function setBrightness(deviceId, brightness) {
-    const devices = readDevices();
-    const device = devices.find(d => d.id === deviceId && d.type === "light");
-    if (!device) return { error: "Light device not found" };
-
-    if (brightness < 0 || brightness > 100) return { error: "Brightness must be between 0-100%" };
-
-    device.brightness = brightness;
-    writeDevices(devices);
-    return { success: true, brightness };
-}
-
 // 7️⃣ 设置风扇或 AC 风速
 function setFanSpeed(deviceId, speed) {
     const devices = readDevices();
@@ -104,7 +91,6 @@ module.exports = {
     getAllDevices,
     getStatus,
     toggleStatus,
-    setBrightness,
     setFanSpeed,
     setMode,
     resetDevice

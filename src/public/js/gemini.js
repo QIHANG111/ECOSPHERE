@@ -186,19 +186,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // new added here
-    function updateDeviceBrightness(deviceName, brightnessLevel) {
-        fetch("/api/device/brightness", {  // 假设你在后端配置了这个 API
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: deviceName, brightness: brightnessLevel })
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log(`Updated ${deviceName} brightness to:`, brightnessLevel);
-                loadDevices();
-            })
-            .catch(error => console.error("Error updating brightness:", error));
-    }
 
     function updateDeviceFanSpeed(deviceName, fanSpeed) {
         fetch("/api/device/fanSpeed", {  // 假设后端提供该 API
@@ -230,7 +217,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.updateDeviceMode = updateDeviceMode;
     window.updateDeviceFanSpeed = updateDeviceFanSpeed;
-    window.updateDeviceBrightness = updateDeviceBrightness;
     window.updateDeviceStatus = updateDeviceStatus;
     window.updateDeviceTemperature = updateDeviceTemperature;
     window.loadDevices = loadDevices;
