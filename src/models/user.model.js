@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
     user_avatar: {
         type: Number,
         default: 1
+    },
+    group: {
+        type: Number,
+        default: 1
     }
 });
 
