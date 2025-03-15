@@ -1298,3 +1298,234 @@ canvas {
     margin-top: 20px;
 }
 
+.addFunctionButton {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.standbyModalCP {
+    display: none;
+    position: fixed;
+    top: 20%;
+    left: 42%;
+    width: 30%;
+    height: auto;
+    border-radius: 15px;
+    background: rgba(250, 198, 158, 1.0);
+
+}
+.standbyModalCP-content {
+    background: #f6c97a;
+    padding: 30px;
+    width: 100%;
+
+    border-radius: 40px;
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+
+}
+.h3Button{
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
+.closeButton {
+    position: absolute;
+    margin-left: 90%;
+    background: rgba(255,255,255,0.5);
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton-img{
+    width: 100%;
+    height: 100%;
+}
+
+.addButton, .removeButton {
+    margin-left: 180px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.standbyItem {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.standbyItem span {
+    margin-left: 10px; /* Adjust as needed */
+}
+
+.function-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.removeFunctionButton {
+    position: absolute;
+    width: 50px;
+    margin-left: 80%;
+    background: red;
+    font-size: 11px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 30px; /* Adjust based on button size */
+    min-width: 60px; /* Adjust based on content */
+}
+
+.StandbyAddButton {
+    margin-left: 80%;
+    position: absolute;
+    width: 15%;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.addFunctionButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fdf6ec; /* Match Light Control card */
+    color: black;
+    border: none;
+    border-radius: 15px; /* Rounded corners */
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.addFunctionButton img {
+    width: 18px; /* Adjust size */
+    height: 18px;
+    margin-right: 8px; /* Space between icon and text */
+}
+
+.dashboardDesign {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.circle-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 50px auto;
+}
+
+
+.big-circle {
+    width: 14vw;
+    height: 14vw;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.big-circle:hover {
+    width: 15vw;
+    height: 15vw;
+    transition: 0.3s;
+}
+
+
+
+.big-circle img {
+    width: 8vw;
+    height: 8vw;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.big-circle img:hover {
+    width: 9vw;
+    height: 9vw;
+    transition: 0.3s;
+}
+
+.profile-name {
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+
+.small-circle {
+    width: 75px;
+    height: 75px;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 50%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.5s;
+}
+.small-circle:hover {
+    width: 80px;
+    height: 80px;
+    transition: 0.3s;
+}
+
+.small-circle img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#avatarSelector option {
+    padding: 5px 10px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 30px 30px;
+}
+
+#avatarSelector option[value="1"] { background-image: url("https://randomuser.me/api/portraits/lego/1.jpg"); }
+#avatarSelector option[value="2"] { background-image: url("https://randomuser.me/api/portraits/lego/2.jpg"); }
+#avatarSelector option[value="3"] { background-image: url("https://randomuser.me/api/portraits/lego/3.jpg"); }
+#avatarSelector option[value="4"] { background-image: url("https://randomuser.me/api/portraits/lego/4.jpg"); }
+#avatarSelector option[value="5"] { background-image: url("https://randomuser.me/api/portraits/lego/5.jpg"); }
+#avatarSelector option[value="6"] { background-image: url("https://randomuser.me/api/portraits/lego/6.jpg"); }
+#avatarSelector option[value="7"] { background-image: url("https://randomuser.me/api/portraits/lego/7.jpg"); }
+#avatarSelector option[value="8"] { background-image: url("https://randomuser.me/api/portraits/lego/8.jpg"); }
+#avatarSelector option[value="9"] { background-image: url("https://randomuser.me/api/portraits/lego/9.jpg"); }
+#avatarSelector option[value="10"] { background-image: url("https://randomuser.me/api/portraits/lego/10.jpg"); }

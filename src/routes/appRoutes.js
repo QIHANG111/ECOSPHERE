@@ -10,6 +10,7 @@ import Room from '../models/room.model.js';
 import mongoose from 'mongoose';
 import Role from '../models/role.model.js'
 import jwt from 'jsonwebtoken';
+import { error } from 'node:console';
 
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
@@ -65,7 +66,7 @@ router.get('/api/users', async (req, res) => {
 */
 router.post('/api/signup', async (req, res) => {
     try {
-        let { name, email, phone, password, role_id } = req.body;
+        let { name, email, phone, password, role_id, parentUser, user_avatar } = req.body;
         console.log("[DEBUG] Received signup data:", req.body);
 
         if (!role_id || role_id.length !== 24) {
@@ -73,47 +74,45 @@ router.post('/api/signup', async (req, res) => {
             return res.status(400).json({ message: "Invalid role_id" });
         }
 
-        // **默认 phone**
         if (!phone) {
             phone = "1234567890";
         }
 
-
+        if (typeof user_avatar === "undefined" || user_avatar === null) {
+            user_avatar = 1;
+        }
         const role = await Role.findById(role_id);
         if (!role) {
             console.error("[ERROR] Role ID not found:", role_id);
             return res.status(400).json({ message: "Role ID not found" });
         }
-
         console.log("[DEBUG] Role ID is valid, proceeding with signup...");
-
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: "Email already registered" });
         }
-
-
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log("[DEBUG] Hashed password:", hashedPassword);
-
-
         const newUser = new User({
             name,
             email,
             phone,
             hashed_password: hashedPassword,
-            role_id: role._id
+            role_id: role._id,
+            parentUser: parentUser || null,
+            user_avatar
         });
 
         await newUser.save();
-        res.status(201).json({ message: "User registered successfully" });
+        res.status(201).json({ message: "User registered successfully", data: newUser });
 
     } catch (error) {
         console.error("[ERROR] POST /api/signup ->", error);
         res.status(500).json({ message: "Server error" });
     }
 });
+
 router.get('/api/getRoleId/:roleName', async (req, res) => {
     try {
         const roleName = req.params.roleName;
@@ -208,13 +207,16 @@ router.put('/api/update-user', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const { name, email, password } = req.body;
+        const { name, email, password, user_avatar } = req.body;
 
         let updateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
         if (password) {
             updateData.hashed_password = await bcrypt.hash(password, 10);
+        }
+        if (typeof user_avatar === "number") {
+            updateData.user_avatar = user_avatar;
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
@@ -418,82 +420,63 @@ router.delete('/api/device/:id', async (req, res) => {
     }
 });
 
-//temporarily use the local data
-
-
 /*
-  Get the list of devices from a JSON file
+  Get the list of devices 
 */
-router.get('/api/devices', (req, res) => {
-    console.log('[DEBUG] GET /api/devices -> reading devicesFile:', devicesFile);
-    fs.readFile(devicesFile, 'utf8', (err, data) => {
-        if (err) {
-            console.error('[ERROR] Reading devices.json ->', err);
-            return res.status(500).json({ error: 'Failed to read devices.json' });
+router.get('/api/devices', async (req, res) => {
+    console.log('[DEBUG] GET /api/devices -> Fetching devices from MongoDB');
+    try {
+        const devices = await Device.find(); 
+        if (!devices || devices.length === 0) {
+            console.error('[ERROR] Finding devices in the database ->', error);
+            return res.status(404).json({ error: 'No devices found' });
         }
-        try {
-            const devices = JSON.parse(data);
-            console.log(`[DEBUG] /api/devices -> found ${devices.length} devices in JSON`);
-            res.json(devices);
-        } catch (error) {
-            console.error('[ERROR] Parsing devices.json ->', error);
-            res.status(500).json({ error: 'Invalid JSON format in devices.json' });
-        }
-    });
+        console.log(`[DEBUG] /api/devices -> found ${devices.length} devices in MongoDB`);
+        res.json(devices);
+    } catch (error) {
+        console.error('[ERROR] Fetching devices from MongoDB ->', error);
+        res.status(500).json({ error: 'Server error while fetching devices' });
+    }
 });
 
 /*
   Update the status of a specific device
 */
-router.post('/api/update-device', (req, res) => {
+router.post('/api/update-device', async (req, res) => {
     console.log('[DEBUG] POST /api/update-device -> req.body:', req.body);
     if (!req.body || typeof req.body.name !== 'string' || typeof req.body.status !== 'boolean') {
-        console.log('[DEBUG] Invalid update-device body');
-        return res.status(400).json({
+        console.error('[ERROR] Parsing body', error);
+        res.status(400).json({
             error: "Invalid request format. 'name' must be a string and 'status' must be a boolean."
         });
     }
 
     const { name, status } = req.body;
 
-    fs.readFile(devicesFile, 'utf8', (err, data) => {
-        if (err) {
-            console.error('[ERROR] Reading devices.json ->', err);
-            return res.status(500).json({ error: 'Failed to read devices.json' });
+    try {
+        const updatedDevice = await Device.findOneAndUpdate(
+            { device_name: name }, 
+            { status: status }, 
+            { new: true } 
+        );
+        if (!updatedDevice) {
+            console.log(`[DEBUG] Device not found with name: ${name}`);
+            return res.status(404).json({ error: 'Device not found' });
         }
-
-        try {
-            let devices = JSON.parse(data);
-            let device = devices.find(d => d.name === name);
-            if (!device) {
-                console.log(`[DEBUG] Device not found with name: ${name}`);
-                return res.status(404).json({ error: 'Device not found' });
-            }
-
-            // Update the device status
-            device.status = status;
-            console.log(`[DEBUG] Updating device '${name}' status to: ${status}`);
-
-            // Save back to the file
-            fs.writeFile(devicesFile, JSON.stringify(devices, null, 4), err => {
-                if (err) {
-                    console.error('[ERROR] Writing devices.json ->', err);
-                    return res.status(500).json({ error: 'Failed to update devices.json' });
-                }
-                res.json({ success: true, updatedDevice: device });
-            });
-        } catch (error) {
-            console.error('[ERROR] Parsing devices.json ->', error);
-            res.status(500).json({ error: 'Invalid JSON format in devices.json' });
-        }
-    });
+        console.log(`[DEBUG] Updated device '${name}' status to: ${status}`);
+        res.json({ success: true, updatedDevice });
+    } catch (error) {
+        console.error('[ERROR] Updating device status in MongoDB ->', error);
+        res.status(500).json({ error: 'Server error while updating device status' });
+    }
 });
 
 /*
-  Update the temperature of a specific AC device
+    Update the temperature of a specific AC device
 */
-router.post('/api/update-temperature', (req, res) => {
+router.post('/api/update-temperature', async (req, res) => {
     console.log('[DEBUG] POST /api/update-temperature -> req.body:', req.body);
+
     if (!req.body || typeof req.body.name !== 'string' || typeof req.body.temperature !== 'number') {
         console.log('[DEBUG] Invalid update-temperature body');
         return res.status(400).json({
@@ -503,41 +486,70 @@ router.post('/api/update-temperature', (req, res) => {
 
     const { name, temperature } = req.body;
 
-    fs.readFile(devicesFile, 'utf8', (err, data) => {
-        if (err) {
-            console.error('[ERROR] Reading devices.json ->', err);
-            return res.status(500).json({ error: 'Failed to read devices.json' });
+    try {
+        // Find and update the AC device in MongoDB
+        console.log(`[DEBUG] Finding AC device of name: ${name}`);
+        const updatedDevice = await Device.findOneAndUpdate(
+            { device_name: name, device_type: 'AC' }, 
+            { temperature: temperature },             // Update temperature field
+            { new: true }                             
+        );
+
+        if (!updatedDevice) {
+            console.error(`[ERROR] Finding AC device ${name} ->`, error);
+            res.status(404).json({ error: 'AC device not found' });
         }
 
-        try {
-            let devices = JSON.parse(data);
-            let device = devices.find(d => d.name === name && d.type === 'AC');
-            if (!device) {
-                console.log(`[DEBUG] AC device not found with name: ${name}`);
-                return res.status(404).json({ error: 'AC device not found' });
-            }
+        console.log(`[DEBUG] Updated AC device '${name}' temperature to: ${temperature}`);
+        res.json({ success: true, updatedDevice });
 
-            // Update the device temperature
-            device.temperature = temperature;
-            console.log(`[DEBUG] Updated AC device '${name}' temperature to: ${temperature}`);
+    } catch (error) {
+        console.error('[ERROR] Updating AC temperature ->', error);
+        res.status(500).json({ error: 'Server error while updating temperature' });
+    }
+});
 
-            // Store notification
-            const notificationMessage = `Updated AC device '${name}' temperature to: ${temperature}`;
-            notifications.push(notificationMessage);
 
-            // Save the updated data back to JSON
-            fs.writeFile(devicesFile, JSON.stringify(devices, null, 4), err => {
-                if (err) {
-                    console.error('[ERROR] Writing devices.json ->', err);
-                    return res.status(500).json({ error: 'Failed to update devices.json' });
-                }
-                res.json({ success: true, updatedDevice: device });
-            });
-        } catch (error) {
-            console.error('[ERROR] Parsing devices.json ->', error);
-            res.status(500).json({ error: 'Invalid JSON format in devices.json' });
+/*
+    Adjust light brightness
+*/
+router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
+    try {
+        const { brightness } = req.body;
+        const deviceId = req.params.id;
+        console.log(`[DEBUG] Received request to update brightness for device ID: ${deviceId}`);
+        console.log(`[DEBUG] Requested brightness level: ${brightness}`);
+
+        if (brightness < 1 || brightness > 5) {
+            console.error('[ERROR] Adjusting brightness ->', error);
+            res.status(400).json({ error: "Brightness level must be between 1 and 5" });
         }
-    });
+
+        const device = await Device.findById(deviceId);
+
+        if (!device) {
+            console.error('[ERROR] Finding device. ->', error);
+            res.status(404).json({ error: "Device not found" });
+        }
+
+        console.log(`[DEBUG] Device found: ${device.device_name}, (Type: ${device.device_type})`);
+
+        if (device.device_type !== "light") {
+            console.error("[ERROR] Getting device type. ->");
+            res.status(400).json({ error: "This device is not a light" });
+        }
+
+        console.log(`[DEBUG] Updating brightness from ${device.brightness} to ${brightness}`);
+        device.brightness = brightness;
+
+        console.log(`[DEBUG] Saving brightness changes to ${device.brightness}`);
+        await device.save();
+        res.status(200).json({ success: true, message: "Brightness adjusted successfully", data: device });
+
+    } catch (error) {
+        console.error("[ERROR] Adjusting brightness ->", error);
+        res.status(500).json({ error: "Server error" });
+    }
 });
 
 // ✅ 这里加上新的 API，避免重复 `/api/update-temperature`

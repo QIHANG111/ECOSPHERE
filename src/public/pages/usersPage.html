@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Family</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/userPage.js"></script>
 </head>
 <body>
 
@@ -46,16 +47,19 @@
 <!-- Main Content -->
 <div class="dashboard">
     <div class="dashboard-content">
-        <div class="family-card">
-            <div class="profile-container">
-            <div id="userInfo" style="font-size: 18px; font-weight: bold; padding: 10px;"></div>
-            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User">
+        <div class="dashboard">
+            <div class="circle-container">
 
-                <span class="badge premium-badge">Premium Subscriber</span>
-        </div></div>
-        <div class="add-card" onclick="openAddModal()">
-            <span>+</span>
-            <p>Add a family member</p>
+                <div class="big-circle">
+                    <img id="mainUserImage" src="" alt="User">
+                    <div id="userInfo" class="profile-name">Current User</div>
+                </div>
+
+            </div>
+            <div class="add-card" onclick="openAddModal()">
+                <span>+</span>
+                <p>Add a family member</p>
+            </div>
         </div>
     </div>
 </div>
@@ -64,18 +68,18 @@
 <div id="addMemberModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeAddModal()">&times;</span>
-        <h2>Add a Family Member</h2>
+        <h2>Add</h2>
         <form id="addMemberForm">
             <label for="memberName">Name:</label>
             <input type="text" id="memberName" name="memberName" required>
 
-            <label for="memberImage">Email:</label>
-            <input type="text" id="memberImage" name="memberImage" placeholder="Enter image URL">
+            <label for="memberEmail">Email:</label>
+            <input type="email" id="memberEmail" name="memberEmail" placeholder="Enter email" required>
 
-            <label for="memberInfo">Additional Info:</label>
-            <input type="text" id="memberInfo" name="memberInfo" placeholder="E.g. Address, School">
+            <label for="memberPassword">Password:</label>
+            <input type="password" id="memberPassword" name="memberPassword" placeholder="Enter password" required>
 
-            <button type="submit">Sent Invite</button>
+            <button type="submit">submit</button>
         </form>
     </div>
 </div>
@@ -83,6 +87,30 @@
 <!-- Scripts -->
 <script src="/js/sidebar.js"></script>
 <script src="/js/theme.js"></script>
-<script src="/js/userPage.js"></script>
+<script>
+function openAddModal() {
+    document.getElementById("addMemberModal").style.display = "flex";
+}
+
+function closeAddModal() {
+    document.getElementById("addMemberModal").style.display = "none";
+}
+
+function positionSmallCircles() {
+    const smallCircles = document.querySelectorAll(".small-circle");
+    const total = smallCircles.length;
+    const radius = 120; // Distance from center
+
+    smallCircles.forEach((circle, index) => {
+        const angle = (index / total) * 2 * Math.PI;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+
+        circle.style.position = "absolute";
+        circle.style.left = `calc(50% + ${x}px - 30px)`;
+        circle.style.top = `calc(50% + ${y}px - 30px)`;
+    });
+}
+</script>
 </body>
 </html>
