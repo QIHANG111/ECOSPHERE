@@ -104,3 +104,67 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please log in first.");
+        window.location.href = "../pages/signinPage.html";
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/user", {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        const user = await response.json();
+
+        if (response.ok) {
+            const avatarImg = document.getElementById("currentAvatar");
+            avatarImg.src = `https://randomuser.me/api/portraits/lego/${user.user_avatar || 1}.jpg`;
+
+            const avatarSelector = document.getElementById("avatarSelector");
+            avatarSelector.value = user.user_avatar || 1;
+        } else {
+            alert("Failed to load user info.");
+        }
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+    }
+
+
+    document.getElementById("avatarSelector").addEventListener("change", function () {
+        const selectedAvatar = this.value;
+        document.getElementById("currentAvatar").src = `https://randomuser.me/api/portraits/lego/${selectedAvatar}.jpg`;
+    });
+
+
+    document.getElementById("updateAvatarBtn").addEventListener("click", async function () {
+        const selectedAvatar = document.getElementById("avatarSelector").value;
+
+        try {
+            const updateResponse = await fetch("/api/update-user", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({ user_avatar: parseInt(selectedAvatar) })
+            });
+
+            const updateResult = await updateResponse.json();
+
+            if (updateResponse.ok) {
+                alert("Avatar updated successfully!");
+            } else {
+                alert("Failed to update avatar: " + updateResult.message);
+            }
+        } catch (error) {
+            console.error("Error updating avatar:", error);
+            alert("Server error.");
+        }
+    });
+});

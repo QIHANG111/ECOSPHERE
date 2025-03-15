@@ -66,7 +66,7 @@ router.get('/api/users', async (req, res) => {
 */
 router.post('/api/signup', async (req, res) => {
     try {
-        let { name, email, phone, password, role_id } = req.body;
+        let { name, email, phone, password, role_id, parentUser, user_avatar } = req.body;
         console.log("[DEBUG] Received signup data:", req.body);
 
         if (!role_id || role_id.length !== 24) {
@@ -74,47 +74,45 @@ router.post('/api/signup', async (req, res) => {
             return res.status(400).json({ message: "Invalid role_id" });
         }
 
-        // **默认 phone**
         if (!phone) {
             phone = "1234567890";
         }
 
-
+        if (typeof user_avatar === "undefined" || user_avatar === null) {
+            user_avatar = 1;
+        }
         const role = await Role.findById(role_id);
         if (!role) {
             console.error("[ERROR] Role ID not found:", role_id);
             return res.status(400).json({ message: "Role ID not found" });
         }
-
         console.log("[DEBUG] Role ID is valid, proceeding with signup...");
-
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: "Email already registered" });
         }
-
-
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log("[DEBUG] Hashed password:", hashedPassword);
-
-
         const newUser = new User({
             name,
             email,
             phone,
             hashed_password: hashedPassword,
-            role_id: role._id
+            role_id: role._id,
+            parentUser: parentUser || null,
+            user_avatar
         });
 
         await newUser.save();
-        res.status(201).json({ message: "User registered successfully" });
+        res.status(201).json({ message: "User registered successfully", data: newUser });
 
     } catch (error) {
         console.error("[ERROR] POST /api/signup ->", error);
         res.status(500).json({ message: "Server error" });
     }
 });
+
 router.get('/api/getRoleId/:roleName', async (req, res) => {
     try {
         const roleName = req.params.roleName;
@@ -209,13 +207,16 @@ router.put('/api/update-user', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const { name, email, password } = req.body;
+        const { name, email, password, user_avatar } = req.body;
 
         let updateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
         if (password) {
             updateData.hashed_password = await bcrypt.hash(password, 10);
+        }
+        if (typeof user_avatar === "number") {
+            updateData.user_avatar = user_avatar;
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });

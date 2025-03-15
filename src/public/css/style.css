@@ -1511,3 +1511,21 @@ canvas {
     border-radius: 50%;
     object-fit: cover;
 }
+
+#avatarSelector option {
+    padding: 5px 10px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 30px 30px;
+}
+
+#avatarSelector option[value="1"] { background-image: url("https://randomuser.me/api/portraits/lego/1.jpg"); }
+#avatarSelector option[value="2"] { background-image: url("https://randomuser.me/api/portraits/lego/2.jpg"); }
+#avatarSelector option[value="3"] { background-image: url("https://randomuser.me/api/portraits/lego/3.jpg"); }
+#avatarSelector option[value="4"] { background-image: url("https://randomuser.me/api/portraits/lego/4.jpg"); }
+#avatarSelector option[value="5"] { background-image: url("https://randomuser.me/api/portraits/lego/5.jpg"); }
+#avatarSelector option[value="6"] { background-image: url("https://randomuser.me/api/portraits/lego/6.jpg"); }
+#avatarSelector option[value="7"] { background-image: url("https://randomuser.me/api/portraits/lego/7.jpg"); }
+#avatarSelector option[value="8"] { background-image: url("https://randomuser.me/api/portraits/lego/8.jpg"); }
+#avatarSelector option[value="9"] { background-image: url("https://randomuser.me/api/portraits/lego/9.jpg"); }
+#avatarSelector option[value="10"] { background-image: url("https://randomuser.me/api/portraits/lego/10.jpg"); }
