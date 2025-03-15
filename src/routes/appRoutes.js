@@ -143,9 +143,11 @@ router.get('/api/user', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
+        // `role_name`
         const user = await User.findById(userId)
             .select("name email phone role_id user_avatar")
             .populate("role_id", "role_name");
+
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -156,8 +158,6 @@ router.get('/api/user', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
-
-
 /*
   Sign in
   NOTE: requires jwt & SECRET_KEY if you truly use token logic
@@ -333,29 +333,26 @@ router.delete('/api/users/:id', async (req, res) => {
   Get all users under a certain manager
 */
 router.get('/api/users/parent/:id', async (req, res) => {
-    console.log('[DEBUG] GET /api/users/parent/:id ->', req.params);
-    logDbState('/api/users/parent/:id');
     try {
         const { id } = req.params;
         const parentUser = await User.findById(id);
         if (!parentUser) {
-            console.log(`[DEBUG] Parent user not found with id: ${id}`);
-            return res.status(404).json({ success: false, message: 'Parent user not found' });
+            return res.status(404).json({ success: false, message: "Parent user not found" });
         }
 
-        const subUsers = await User.find({ parentUser: id });
-        console.log(`[DEBUG] Found ${subUsers.length} subusers for manager: ${id}`);
+
+        const subUsers = await User.find({ parentUser: id }).populate("role_id", "role_name");
+
         res.status(200).json({
             success: true,
             parent: parentUser,
             subUsers
         });
     } catch (error) {
-        console.error('[ERROR] GET /api/users/parent/:id ->', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("[ERROR] GET /api/users/parent/:id ->", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
-
 /*
   Get all users
 */

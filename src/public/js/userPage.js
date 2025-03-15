@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const addUserForm = document.getElementById("addUserForm");
     const modal = document.getElementById("addUserModal");
-    const userListContainer = document.getElementById("userListContainer");
-    const avatarList = document.getElementById("avatarList");
     const addUserBtn = document.getElementById("addUserBtn");
 
     const token = localStorage.getItem("token");
@@ -125,7 +123,7 @@ async function addSubUser() {
     const memberName = document.getElementById("name").value.trim();
     const memberEmail = document.getElementById("email").value.trim();
     const memberPassword = document.getElementById("password").value.trim();
-    const userAvatar = Math.floor(Math.random() * 10); // 随机头像
+    const userAvatar = Math.floor(Math.random() * 10);
 
     if (!memberName || !memberEmail || !memberPassword) {
         alert("Please fill in all fields.");
@@ -146,7 +144,7 @@ async function addSubUser() {
         }
 
 
-        const roleResponse = await fetch("/api/getRoleId/user");
+        const roleResponse = await fetch("/api/getRoleId/dweller");
         const roleResult = await roleResponse.json();
 
         if (!roleResponse.ok || !roleResult.role_id) {
