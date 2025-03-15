@@ -10,6 +10,7 @@ import Room from '../models/room.model.js';
 import mongoose from 'mongoose';
 import Role from '../models/role.model.js'
 import jwt from 'jsonwebtoken';
+import { error } from 'node:console';
 
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
@@ -538,6 +539,46 @@ router.post('/api/update-temperature', (req, res) => {
             res.status(500).json({ error: 'Invalid JSON format in devices.json' });
         }
     });
+});
+
+// Adjust light brightness
+router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
+    try {
+        const { brightness } = req.body;
+        const deviceId = req.params.id;
+        console.log(`[DEBUG] Received request to update brightness for device ID: ${deviceId}`);
+        console.log(`[DEBUG] Requested brightness level: ${brightness}`);
+
+        if (brightness < 1 || brightness > 5) {
+            console.error('[ERROR] Adjusting brightness ->', error);
+            res.status(400).json({ error: "Brightness level must be between 1 and 5" });
+        }
+
+        const device = await Device.findById(deviceId);
+
+        if (!device) {
+            console.error('[ERROR] Finding device. ->', error);
+            res.status(404).json({ error: "Device not found" });
+        }
+
+        console.log(`[DEBUG] Device found: ${device.device_name}, (Type: ${device.device_type})`);
+
+        if (device.device_type !== "light") {
+            console.error("[ERROR] Getting device type. ->");
+            res.status(400).json({ error: "This device is not a light" });
+        }
+
+        console.log(`[DEBUG] Updating brightness from ${device.brightness} to ${brightness}`);
+        device.brightness = brightness;
+
+        console.log(`[DEBUG] Saving brightness changes to ${device.brightness}`);
+        await device.save();
+        res.status(200).json({ success: true, message: "Brightness adjusted successfully", data: device });
+
+    } catch (error) {
+        console.error("[ERROR] Adjusting brightness ->", error);
+        res.status(500).json({ error: "Server error" });
+    }
 });
 
 /* ============================================================
