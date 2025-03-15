@@ -6,6 +6,46 @@
     <title>Family Management</title>
     <link rel="stylesheet" href="../css/style.css">
     <script defer src="../js/userPage.js"></script>
+    <style>
+        .modal-content {
+            text-align: center;
+            padding: 20px;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin: auto;
+        }
+
+        .modal-header img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .modal button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007AFF;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 <div class="sidebar">
@@ -57,18 +97,29 @@
     <div id="addUserModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAddUserModal()">&times;</span>
-            <h2>Add Family Member</h2>
+
+
+            <div class="icon-container">
+                <div class="ui-menu-icon">
+                    <img src="/icons/family-round-svgrepo-com.svg" alt="Vector Icon" width="70" height="70">
+                </div>
+            </div>
             <form id="addUserForm">
-                <label for="name">Name:</label>
-                <input type="text" id="name" required>
+                <h2 class="form-title">Create a Dweller Account</h2>
+                <p class="form-description">
+                    This account will be part of your family. Ensure the details are correct.
+                </p>
 
-                <label for="email">Email:</label>
-                <input type="email" id="email" required>
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Enter full name" required>
 
-                <label for="password">Password:</label>
-                <input type="password" id="password" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email" required>
 
-                <button type="submit">Add</button>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a password" required>
+
+                <button type="submit">Create Account</button>
             </form>
         </div>
     </div>
