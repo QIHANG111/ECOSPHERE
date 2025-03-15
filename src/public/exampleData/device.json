@@ -7,7 +7,7 @@
     },
     {
         "name": "AC2",
-        "status": false,
+        "status": true,
         "type": "AC",
         "temperature": 16
     },
@@ -26,5 +26,40 @@
         "name": "LIGHT2",
         "status": false,
         "type": "LIGHT"
-    }
+    },
+
+
+        {
+            "id": "Lamp1",
+            "name": "Beside Lamp",
+            "type": "light",
+            "icon": "../icons/device-page/light-svgrepo-com.svg",
+            "status": false
+        },
+        {
+            "id": "DoorLock1",
+            "name": "Smart Door Lock",
+            "type": "lock",
+            "icon": "../icons/device-page/door-lock-svgrepo-com.svg",
+            "status": true
+        },
+        {
+            "id": "AirConditioner1",
+            "name": "Air Conditioner",
+            "type": "AC",
+            "icon": "../icons/device-page/air-conditioner.svg",
+            "status": false,
+            "temperature": 24
+        },
+        {
+            "id": "Socket1",
+            "name": "Socket",
+            "type": "socket",
+            "icon": "../icons/device-page/socket-i-svgrepo-com.svg",
+            "status": true
+        }
+
+
+
 ]
+
