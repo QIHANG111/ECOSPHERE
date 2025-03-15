@@ -185,6 +185,38 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Error updating temperature:", error));
     }
 
+    // new added here
+
+    function updateDeviceFanSpeed(deviceName, fanSpeed) {
+        fetch("/api/device/fanSpeed", {  // 假设后端提供该 API
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: deviceName, fanSpeed: fanSpeed })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Updated ${deviceName} fan speed to:`, fanSpeed);
+                loadDevices();
+            })
+            .catch(error => console.error("Error updating fan speed:", error));
+    }
+
+    function updateDeviceMode(deviceName, mode) {
+        fetch("/api/device/mode", {  // 假设你已配置此 API
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: deviceName, mode: mode })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Updated ${deviceName} mode to:`, mode);
+                loadDevices();
+            })
+            .catch(error => console.error("Error updating mode:", error));
+    }
+
+    window.updateDeviceMode = updateDeviceMode;
+    window.updateDeviceFanSpeed = updateDeviceFanSpeed;
     window.updateDeviceStatus = updateDeviceStatus;
     window.updateDeviceTemperature = updateDeviceTemperature;
     window.loadDevices = loadDevices;
