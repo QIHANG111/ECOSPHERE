@@ -1729,10 +1729,8 @@ canvas {
 
 
 #accountForm button, #addUserForm button {
-    width: 100%;
-    max-width: 350px;
-    padding: 12px;
-    font-size: 18px;
+    width: 15%;
+    font-size: 15px;
     font-weight: bold;
     color: white;
     background: linear-gradient(135deg, #007AFF, #005DD1);
@@ -1745,4 +1743,46 @@ canvas {
 #accountForm button:hover, #addUserForm button:hover {
     background: linear-gradient(135deg, #005DD1, #0040A5);
     transform: scale(1.02);
+}
+
+.container2 {
+    width: 95%;
+    margin: 20px auto;
+    background: var(--c-bg-sidebar);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.menu-item2 {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 16px;
+}
+.menu-item2:hover {
+    background: var(--c-bg-card-hover);
+}
+.menu-item2:last-child {
+    border-bottom: none;
+}
+.icon2 {
+    margin-right: 10px;
+}
+.details2 {
+    display: none;
+    padding: 20px;
+    background: var(--c-bg-sidebar);
+}
+.details2 input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.back2 {
+    color: var(--c-text-primary);
+    cursor: pointer;
 }
