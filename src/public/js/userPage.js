@@ -113,6 +113,9 @@ function addUserToList(user, isMainUser = false) {
             <p class="user-name">${user.name} ${isMainUser ? "(You)" : ""}</p>
             <p class="user-role">${user.role_id?.role_name || "User"}</p>
         </div>
+        <div style="align-content: end">
+        <img src="/icons/setting-3-svgrepo-com.svg" onclick="showDetails(roleEdit)"  alt="Vector Icon" width="30" height="30" style="flex: 1; text-align: center;">
+        </div>
     `;
 
     userListContainer.appendChild(listItem);
@@ -185,4 +188,15 @@ async function addSubUser() {
 
 
     closeAddUserModal();
+}
+function showDetails(id) {
+    history.pushState({ section: id }, "", `#${id}`);
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById(id).style.display = 'block';
+}
+
+function showMenu() {
+    history.pushState(null, "", window.location.pathname);
+    document.querySelectorAll('.details2').forEach(detail => detail.style.display = 'none');
+    document.getElementById('menu').style.display = 'block';
 }

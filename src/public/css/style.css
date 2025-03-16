@@ -165,20 +165,98 @@ body {
     transform: scale(1.1); /* Enlarge icon */
 }
 
+/*phone*/
+@media screen and (max-width: 768px) {
+    .normalCard{
+        width: 120%;
+    }
+    .sidebar {
+        width: 100vw;
+        height: 8vh;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        border-radius: 0;
+        padding: 0.5vw 0;
+    }
+    .aiCard {
+        height: 7vh;
+        width: 10%;
+
+    }
+
+
+    .menu-item {
+        width: auto;
+        height: 40%;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 2vw;
+    }
+
+
+    .ui-menu-icon img {
+        width: 40px;
+        height: 40px;
+    }
+
+
+    .menu-text {
+        font-size: 12px;
+        opacity: 1;
+    }
+
+
+    .sidebar:hover {
+        width: 100vw;
+    }
+    .menu-item:hover {
+        height: auto;
+        box-shadow: none;
+        background-color: transparent;
+    }
+    .dashboard {
+        color: var(--c-text-primary);
+        margin-left: 0; /* Default offset for sidebar */
+        width: calc(100%); /* Adjust width dynamically */
+        padding: 2vw;
+        height: 200vh;
+        transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
+        overflow: visible;
+    }
+
+}
+
+
+
+
 .dashboard {
     color: var(--c-text-primary);
-    margin-left: 12vw; /* Default offset for sidebar */
-    width: calc(100% - 14vw); /* Adjust width dynamically */
+    margin-left: 3vw;
+    width: calc(100% - 14vw);
     padding: 2vw;
     height: 200vh;
-    transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
+    transition: margin-left 0.3s ease, width 0.3s ease;
     overflow: visible;
 }
 
-/* Adjust dashboard when sidebar expands */
-.sidebar:hover ~ .dashboard {
-    margin-left: 14vw; /* Adjust margin when sidebar expands */
-    width: calc(100% - 16vw); /* Adjust width accordingly */
+@media screen and (min-width: 769px) {
+    .sidebar:hover ~ .dashboard {
+        margin-left: 14vw;
+        width: calc(100% - 16vw);
+    }
+    .dashboard {
+        color: var(--c-text-primary);
+        margin-left: 12vw;
+        width: calc(100% - 14vw);
+        padding: 2vw;
+        height: 200vh;
+        transition: margin-left 0.3s ease, width 0.3s ease;
+        overflow: visible;
+    }
 }
 
 .dashboard-content {
@@ -850,22 +928,6 @@ canvas {
     min-height: 50px; /* Prevents height jumping */
 }
 
-.aiCard {
-    height: 7vh;
-    width: 320%;
-    max-width: 100%;
-    overflow: visible; /* Allow text expansion */
-    padding: 1vw;
-    flex-direction: column;
-    background-color: var(--c-bg-sidebar);
-    border-radius: 3vw;
-    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: start; /* Keep input field at the top */
-    align-items: center;
-    border: 0.1vw solid rgba(255, 255, 255, 0.5);
-    transition: 0.3s ease;
-}
 
 @keyframes glow {
     0% {
@@ -878,7 +940,21 @@ canvas {
         box-shadow: 0 0 1vw var(--c-glow);
     }
 }
-
+.aiCard {
+    height: 8vh;
+    width: 100%;
+    overflow: visible; /* Allow text expansion */
+    padding: 1vw;
+    flex-direction: column;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 3vw;
+    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: start; /* Keep input field at the top */
+    align-items: center;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    transition: 0.3s ease;
+}
 .aiCard:hover {
     transform: scale(1.03);
     height: 40vh;
@@ -1622,21 +1698,7 @@ canvas {
     color: gray;
 }
 
-#addUserBtn {
-    display: block;
-    width: 150px;
-    margin: 20px auto;
-    padding: 10px;
-    background-color: #007aff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
 
-#addUserBtn:hover {
-    background-color: #005ecb;
-}
 
 #addUserForm {
     display: flex;
@@ -1690,7 +1752,26 @@ canvas {
     background: linear-gradient(135deg, #005DD1, #0040A5);
     transform: scale(1.02);
 }
+#addUserBtn {
+    display: block;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #007AFF, #005DD1);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
 
+#addUserBtn:hover {
+    background: linear-gradient(135deg, #005DD1, #0040A5);
+    transform: scale(1.02);
+}
 
 #accountForm {
     display: flex;
@@ -1728,8 +1809,8 @@ canvas {
 }
 
 
-#accountForm button, #addUserForm button {
-    width: 15%;
+#accountForm button, #addUserForm button #newbuttonFrom  button{
+    width: 30%;
     font-size: 15px;
     font-weight: bold;
     color: white;
@@ -1740,7 +1821,7 @@ canvas {
     transition: background 0.3s, transform 0.2s;
 }
 
-#accountForm button:hover, #addUserForm button:hover {
+#accountForm button:hover, #addUserForm button:hover #newbuttonFrom  button:hover{
     background: linear-gradient(135deg, #005DD1, #0040A5);
     transform: scale(1.02);
 }
