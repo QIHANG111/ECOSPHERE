@@ -33,9 +33,42 @@
             "id": "Lamp1",
             "name": "Beside Lamp",
             "type": "light",
-            "icon": "../icons/device-page/light-svgrepo-com.svg",
+            "category": "Lighting",
+            "icon": "../icons/lighting/light-svgrepo-com.svg",
             "status": false
         },
+
+    {
+        "id": "Lamp2",
+        "name": "Desk Lamp",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/desk-lamp-lamp.svg",
+        "status": false
+    },
+
+    {
+        "id": "Lamp3",
+        "name": "Ceiling Lamp",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/ceiling-light.svg",
+        "status": false
+    },
+
+    {
+        "id": "Lamp4",
+        "name": "Light bulbs",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/energy-saving-light-bulbs.svg",
+        "status": false
+    },
+
+
+
+
+
         {
             "id": "DoorLock1",
             "name": "Smart Door Lock",
