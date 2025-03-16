@@ -265,6 +265,24 @@
         "category": "health",
         "icon": "../icons/kitchen-electronics/bicycle-man.svg",
         "status": true
+    },
+
+    {
+        "id": "Washer1",
+        "name": "Washer",
+        "type": "cleaning",
+        "category": "cleaning-appliances",
+        "icon": "../icons/cleaning-appliances/washing-machine.svg",
+        "status": true
+    },
+
+    {
+        "id": "vacuum1",
+        "name": "Vacuum Robot",
+        "type": "cleaning",
+        "category": "cleaning-appliances",
+        "icon": "../icons/cleaning-appliances/vacuum-robot.svg",
+        "status": true
     }
 ]
 
