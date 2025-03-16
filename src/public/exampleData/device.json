@@ -238,6 +238,33 @@
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/stove.svg",
         "status": true
+    },
+
+    {
+        "id": "watch1",
+        "name": "Watch",
+        "type": "Health",
+        "category": "health",
+        "icon": "../icons/kitchen-electronics/watch-status.svg",
+        "status": true
+    },
+
+    {
+        "id": "scale1",
+        "name": "Weighing Scale",
+        "type": "Health",
+        "category": "health",
+        "icon": "../icons/kitchen-electronics/weight-scale-1.svg",
+        "status": true
+    },
+
+    {
+        "id": "Bike1",
+        "name": "Smart Bike",
+        "type": "Health",
+        "category": "health",
+        "icon": "../icons/kitchen-electronics/bicycle-man.svg",
+        "status": true
     }
 ]
 
