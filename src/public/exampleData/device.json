@@ -7,7 +7,7 @@
     },
     {
         "name": "AC2",
-        "status": false,
+        "status": true,
         "type": "AC",
         "temperature": 16
     },
@@ -26,5 +26,263 @@
         "name": "LIGHT2",
         "status": false,
         "type": "LIGHT"
+    },
+
+
+        {
+            "id": "Lamp1",
+            "name": "Beside Lamp",
+            "type": "light",
+            "category": "Lighting",
+            "icon": "../icons/lighting/light-svgrepo-com.svg",
+            "status": false
+        },
+
+    {
+        "id": "Lamp2",
+        "name": "Desk Lamp",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/desk-lamp-lamp.svg",
+        "status": false
+    },
+
+    {
+        "id": "Lamp3",
+        "name": "Ceiling Lamp",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/ceiling-light.svg",
+        "status": false
+    },
+
+    {
+        "id": "Lamp4",
+        "name": "Light Bulbs",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/energy-saving-light-bulbs.svg",
+        "status": false
+    },
+
+        {
+            "id": "DoorLock1",
+            "name": "Smart Door Lock",
+            "type": "security",
+            "category": "household-security",
+            "icon": "../icons/household-security/door-lock-svgrepo-com.svg",
+            "status": true
+        },
+
+    {
+        "id": "cctv1",
+        "name": "CCTV",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-electronics/cctv.svg",
+        "status": true
+    },
+
+    {
+        "id": "Doorbell1",
+        "name": "Doorbell",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-security/doorbell.svg",
+        "status": true
+    },
+
+    {
+        "id": "safe-box1",
+        "name": "Safe Box",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-security/safebox-2.svg",
+        "status": true
+    },
+
+
+        {
+            "id": "AirConditioner1",
+            "name": "Air Conditioner",
+            "type": "Air",
+            "category": "air-treatment",
+            "icon": "../icons/air-treatment/air-conditioner.svg",
+            "status": false
+        },
+
+    {
+        "id": "Heater1",
+        "name": "Heater",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/heater-heat.svg",
+        "status": false
+    },
+
+    {
+        "id": "Humidifier1",
+        "name": "Humidifier",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/humidifier.svg",
+        "status": false
+    },
+
+
+    {
+        "id": "Fan1",
+        "name": "Fan",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/fan-2.svg",
+        "status": false
+    },
+
+
+        {
+            "id": "Socket1",
+            "name": "Socket",
+            "type": "switch",
+            "category": "power-switch",
+            "icon": "../icons/power-switch/socket-i-svgrepo-com.svg",
+            "status": true
+        },
+
+    {
+        "id": "Switch1",
+        "name": "Switch",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/switch-off-switch.svg",
+        "status": true
+    },
+
+    {
+        "id": "remote-control1",
+        "name": "Remote Control",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/remote-control.svg",
+        "status": true
+    },
+
+    {
+        "id": "plug-outlet1",
+        "name": "Plug Outlet",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/plug-outlet-1.svg",
+        "status": true
+    },
+
+    {
+        "id": "Cook-pot1",
+        "name": "Multifunction Cooking Pot",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/cooking-pot-outline-with-cover.svg",
+        "status": true
+    },
+
+    {
+        "id": "Fridge1",
+        "name": "Fridge",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/fridge.svg",
+        "status": true
+    },
+
+    {
+        "id": "Oven1",
+        "name": "Oven",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/oven-bake.svg",
+        "status": true
+    },
+
+    {
+        "id": "Microwave Oven1",
+        "name": "Microwave Oven",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/microwave-oven-microwave.svg",
+        "status": true
+    },
+
+
+    {
+        "id": "Kettle1",
+        "name": "Electric Kettle",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/kettle.svg",
+        "status": true
+    },
+
+    {
+        "id": "Dishwasher1",
+        "name": "Dishwasher",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/dishwasher-2.svg",
+        "status": true
+    },
+
+    {
+        "id": "stove",
+        "name": "Induction Stove",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/stove.svg",
+        "status": true
+    },
+
+    {
+        "id": "watch1",
+        "name": "Watch",
+        "type": "Health",
+        "category": "health",
+        "icon": "../icons/kitchen-electronics/watch-status.svg",
+        "status": true
+    },
+
+    {
+        "id": "scale1",
+        "name": "Weighing Scale",
+        "type": "Health",
+        "category": "health",
+        "icon": "../icons/kitchen-electronics/weight-scale-1.svg",
+        "status": true
+    },
+
+    {
+        "id": "Bike1",
+        "name": "Smart Bike",
+        "type": "Health",
+        "category": "health",
+        "icon": "../icons/kitchen-electronics/bicycle-man.svg",
+        "status": true
+    },
+
+    {
+        "id": "Washer1",
+        "name": "Washer",
+        "type": "cleaning",
+        "category": "cleaning-appliances",
+        "icon": "../icons/cleaning-appliances/washing-machine.svg",
+        "status": true
+    },
+
+    {
+        "id": "vacuum1",
+        "name": "Vacuum Robot",
+        "type": "cleaning",
+        "category": "cleaning-appliances",
+        "icon": "../icons/cleaning-appliances/vacuum-robot.svg",
+        "status": true
     }
 ]
+

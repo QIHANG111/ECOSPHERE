@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            const roleResponse = await fetch("http://localhost:4000/api/getRoleId/user");
+            const roleResponse = await fetch("/api/getRoleId/manager");
             const roleResult = await roleResponse.json();
 
             if (!roleResponse.ok || !roleResult.role_id) {
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         try {
-            const response = await fetch("http://localhost:4000/api/signin", {
+            const response = await fetch("/api/signin", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -165,20 +165,98 @@ body {
     transform: scale(1.1); /* Enlarge icon */
 }
 
+/*phone*/
+@media screen and (max-width: 768px) {
+    .normalCard{
+        width: 120%;
+    }
+    .sidebar {
+        width: 100vw;
+        height: 8vh;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        border-radius: 0;
+        padding: 0.5vw 0;
+    }
+    .aiCard {
+        height: 7vh;
+        width: 10%;
+
+    }
+
+
+    .menu-item {
+        width: auto;
+        height: 40%;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 2vw;
+    }
+
+
+    .ui-menu-icon img {
+        width: 40px;
+        height: 40px;
+    }
+
+
+    .menu-text {
+        font-size: 12px;
+        opacity: 1;
+    }
+
+
+    .sidebar:hover {
+        width: 100vw;
+    }
+    .menu-item:hover {
+        height: auto;
+        box-shadow: none;
+        background-color: transparent;
+    }
+    .dashboard {
+        color: var(--c-text-primary);
+        margin-left: 0; /* Default offset for sidebar */
+        width: calc(100%); /* Adjust width dynamically */
+        padding: 2vw;
+        height: 200vh;
+        transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
+        overflow: visible;
+    }
+
+}
+
+
+
+
 .dashboard {
     color: var(--c-text-primary);
-    margin-left: 12vw; /* Default offset for sidebar */
-    width: calc(100% - 14vw); /* Adjust width dynamically */
+    margin-left: 3vw;
+    width: calc(100% - 14vw);
     padding: 2vw;
     height: 200vh;
-    transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition */
+    transition: margin-left 0.3s ease, width 0.3s ease;
     overflow: visible;
 }
 
-/* Adjust dashboard when sidebar expands */
-.sidebar:hover ~ .dashboard {
-    margin-left: 14vw; /* Adjust margin when sidebar expands */
-    width: calc(100% - 16vw); /* Adjust width accordingly */
+@media screen and (min-width: 769px) {
+    .sidebar:hover ~ .dashboard {
+        margin-left: 14vw;
+        width: calc(100% - 16vw);
+    }
+    .dashboard {
+        color: var(--c-text-primary);
+        margin-left: 12vw;
+        width: calc(100% - 14vw);
+        padding: 2vw;
+        height: 200vh;
+        transition: margin-left 0.3s ease, width 0.3s ease;
+        overflow: visible;
+    }
 }
 
 .dashboard-content {
@@ -679,9 +757,9 @@ body {
     transition: 0.3s;
 }
 .modal-content:hover {
-    transform: scale(1.03);
+    transform: scale(1.01);
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: var(--c-bg-card-hover);
+
 }
 
 /* Close Button */
@@ -850,22 +928,6 @@ canvas {
     min-height: 50px; /* Prevents height jumping */
 }
 
-.aiCard {
-    height: 7vh;
-    width: 320%;
-    max-width: 100%;
-    overflow: visible; /* Allow text expansion */
-    padding: 1vw;
-    flex-direction: column;
-    background-color: var(--c-bg-sidebar);
-    border-radius: 3vw;
-    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: start; /* Keep input field at the top */
-    align-items: center;
-    border: 0.1vw solid rgba(255, 255, 255, 0.5);
-    transition: 0.3s ease;
-}
 
 @keyframes glow {
     0% {
@@ -878,7 +940,21 @@ canvas {
         box-shadow: 0 0 1vw var(--c-glow);
     }
 }
-
+.aiCard {
+    height: 8vh;
+    width: 100%;
+    overflow: visible; /* Allow text expansion */
+    padding: 1vw;
+    flex-direction: column;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 3vw;
+    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: start; /* Keep input field at the top */
+    align-items: center;
+    border: 0.1vw solid rgba(255, 255, 255, 0.5);
+    transition: 0.3s ease;
+}
 .aiCard:hover {
     transform: scale(1.03);
     height: 40vh;
@@ -1443,8 +1519,8 @@ canvas {
 
 
 .big-circle {
-    width: 14vw;
-    height: 14vw;
+    width: 20vw;
+    height: 20vw;
     background-color: var(--c-bg-sidebar);
     border-radius: 50%;
     position: absolute;
@@ -1457,8 +1533,8 @@ canvas {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 .big-circle:hover {
-    width: 15vw;
-    height: 15vw;
+    width: 25vw;
+    height: 25vw;
     transition: 0.3s;
 }
 
@@ -1510,4 +1586,284 @@ canvas {
     height: 60px;
     border-radius: 50%;
     object-fit: cover;
+}
+
+#avatarSelector option {
+    padding: 5px 10px;
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 30px 30px;
+}
+
+#avatarSelector option[value="1"] { background-image: url("https://randomuser.me/api/portraits/lego/1.jpg"); }
+#avatarSelector option[value="2"] { background-image: url("https://randomuser.me/api/portraits/lego/2.jpg"); }
+#avatarSelector option[value="3"] { background-image: url("https://randomuser.me/api/portraits/lego/3.jpg"); }
+#avatarSelector option[value="4"] { background-image: url("https://randomuser.me/api/portraits/lego/4.jpg"); }
+#avatarSelector option[value="5"] { background-image: url("https://randomuser.me/api/portraits/lego/5.jpg"); }
+#avatarSelector option[value="6"] { background-image: url("https://randomuser.me/api/portraits/lego/6.jpg"); }
+#avatarSelector option[value="7"] { background-image: url("https://randomuser.me/api/portraits/lego/7.jpg"); }
+#avatarSelector option[value="8"] { background-image: url("https://randomuser.me/api/portraits/lego/8.jpg"); }
+#avatarSelector option[value="9"] { background-image: url("https://randomuser.me/api/portraits/lego/9.jpg"); }
+#avatarSelector option[value="10"] { background-image: url("https://randomuser.me/api/portraits/lego/10.jpg"); }
+
+
+
+
+.avatar-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ddd;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.section-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+
+.user-list {
+    width: 70%;
+    margin: 0 auto;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+.user-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.user-list-item:last-child {
+    border-bottom: none;
+}
+
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: bold;
+}
+
+.user-role {
+    font-size: 12px;
+    color: gray;
+}
+
+
+
+#addUserForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+#addUserForm label {
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 5px;
+}
+
+#addUserForm input {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border 0.3s, background-color 0.3s;
+}
+
+#addUserForm input:focus {
+    border: 1px solid #007AFF;
+    background-color: #fff;
+}
+
+#addUserForm button {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #007AFF, #005DD1);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#addUserForm button:hover {
+    background: linear-gradient(135deg, #005DD1, #0040A5);
+    transform: scale(1.02);
+}
+#addUserBtn {
+    display: block;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #007AFF, #005DD1);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#addUserBtn:hover {
+    background: linear-gradient(135deg, #005DD1, #0040A5);
+    transform: scale(1.02);
+}
+
+#accountForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+
+}
+
+#accountForm label {
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 5px;
+}
+
+#accountForm input {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border 0.3s, background-color 0.3s;
+}
+
+#accountForm input:focus, #addUserForm input:focus {
+    border: 1px solid #007AFF;
+    background-color: #fff;
+}
+
+
+#accountForm button, #addUserForm button #newbuttonFrom  button{
+    width: 30%;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #007AFF, #005DD1);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#accountForm button:hover, #addUserForm button:hover #newbuttonFrom  button:hover{
+    background: linear-gradient(135deg, #005DD1, #0040A5);
+    transform: scale(1.02);
+}
+
+.container2 {
+    width: 95%;
+    margin: 20px auto;
+    background: var(--c-bg-sidebar);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.menu-item2 {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 16px;
+}
+.menu-item2:hover {
+    background: var(--c-bg-card-hover);
+}
+.menu-item2:last-child {
+    border-bottom: none;
+}
+.icon2 {
+    margin-right: 10px;
+}
+.details2 {
+    display: none;
+    padding: 20px;
+    background: var(--c-bg-sidebar);
+}
+.details2 input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.back2 {
+    color: var(--c-text-primary);
+    cursor: pointer;
 }

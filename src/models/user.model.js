@@ -31,6 +31,14 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         default: null
+    },
+    user_avatar: {
+        type: Number,
+        default: 1
+    },
+    group: {
+        type: Number,
+        default: 1
     }
 });
 

@@ -3,13 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Family</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>Family Management</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script defer src="../js/userPage.js"></script>
+    <style>
+        .modal-content {
+            text-align: center;
+            padding: 20px;
+            max-width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin: auto;
+        }
+
+        .modal-header img {
+            width: 50px;
+            height: 50px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .modal button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007AFF;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-
-
-<!-- Sidebar -->
 <div class="sidebar">
     <div class="menu-item" data-target="/pages/usersPage.html">
         <div class="ui-menu-icon">
@@ -43,77 +81,70 @@
     </div>
 </div>
 
-<!-- Main Content -->
+
+
 <div class="dashboard">
-    <div class="dashboard-content">
-<!--        <div class="family-card">-->
-<!--            <div class="profile-container">-->
-<!--            <div id="userInfo" style="font-size: 18px; font-weight: bold; padding: 10px;"></div>-->
-<!--            <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User">-->
+    <div class="avatar-container">
+        <div id="avatarList"></div>
+    </div>
 
-<!--                <span class="badge premium-badge">Premium Subscriber</span>-->
-<!--        </div></div>-->
-<!--        <div class="add-card" onclick="openAddModal()">-->
-<!--            <span>+</span>-->
-<!--            <p>Add a family member</p>-->
-<!--        </div>-->
-        <div class="dashboard">
-            <div class="circle-container">
+    <h2 class="section-title">Family</h2>
 
-                <div class="big-circle">
-                    <img id="mainUserImage" src="https://randomuser.me/api/portraits/lego/1.jpg" alt="User">
-                    <div id="userInfo" class="profile-name">Current User</div>
+
+    <div class="user-list" id="userListContainer">
+
+    </div>
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddUserModal()">&times;</span>
+
+
+            <div class="icon-container">
+                <div class="ui-menu-icon">
+                    <img src="/icons/family-round-svgrepo-com.svg" alt="Vector Icon" width="70" height="70">
                 </div>
-
             </div>
-            <div class="add-card" onclick="openAddModal()">
-                <span>+</span>
-                <p>Add a family member</p>
+            <form id="addUserForm">
+                <h2 class="form-title">Create a Dweller Account</h2>
+                <p class="form-description">
+                    This account will be part of your family. Ensure the details are correct.
+                </p>
+
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Enter full name" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email" required>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Create a password" required>
+
+                <button type="submit">Create Account</button>
+            </form>
+        </div>
+    </div>
+    <div id="roleEdit" class="details2">
+        <p class="back2" onclick="showMenu()">&larr; Back</p>
+
+        <div>
+            <h2>Notification Preferences</h2>
+            <label>
+                <input type="checkbox" id="push-notifications"> Enable Push Notifications
+            </label>
+
+            <label>
+                <input type="checkbox" id="email-alerts"> Receive Email Alerts
+            </label>
+
+            <div align="center">
+                <button id="updateNotificationBtn" class="save-btn" >Update</button>
             </div>
         </div>
     </div>
+    <button id="addUserBtn">Add Member</button>
+
 </div>
-
-<!-- Add Member Modal -->
-<div id="addMemberModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeAddModal()">&times;</span>
-        <h2>Add a Family Member</h2>
-        <form id="addMemberForm">
-            <label for="memberName">Name:</label>
-            <input type="text" id="memberName" name="memberName" required>
-
-            <label for="memberImage">Email:</label>
-            <input type="text" id="memberImage" name="memberImage" placeholder="Enter image URL">
-
-            <label for="memberInfo">Additional Info:</label>
-            <input type="text" id="memberInfo" name="memberInfo" placeholder="E.g. Address, School">
-
-            <button type="submit">Sent Invite</button>
-        </form>
-    </div>
-</div>
-
-<!-- Scripts -->
 <script src="/js/sidebar.js"></script>
 <script src="/js/theme.js"></script>
-<script src="/js/userPage.js"></script>
-<script>
-function positionSmallCircles() {
-    const smallCircles = document.querySelectorAll(".small-circle");
-    const total = smallCircles.length;
-    const radius = 120; // Distance from center
-
-    smallCircles.forEach((circle, index) => {
-        const angle = (index / total) * 2 * Math.PI;
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-
-        circle.style.position = "absolute";
-        circle.style.left = `calc(50% + ${x}px - 30px)`;
-        circle.style.top = `calc(50% + ${y}px - 30px)`;
-    });
-}
-</script>
 </body>
 </html>

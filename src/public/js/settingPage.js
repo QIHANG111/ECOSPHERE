@@ -6,7 +6,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     const usernameInput = document.getElementById("username");
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
-    const saveBtn = document.querySelector(".save-btn");
+    const avatarSelector = document.getElementById("avatarSelector");
+    const updateUserBtn = document.getElementById("updateUserBtn");
+    const currentUsername = document.getElementById("currentUsername");
+    const currentEmail = document.getElementById("currentEmail");
+    const currentAvatar = document.getElementById("currentAvatar");
 
     const savedTheme = localStorage.getItem("selectedTheme");
     if (savedTheme) {
@@ -28,11 +32,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     darkTheme.addEventListener("change", () => switchTheme("dark-theme"));
     blackTheme.addEventListener("change", () => switchTheme("black-theme"));
 
-
     const token = localStorage.getItem("token");
     if (!token) {
         alert("Please log in first.");
-        window.location.href = "../pages/signinPage.html"; //no token
+        window.location.href = "../pages/signinPage.html"; // No token
         return;
     }
 
@@ -48,11 +51,15 @@ document.addEventListener("DOMContentLoaded", async function () {
             console.log("[DEBUG] Current User:", user);
             usernameInput.value = user.name;
             emailInput.value = user.email;
+            currentUsername.innerText = user.name;
+            currentEmail.innerText = user.email;
+            avatarSelector.value = user.user_avatar || 1;
+            currentAvatar.src = `https://randomuser.me/api/portraits/lego/${user.user_avatar || 1}.jpg`;
         } else {
             console.error("[ERROR] Fetching user:", user.message);
             alert("Session expired, please log in again.");
             localStorage.removeItem("token");
-            window.location.href = "../pages/login.html";
+            window.location.href = "../pages/signinPage.html";
         }
     } catch (error) {
         console.error("[ERROR] Fetching user:", error);
@@ -60,13 +67,20 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
 
-    saveBtn.addEventListener("click", async function (event) {
+    avatarSelector.addEventListener("change", function () {
+        const selectedAvatar = avatarSelector.value;
+        currentAvatar.src = `https://randomuser.me/api/portraits/lego/${selectedAvatar}.jpg`;
+    });
+
+
+    updateUserBtn.addEventListener("click", async function (event) {
         event.preventDefault();
 
         const updatedUser = {
             name: usernameInput.value,
             email: emailInput.value,
-            password: passwordInput.value || undefined
+            password: passwordInput.value || undefined,
+            user_avatar: parseInt(avatarSelector.value) // 更新头像
         };
 
         try {
@@ -82,7 +96,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             const result = await response.json();
 
             if (response.ok) {
-                alert("Account updated successfully!");
+                alert("updated successfully!");
+                currentUsername.innerText = updatedUser.name;
+                currentEmail.innerText = updatedUser.email;
+                currentAvatar.src = `https://randomuser.me/api/portraits/lego/${updatedUser.user_avatar}.jpg`;
             } else {
                 console.error("[ERROR] Updating user:", result.message);
                 alert("Failed to update account: " + result.message);
@@ -93,14 +110,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 });
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutBtn = document.getElementById("logout-btn");
+function showDetails(id) {
+    history.pushState({ section: id }, "", `#${id}`);
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById(id).style.display = 'block';
+}
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", function () {
-            localStorage.removeItem("token");  //  clear token
-            alert("You have been logged out.");
-            window.location.href = "../pages/signinPage.html";
-        });
-    }
-});
+function showMenu() {
+    history.pushState(null, "", window.location.pathname);
+    document.querySelectorAll('.details2').forEach(detail => detail.style.display = 'none');
+    document.getElementById('menu').style.display = 'block';
+}
