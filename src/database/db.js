@@ -151,6 +151,12 @@ const rolePermissionsMapping = {
 // }
 export async function addPermissions() {
     try {
+        //delete previous role permission
+        await RolePermission.deleteMany({});
+        await Role.deleteMany({});
+        await Permission.deleteMany({});
+        console.log('[DEBUG] Existing role permissions cleared!');
+
         // Insert permissions
         const insertedPermissions = await Permission.insertMany(
             permissions.map(name => ({ name }))
