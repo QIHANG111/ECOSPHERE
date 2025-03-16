@@ -5,12 +5,12 @@ import permission from './permission.model.js';
 const rolePermissionSchema = new mongoose.Schema({
     role_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: role,
+        ref: 'Role',
         required: true
     },
     permission_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: permission,
+        ref: 'Permission',
         required: true
     }
 });

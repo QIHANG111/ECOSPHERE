@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import Room from '../models/room.model.js';
 import mongoose from 'mongoose';
 import Role from '../models/role.model.js'
+import RolePermission from '../models/rolePermission.model.js';
 import jwt from 'jsonwebtoken';
 import { error } from 'node:console';
 
@@ -369,6 +370,31 @@ router.get('/api/allusers', async (req, res) => {
     }
 });
 
+
+router.post('/api/users/:userId/assign-role', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { roleId } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const role = await Role.findById(roleId);
+        if (!role) {
+            return res.status(404).json({ error: "Role not found" });
+        }
+
+        user.role_id = roleId;
+        await user.save();
+
+        res.json({ message: "Role assigned successfully", user });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to assign role" });
+    }
+});
+
 /* ============================================================
    DEVICES CONFIG
 ============================================================ */
@@ -403,12 +429,37 @@ router.post('/api/device', async (req, res) => {
 /*
   Delete device by id
 */
+
+const checkPermission = async (userId, permissionName) => {
+    try {
+        const user = await User.findById(userId).populate('role_id');
+        if (!user || !user.role_id) return false;
+
+        const rolePermissions = await RolePermission.find({ role_id: user.role_id._id }).populate('permission_id');
+        if (!rolePermissions || rolePermissions.length === 0) return false;
+
+        return rolePermissions.some(rp => rp.permission_id.name === permissionName);
+    } catch (error) {
+        console.error('[ERROR] checkPermission ->', error);
+        return false;
+    }
+};
+
+
 router.delete('/api/device/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/device/:id ->', req.params);
     logDbState('/api/device/:id');
     const { id } = req.params;
+    const userId = req.user && req.user._id;
 
     try {
+        // Check if user has permission to delete devices
+        // const hasPermission = await checkPermission(userId, "deleteDevice");
+        if (!hasPermission) {
+            console.log(`[DEBUG] Permission denied for user ${userId}`);
+            return res.status(403).json({ success: false, message: 'Permission denied' });
+        }
+
         const device = await Device.findByIdAndDelete(id);
         if (!device) {
             console.log(`[DEBUG] Device not found with id: ${id}`);
@@ -456,6 +507,13 @@ router.post('/api/update-device', async (req, res) => {
     const { name, status } = req.body;
 
     try {
+        // Check if user has permission to delete devices
+        // const hasPermission = await checkPermission(userId, "deleteDevice");
+        // if (!hasPermission) {
+        //     console.log(`[DEBUG] Permission denied for user ${userId}`);
+        //     return res.status(403).json({ success: false, message: 'Permission denied' });
+        // }
+
         const updatedDevice = await Device.findOneAndUpdate(
             { device_name: name },
             { status: status },
@@ -489,6 +547,13 @@ router.post('/api/update-temperature', async (req, res) => {
     const { name, temperature } = req.body;
 
     try {
+        // Check if user has permission to delete devices
+        // const hasPermission = await checkPermission(userId, "deleteDevice");
+        // if (!hasPermission) {
+        //     console.log(`[DEBUG] Permission denied for user ${userId}`);
+        //     return res.status(403).json({ success: false, message: 'Permission denied' });
+        // }
+
         // Find and update the AC device in MongoDB
         console.log(`[DEBUG] Finding AC device of name: ${name}`);
         const updatedDevice = await Device.findOneAndUpdate(
@@ -517,6 +582,13 @@ router.post('/api/update-temperature', async (req, res) => {
 */
 router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
     try {
+        // Check if user has permission to delete devices
+        // const hasPermission = await checkPermission(userId, "deleteDevice");
+        // if (!hasPermission) {
+        //     console.log(`[DEBUG] Permission denied for user ${userId}`);
+        //     return res.status(403).json({ success: false, message: 'Permission denied' });
+        // }
+
         const { brightness } = req.body;
         const deviceId = req.params.id;
         console.log(`[DEBUG] Received request to update brightness for device ID: ${deviceId}`);
@@ -593,6 +665,13 @@ router.post('/api/rooms', async (req, res) => {
     console.log('[DEBUG] POST /api/rooms -> req.body:', req.body);
     logDbState('/api/rooms');
     try {
+        // Check if user has permission to delete devices
+        // const hasPermission = await checkPermission(userId, "deleteDevice");
+        // if (!hasPermission) {
+        //     console.log(`[DEBUG] Permission denied for user ${userId}`);
+        //     return res.status(403).json({ success: false, message: 'Permission denied' });
+        // }
+
         const { room_name, room_type } = req.body;
         if (!room_name || !room_type) {
             console.log('[DEBUG] Missing room_name or room_type');
@@ -617,6 +696,13 @@ router.delete('/api/rooms/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/rooms/:id ->', req.params);
     logDbState('/api/rooms/:id');
     try {
+        // Check if user has permission to delete devices
+        // const hasPermission = await checkPermission(userId, "deleteDevice");
+        // if (!hasPermission) {
+        //     console.log(`[DEBUG] Permission denied for user ${userId}`);
+        //     return res.status(403).json({ success: false, message: 'Permission denied' });
+        // }
+
         const { id } = req.params;
 
         const room = await Room.findById(id);
