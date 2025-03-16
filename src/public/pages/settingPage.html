@@ -46,8 +46,6 @@
 <!-- Main Content -->
 <div class="dashboard">
     <h1>Settings</h1>
-
-
     <!-- Dark Mode Toggle -->
     <div class="theme-switcher">
         <input type="radio" id="light-theme" name="themes" checked />
@@ -71,90 +69,103 @@
         <span class="slider"></span>
     </div>
 
-
-    <!-- Account Settings -->
-
-
-            <h2>Account Settings</h2>
             <form id="accountForm">
-                <h2>Avatar</h2>
                 <img style="border-radius: 50%" id="currentAvatar" src="" alt="Current Avatar" width="100">
+                <h2 id="currentUsername" style="margin-bottom: 1vw"></h2>
+                <h3 id="currentEmail" style="margin-top: 1vw; margin-bottom: 1vw"></h3>
+                <div class="container2">
+                <div id="menu">
+                    <div class="menu-item2" onclick="showDetails('personal')">
+                        <div class="ui-menu-icon">
+                            <img src="/icons/personal-identification-card-svgrepo-com.svg" alt="Vector Icon" width="25" height="25">
+                        </div>
+                        <label style="align-self: center; padding: 1vw"> Account Information</label>
+                    </div>
+                    <div class="menu-item2" onclick=window.location.href="./usersPage.html">
 
-                <label for="avatarSelector">Select Avatar:</label>
-                <select id="avatarSelector">
-                    <option value="1" data-img="https://randomuser.me/api/portraits/lego/1.jpg">Avatar 1</option>
-                    <option value="2" data-img="https://randomuser.me/api/portraits/lego/2.jpg">Avatar 2</option>
-                    <option value="3" data-img="https://randomuser.me/api/portraits/lego/3.jpg">Avatar 3</option>
-                    <option value="4" data-img="https://randomuser.me/api/portraits/lego/4.jpg">Avatar 4</option>
-                    <option value="5" data-img="https://randomuser.me/api/portraits/lego/5.jpg">Avatar 5</option>
-                    <option value="6" data-img="https://randomuser.me/api/portraits/lego/6.jpg">Avatar 6</option>
-                    <option value="7" data-img="https://randomuser.me/api/portraits/lego/7.jpg">Avatar 7</option>
-                    <option value="8" data-img="https://randomuser.me/api/portraits/lego/8.jpg">Avatar 8</option>
-                    <option value="9" data-img="https://randomuser.me/api/portraits/lego/9.jpg">Avatar 9</option>
-                </select>
-                <button id="updateAvatarBtn" class="save-btn">Update Avatar</button>
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter your username">
+                        <div class="ui-menu-icon">
+                            <img src="/icons/family-round-svgrepo-com.svg" alt="Vector Icon" width="28" height="28">
+                        </div>
+                        <label style="align-self: center; padding: 1vw">Family Management</label>
+                    </div>
+                    <div class="menu-item2" onclick="showDetails('payment')">
+                        <div class="ui-menu-icon">
+                            <img src="/icons/pay-svgrepo-com.svg" alt="Vector Icon" width="28" height="28">
+                        </div>
+                        <label style="align-self: center; padding: 1vw">Subscription and Payment</label>
+                    </div>
+                    <div class="menu-item2" onclick="showDetails('notification')">
+                        <div class="ui-menu-icon">
+                            <img src="/icons/notification-status-svgrepo-com.svg" alt="Vector Icon" width="28" height="28">
+                        </div>
+                        <label style="align-self: center; padding: 1vw">Notification Preferences</label>
+                    </div>
+                </div>
+                    <div id="personal" class="details2">
+                        <p class="back2" onclick="showMenu()">&larr; Back</p>
+                        <div>
+                            <label for="avatarSelector">Select Avatar:</label>
+                            <select id="avatarSelector">
+                                <option value="1">Avatar 1</option>
+                                <option value="2">Avatar 2</option>
+                                <option value="3">Avatar 3</option>
+                                <option value="4">Avatar 4</option>
+                                <option value="5">Avatar 5</option>
+                                <option value="6">Avatar 6</option>
+                                <option value="7">Avatar 7</option>
+                                <option value="8">Avatar 8</option>
+                                <option value="9">Avatar 9</option>
+                            </select>
+                        </div>
 
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="Enter your email">
+                        <div align="center">
+                            <label for="username">Name:</label>
+                            <input type="text" id="username" placeholder="Enter your username">
+                        </div>
 
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Enter new password (optional)">
+                        <div align="center">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" placeholder="Enter your email">
+                        </div>
 
-                <button type="submit">Save Changes</button>
-                <label for="email">Logout</label>
+                        <div align="center">
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" placeholder="Enter new password (optional)">
+                        </div>
+                        <div    align="center">
+                            <button id="updateUserBtn" class="save-btn" >Update</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="container2">
+                <div id="notification" class="details2">
+                    <p class="back2" onclick="showMenu()">&larr; Back</p>
+
+                    <div>
+                        <h2>Notification Preferences</h2>
+                        <label>
+                            <input type="checkbox" id="push-notifications"> Enable Push Notifications
+                        </label>
+
+                        <label>
+                            <input type="checkbox" id="email-alerts"> Receive Email Alerts
+                        </label>
+
+                        <div align="center">
+                            <button id="updateNotificationBtn" class="save-btn" >Update</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+
                     <button id="logout-btn" class="logout-btn">Logout</button>
 
             </form>
 
 
-    <!-- Device Management -->
-    <div class="settings-card">
-        <h2>Device Management</h2>
-        <label for="device-list">Connected Devices:</label>
-        <select id="device-list">
-            <option value="device1">Smart Light</option>
-            <option value="device2">Thermostat</option>
-            <option value="device3">Security Camera</option>
-        </select>
-        <button class="manage-btn">Manage Device</button>
-    </div>
-
-    <!-- Automation Rules -->
 
 
-    <!-- Security Settings -->
-    <div class="settings-card">
-        <h2>Security Settings</h2>
-        <label>
-            <input type="checkbox" id="two-factor-auth"> Enable Two-Factor Authentication
-        </label>
-
-        <label>
-            <input type="checkbox" id="guest-access"> Enable Guest Access
-        </label>
-    </div>
-
-    <!-- Notification Preferences -->
-    <div class="settings-card">
-        <h2>Notification Preferences</h2>
-        <label>
-            <input type="checkbox" id="push-notifications"> Enable Push Notifications
-        </label>
-
-        <label>
-            <input type="checkbox" id="email-alerts"> Receive Email Alerts
-        </label>
-    </div>
-
-
-
-    <!-- Reset Settings -->
-    <div class="settings-card">
-        <h2>Reset Settings</h2>
-        <button class="reset-btn">Factory Reset</button>
-    </div>
 </div>
 
 <script src="/js/sidebar.js"></script>
