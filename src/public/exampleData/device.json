@@ -174,6 +174,70 @@
         "category": "power-switch",
         "icon": "../icons/power-switch/plug-outlet-1.svg",
         "status": true
+    },
+
+    {
+        "id": "Cook-pot1",
+        "name": "Multifunction Cooking Pot",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/cooking-pot-outline-with-cover.svg",
+        "status": true
+    },
+
+    {
+        "id": "Fridge1",
+        "name": "Fridge",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/fridge.svg",
+        "status": true
+    },
+
+    {
+        "id": "Oven1",
+        "name": "Oven",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/oven-bake.svg",
+        "status": true
+    },
+
+    {
+        "id": "Microwave Oven1",
+        "name": "Microwave Oven",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/microwave-oven-microwave.svg",
+        "status": true
+    },
+
+
+    {
+        "id": "Kettle1",
+        "name": "Electric Kettle",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/kettle.svg",
+        "status": true
+    },
+
+    {
+        "id": "Dishwasher1",
+        "name": "Dishwasher",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/dishwasher-2.svg",
+        "status": true
+    },
+
+    {
+        "id": "stove",
+        "name": "Induction Stove",
+        "type": "kitchen",
+        "category": "kitchen-electronics",
+        "icon": "../icons/kitchen-electronics/stove.svg",
+        "status": true
     }
 ]
 
