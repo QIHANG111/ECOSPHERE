@@ -24,12 +24,12 @@ const userSchema = new mongoose.Schema({
     },
     role_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: role,
+        ref: 'Role',
         required: true
     },
     parentUser: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
         default: null
     }
 });

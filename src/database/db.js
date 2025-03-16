@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import dotenv from "dotenv";
 import EnergyUsage from '../models/energy.model.js';
+import Permission from '../models/permission.model.js';
+import Role from '../models/role.model.js';
+import RolePermission from '../models/rolePermission.model.js';
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 dotenv.config();
@@ -87,7 +90,104 @@ export const insertDataFromJSON = async (filePath) => {
     }
 };
 
+const permissions = [
+    "addDevice",
+    "deleteDevice",
+    "editDevice",
+    "viewReport",
+    "addRoom",
+    "deleteRoom",
+    "adjustTemp",
+    "switchOn",
+    "switchOff",
+    "addUser",
+    "deleteUser",
+    "changeSettings",
+    "updateSystem",
+    "backupSystem"
+];
 
+const roles = [
+    { role_name: "Home Dweller" },  // Basic user
+    { role_name: "Home Owner" },    // Home owner with full control
+    { role_name: "Developer" }      // Developer for system management
+];
+
+const rolePermissionsMapping = {
+    "Home Dweller": ["switchOff", "viewReport"],
+    "Home Owner": ["switchOn", "switchOff", "adjustTemp", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "editDevice", "changeSettings"],
+    "Developer": ["switchOn", "switchOff", "adjustTemp", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "editDevice", "changeSettings", "updateSystem", "backupSystem"]
+};
+
+// export async function addPermissions() {
+//     try {
+//         // Insert permissions
+//         const insertedPermissions = await Permission.insertMany(
+//             permissions.map(name => ({ name }))
+//         );
+
+//         // Insert roles
+//         const insertedRoles = await Role.insertMany(roles);
+
+//         // Map role names to IDs
+//         const permissionMap = Object.fromEntries(insertedPermissions.map(p => [p.name, p._id]));
+//         const roleMap = Object.fromEntries(insertedRoles.map(r => [r.name, r._id]));
+
+//         // Insert role-permission mappings
+//         const rolePermissions = [];
+//         for (const [roleName, permissionList] of Object.entries(rolePermissionsMapping)) {
+//             const roleId = roleMap[roleName];
+//             permissionList.forEach(permissionName => {
+//                 rolePermissions.push({ role_id: roleId, permission_id: permissionMap[permissionName] });
+//             });
+//         }
+
+//         await RolePermission.insertMany(rolePermissions);
+
+//         console.log("Roles and permissions seeded successfully!");
+//     } catch (error) {
+//         console.error("Error serole_eding database:", error);
+//     }
+// }
+export async function addPermissions() {
+    try {
+        // Insert permissions
+        const insertedPermissions = await Permission.insertMany(
+            permissions.map(name => ({ name }))
+        );
+        console.log('[DEBUG] Inserted permissions:', insertedPermissions);
+
+        // Insert roles
+        const insertedRoles = await Role.insertMany(roles);
+        console.log('[DEBUG] Inserted roles:', insertedRoles);
+
+        // Map role names to IDs
+        const permissionMap = Object.fromEntries(insertedPermissions.map(p => [p.name, p._id]));
+        const roleMap = Object.fromEntries(insertedRoles.map(r => [r.role_name, r._id]));
+
+        // Insert role-permission mappings
+        const rolePermissions = [];
+        for (const [roleName, permissionList] of Object.entries(rolePermissionsMapping)) {
+            const roleId = roleMap[roleName];
+            permissionList.forEach(permissionName => {
+                const permissionId = permissionMap[permissionName];
+                if (!roleId || !permissionId) {
+                    console.error(`[ERROR] Missing roleId or permissionId for role: ${roleName}, permission: ${permissionName}`);
+                } else {
+                    rolePermissions.push({ role_id: roleId, permission_id: permissionId });
+                }
+            });
+        }
+
+        console.log('[DEBUG] RolePermissions to be inserted:', rolePermissions);
+
+        await RolePermission.insertMany(rolePermissions);
+
+        console.log("Roles and permissions seeded successfully!");
+    } catch (error) {
+        console.error("Error seeding database:", error);
+    }
+}
 
 /**
  * Optional function to close the connection.
