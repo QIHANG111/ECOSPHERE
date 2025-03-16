@@ -33,33 +33,147 @@
             "id": "Lamp1",
             "name": "Beside Lamp",
             "type": "light",
-            "icon": "../icons/device-page/light-svgrepo-com.svg",
+            "category": "Lighting",
+            "icon": "../icons/lighting/light-svgrepo-com.svg",
             "status": false
         },
+
+    {
+        "id": "Lamp2",
+        "name": "Desk Lamp",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/desk-lamp-lamp.svg",
+        "status": false
+    },
+
+    {
+        "id": "Lamp3",
+        "name": "Ceiling Lamp",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/ceiling-light.svg",
+        "status": false
+    },
+
+    {
+        "id": "Lamp4",
+        "name": "Light Bulbs",
+        "type": "light",
+        "category": "Lighting",
+        "icon": "../icons/lighting/energy-saving-light-bulbs.svg",
+        "status": false
+    },
+
         {
             "id": "DoorLock1",
             "name": "Smart Door Lock",
-            "type": "lock",
-            "icon": "../icons/device-page/door-lock-svgrepo-com.svg",
+            "type": "security",
+            "category": "household-security",
+            "icon": "../icons/household-security/door-lock-svgrepo-com.svg",
             "status": true
         },
+
+    {
+        "id": "cctv1",
+        "name": "CCTV",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-electronics/cctv.svg",
+        "status": true
+    },
+
+    {
+        "id": "Doorbell1",
+        "name": "Doorbell",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-security/doorbell.svg",
+        "status": true
+    },
+
+    {
+        "id": "safe-box1",
+        "name": "Safe Box",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-security/safebox-2.svg",
+        "status": true
+    },
+
+
         {
             "id": "AirConditioner1",
             "name": "Air Conditioner",
-            "type": "AC",
-            "icon": "../icons/device-page/air-conditioner.svg",
-            "status": false,
-            "temperature": 24
+            "type": "Air",
+            "category": "air-treatment",
+            "icon": "../icons/air-treatment/air-conditioner.svg",
+            "status": false
         },
+
+    {
+        "id": "Heater1",
+        "name": "Heater",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/heater-heat.svg",
+        "status": false
+    },
+
+    {
+        "id": "Humidifier1",
+        "name": "Humidifier",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/humidifier.svg",
+        "status": false
+    },
+
+
+    {
+        "id": "Fan1",
+        "name": "Fan",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/fan-2.svg",
+        "status": false
+    },
+
+
         {
             "id": "Socket1",
             "name": "Socket",
-            "type": "socket",
-            "icon": "../icons/device-page/socket-i-svgrepo-com.svg",
+            "type": "switch",
+            "category": "power-switch",
+            "icon": "../icons/power-switch/socket-i-svgrepo-com.svg",
             "status": true
-        }
+        },
 
+    {
+        "id": "Switch1",
+        "name": "Switch",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/switch-off-switch.svg",
+        "status": true
+    },
 
+    {
+        "id": "remote-control1",
+        "name": "Remote Control",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/remote-control.svg",
+        "status": true
+    },
 
+    {
+        "id": "plug-outlet1",
+        "name": "Plug Outlet",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/plug-outlet-1.svg",
+        "status": true
+    }
 ]
 
