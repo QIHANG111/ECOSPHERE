@@ -1,122 +1,377 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AddElectrics</title>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .category-container {
+            margin-bottom: 30px;
+        }
+        .category-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .category-divider {
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .device-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .device-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .device-card img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+        .device-card h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .device-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .device-card button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .device-card button:hover {
+            background-color: #0056b3;
+        }
 
-    .add-button {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      background-color: transparent;
-      border-radius: 0;
-      padding: 0;
-      cursor: pointer;
-    }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-    .add-button img {
-      width: 3vw;
-      height: 3vw;
-      object-fit: contain;
-      margin-right: 2vw;
-    }
+        .modal-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-content button.confirm {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .modal-content button.cancel {
+            background-color: #ccc;
+            color: #333;
+        }
 
-    .button-text {
-      font-size: 1.5vw;
-      font-weight: bold;
-      color: #333;
-      text-align: left;
-    }
-
-    .device-list {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .device-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      background-color: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
-
-    .device-item input {
-      padding: 5px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      flex-grow: 1;
-    }
-
-    .device-item button {
-      padding: 5px 10px;
-      background-color: #ff4d4d;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .device-item button:hover {
-      background-color: #cc0000;
-    }
-
-  </style>
+    </style>
 </head>
 <body>
-<div class="add">
-        <span class="add-button" id="addButton">
-            <img src="../icons/add-button.svg" alt="add-button">
-            <span class="button-text">Add</span>
-        </span>
+<h1>Device Management</h1>
+
+<!-- Lighting Devices -->
+<div class="category-container">
+    <div class="category-title">Lighting</div>
+    <div class="category-divider"></div>
+    <div class="device-container">
+        <div class="device-card">
+            <img src="../icons/lighting/light-svgrepo-com.svg" alt="Beside Lamp">
+            <h3>Beside Lamp</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Beside Lamp')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/lighting/desk-lamp-lamp.svg" alt="Desk Lamp">
+            <h3>Desk Lamp</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Desk Lamp')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/lighting/ceiling-light.svg" alt="Ceiling Lamp">
+            <h3>Ceiling Lamp</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Ceiling Lamp')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/lighting/energy-saving-light-bulbs.svg" alt="Light Bulbs">
+            <h3>Light Bulbs</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Light Bulbs')">Add</button>
+        </div>
+    </div>
 </div>
 
-<div id="deviceList" class="device-list"></div>
+<!-- Household Security Devices -->
+<div class="category-container">
+    <div class="category-title">Household Security</div>
+    <div class="category-divider"></div>
+    <div class="device-container">
+        <div class="device-card">
+            <img src="../icons/household-security/door-lock-svgrepo-com.svg" alt="Smart Door Lock">
+            <h3>Smart Door Lock</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Smart Door Lock')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/household-security/cctv.svg" alt="CCTV">
+            <h3>CCTV</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('CCTV')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/household-security/doorbell.svg" alt="Doorbell">
+            <h3>Doorbell</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Doorbell')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/household-security/safebox-2.svg" alt="Safe Box">
+            <h3>Safe Box</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Safe Box')">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Air Treatment Devices -->
+<div class="category-container">
+    <div class="category-title">Air Treatment</div>
+    <div class="category-divider"></div>
+    <div class="device-container">
+        <div class="device-card">
+            <img src="../icons/air-treatment/air-conditioner.svg" alt="Air Conditioner">
+            <h3>Air Conditioner</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Air Conditioner')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/air-treatment/heater-heat.svg" alt="Heater">
+            <h3>Heater</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Heater')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/air-treatment/humidifier.svg" alt="Humidifier">
+            <h3>Humidifier</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Humidifier')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/air-treatment/fan-2.svg" alt="Fan">
+            <h3>Fan</h3>
+            <p>Status: Off</p>
+            <button onclick="showAddModal('Fan')">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Power Switch Devices -->
+<div class="category-container">
+    <div class="category-title">Power Switch</div>
+    <div class="category-divider"></div>
+    <div class="device-container">
+        <div class="device-card">
+            <img src="../icons/power-switch/socket-i-svgrepo-com.svg" alt="Socket">
+            <h3>Socket</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Socket')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/power-switch/switch-off-switch.svg" alt="Switch">
+            <h3>Switch</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Switch')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/power-switch/remote-control.svg" alt="Remote Control">
+            <h3>Remote Control</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Remote Control')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/power-switch/plug-outlet-1.svg" alt="Plug Outlet">
+            <h3>Plug Outlet</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Plug Outlet')">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Kitchen Electronics Devices -->
+<div class="category-container">
+    <div class="category-title">Kitchen Electronics</div>
+    <div class="category-divider"></div>
+    <div class="device-container">
+        <div class="device-card">
+            <img src="../icons/kitchen-electronics/cooking-pot-outline-with-cover.svg" alt="Multifunction Cooking Pot">
+            <h3>Multifunction Cooking Pot</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Multifunction Cooking Pot')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/kitchen-electronics/fridge.svg" alt="Fridge">
+            <h3>Fridge</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Fridge')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/kitchen-electronics/oven-bake.svg" alt="Oven">
+            <h3>Oven</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Oven')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/kitchen-electronics/microwave-oven-microwave.svg" alt="Microwave Oven">
+            <h3>Microwave Oven</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Microwave Oven')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/kitchen-electronics/kettle.svg" alt="Electric Kettle">
+            <h3>Electric Kettle</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Electric Kettle')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/kitchen-electronics/dishwasher-2.svg" alt="Dishwasher">
+            <h3>Dishwasher</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Dishwasher')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/kitchen-electronics/stove.svg" alt="Induction Stove">
+            <h3>Induction Stove</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Induction Stove')">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Health Devices -->
+<div class="category-container">
+    <div class="category-title">Health</div>
+    <div class="category-divider"></div>
+    <div class="device-container">
+        <div class="device-card">
+            <img src="../icons/health/watch-status.svg" alt="Watch">
+            <h3>Watch</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Watch')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/health/weight-scale-1.svg" alt="Weighing Scale">
+            <h3>Weighing Scale</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Weighing Scale')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/health/bicycle-man.svg" alt="Smart Bike">
+            <h3>Smart Bike</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Smart Bike')">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cleaning Appliances Devices -->
+<div class="category-container">
+    <div class="category-title">Cleaning Appliances</div>
+    <div class="category-divider"></div>
+    <div class="device-container">
+        <div class="device-card">
+            <img src="../icons/cleaning-appliances/washing-machine.svg" alt="Washer">
+            <h3>Washer</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Washer')">Add</button>
+        </div>
+        <div class="device-card">
+            <img src="../icons/cleaning-appliances/vacuum-robot.svg" alt="Vacuum Robot">
+            <h3>Vacuum Robot</h3>
+            <p>Status: On</p>
+            <button onclick="showAddModal('Vacuum Robot')">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <p>Sure to Add？</p>
+        <button class="confirm" onclick="confirmAdd()">Yes</button>
+        <button class="cancel" onclick="cancelAdd()">Cancel</button>
+    </div>
+</div>
 
 <script>
-
-  document.addEventListener('DOMContentLoaded', function () {
-    console.log("Script loaded!");
-
-    const addButton = document.getElementById('addButton');
-    const deviceList = document.getElementById('deviceList');
-
-    if (!addButton || !deviceList) {
-      console.error("Not found!");
-      return;
+    function addDevice(deviceId) {
+        // Implement the logic to add the device
+        console.log(`Adding device: ${deviceId}`);
+        // You can add AJAX calls or other logic here to add the device
     }
 
-    addButton.addEventListener('click', function () {
-      console.log("Add button clicked!");
+    let currentDeviceId = null;
 
-      const deviceItem = document.createElement('div');
-      deviceItem.className = 'device-item';
+    function showAddModal(deviceId) {
+        currentDeviceId = deviceId;
+        document.getElementById('addModal').style.display = 'flex';
+    }
 
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'input the device name';
+    function confirmAdd() {
+        if (currentDeviceId) {
+            console.log(`Device added: ${currentDeviceId}`);
+            // Here you can add logic to actually add the device to your devicePage
+            alert(`设备 ${currentDeviceId} 已添加！`);
+        }
+        closeModal();
+    }
 
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'DELETE';
+    function cancelAdd() {
+        closeModal();
+    }
 
-      deleteButton.addEventListener('click', function () {
-        deviceList.removeChild(deviceItem);
-      });
+    function closeModal() {
+        document.getElementById('addModal').style.display = 'none';
+        currentDeviceId = null;
+    }
 
-      deviceItem.appendChild(input);
-      deviceItem.appendChild(deleteButton);
-
-      deviceList.appendChild(deviceItem);
-    });
-  });
 </script>
 </body>
 </html>

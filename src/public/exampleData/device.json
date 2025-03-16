@@ -79,7 +79,7 @@
         "name": "CCTV",
         "type": "security",
         "category": "household-security",
-        "icon": "../icons/household-electronics/cctv.svg",
+        "icon": "../icons/household-security/cctv.svg",
         "status": true
     },
 
@@ -245,7 +245,7 @@
         "name": "Watch",
         "type": "Health",
         "category": "health",
-        "icon": "../icons/kitchen-electronics/watch-status.svg",
+        "icon": "../icons/health/watch-status.svg",
         "status": true
     },
 
@@ -254,7 +254,7 @@
         "name": "Weighing Scale",
         "type": "Health",
         "category": "health",
-        "icon": "../icons/kitchen-electronics/weight-scale-1.svg",
+        "icon": "../icons/health/weight-scale-1.svg",
         "status": true
     },
 
@@ -263,7 +263,7 @@
         "name": "Smart Bike",
         "type": "Health",
         "category": "health",
-        "icon": "../icons/kitchen-electronics/bicycle-man.svg",
+        "icon": "../icons/health/bicycle-man.svg",
         "status": true
     },
 
