@@ -121,3 +121,15 @@ function showMenu() {
     document.querySelectorAll('.details2').forEach(detail => detail.style.display = 'none');
     document.getElementById('menu').style.display = 'block';
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const logoutBtn = document.getElementById("logout-btn");
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", function () {
+            localStorage.removeItem("token");  //  clear token
+            alert("You have been logged out.");
+            window.location.href = "../pages/signinPage.html";
+        });}
+
+    });

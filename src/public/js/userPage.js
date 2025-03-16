@@ -147,7 +147,7 @@ async function addSubUser() {
         }
 
 
-        const roleResponse = await fetch("/api/getRoleId/dweller");
+        const roleResponse = await fetch("/api/getRoleId/Home Dweller");
         const roleResult = await roleResponse.json();
 
         if (!roleResponse.ok || !roleResult.role_id) {
