@@ -58,7 +58,7 @@
 
     {
         "id": "Lamp4",
-        "name": "Light bulbs",
+        "name": "Light Bulbs",
         "type": "light",
         "category": "Lighting",
         "icon": "../icons/lighting/energy-saving-light-bulbs.svg",
@@ -76,7 +76,7 @@
 
     {
         "id": "cctv1",
-        "name": "cctv",
+        "name": "CCTV",
         "type": "security",
         "category": "household-security",
         "icon": "../icons/household-electronics/cctv.svg",
@@ -94,7 +94,7 @@
 
     {
         "id": "safe-box1",
-        "name": "safe-box",
+        "name": "Safe Box",
         "type": "security",
         "category": "household-security",
         "icon": "../icons/household-security/safebox-2.svg",
@@ -140,34 +140,40 @@
     },
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         {
             "id": "Socket1",
             "name": "Socket",
-            "type": "socket",
-            "icon": "../icons/device-page/socket-i-svgrepo-com.svg",
+            "type": "switch",
+            "category": "power-switch",
+            "icon": "../icons/power-switch/socket-i-svgrepo-com.svg",
             "status": true
-        }
+        },
 
+    {
+        "id": "Switch1",
+        "name": "Switch",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/switch-off-switch.svg",
+        "status": true
+    },
 
+    {
+        "id": "remote-control1",
+        "name": "Remote Control",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/remote-control.svg",
+        "status": true
+    },
 
+    {
+        "id": "plug-outlet1",
+        "name": "Plug Outlet",
+        "type": "switch",
+        "category": "power-switch",
+        "icon": "../icons/power-switch/plug-outlet-1.svg",
+        "status": true
+    }
 ]
 
