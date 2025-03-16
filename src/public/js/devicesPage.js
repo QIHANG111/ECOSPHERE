@@ -11,3 +11,4 @@ menuItems.forEach((item) => {
         }
     });
 });
+

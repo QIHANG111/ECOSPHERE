@@ -21,6 +21,7 @@ async function startServer() {
         await addPermissions();
         // await insertData();
         console.log('[DEBUG] Initial data inserted (if needed).');
+
         // Finally, start listening on the specified port
         app.listen(PORT, () => {
             console.log(`[DEBUG] Server is running at http://localhost:${PORT}`);

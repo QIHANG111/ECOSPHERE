@@ -23,6 +23,8 @@ const __dirname = dirname(__filename);
 const router = express.Router();
 let notifications = [];
 const SECRET_KEY = "your_secret_key";
+const devicesFile = path.join(__dirname, '../device.json');
+
 
 // Enable JSON body parsing
 router.use(express.json());
@@ -491,6 +493,7 @@ router.get('/api/devices', async (req, res) => {
         res.status(500).json({ error: 'Server error while fetching devices' });
     }
 });
+
 
 /*
   Update the status of a specific device
