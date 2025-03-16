@@ -679,9 +679,9 @@ body {
     transition: 0.3s;
 }
 .modal-content:hover {
-    transform: scale(1.03);
+    transform: scale(1.01);
     box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
-    background-color: var(--c-bg-card-hover);
+
 }
 
 /* Close Button */
@@ -1443,8 +1443,8 @@ canvas {
 
 
 .big-circle {
-    width: 14vw;
-    height: 14vw;
+    width: 20vw;
+    height: 20vw;
     background-color: var(--c-bg-sidebar);
     border-radius: 50%;
     position: absolute;
@@ -1457,8 +1457,8 @@ canvas {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 .big-circle:hover {
-    width: 15vw;
-    height: 15vw;
+    width: 25vw;
+    height: 25vw;
     transition: 0.3s;
 }
 
@@ -1529,3 +1529,220 @@ canvas {
 #avatarSelector option[value="8"] { background-image: url("https://randomuser.me/api/portraits/lego/8.jpg"); }
 #avatarSelector option[value="9"] { background-image: url("https://randomuser.me/api/portraits/lego/9.jpg"); }
 #avatarSelector option[value="10"] { background-image: url("https://randomuser.me/api/portraits/lego/10.jpg"); }
+
+
+
+
+.avatar-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    overflow-x: auto;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ddd;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.section-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+
+.user-list {
+    width: 70%;
+    margin: 0 auto;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+.user-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.user-list-item:last-child {
+    border-bottom: none;
+}
+
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: bold;
+}
+
+.user-role {
+    font-size: 12px;
+    color: gray;
+}
+
+#addUserBtn {
+    display: block;
+    width: 150px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#addUserBtn:hover {
+    background-color: #005ecb;
+}
+
+#addUserForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+#addUserForm label {
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 5px;
+}
+
+#addUserForm input {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border 0.3s, background-color 0.3s;
+}
+
+#addUserForm input:focus {
+    border: 1px solid #007AFF;
+    background-color: #fff;
+}
+
+#addUserForm button {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #007AFF, #005DD1);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#addUserForm button:hover {
+    background: linear-gradient(135deg, #005DD1, #0040A5);
+    transform: scale(1.02);
+}
+
+
+#accountForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+
+}
+
+#accountForm label {
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 5px;
+}
+
+#accountForm input {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border 0.3s, background-color 0.3s;
+}
+
+#accountForm input:focus, #addUserForm input:focus {
+    border: 1px solid #007AFF;
+    background-color: #fff;
+}
+
+
+#accountForm button, #addUserForm button {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #007AFF, #005DD1);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#accountForm button:hover, #addUserForm button:hover {
+    background: linear-gradient(135deg, #005DD1, #0040A5);
+    transform: scale(1.02);
+}

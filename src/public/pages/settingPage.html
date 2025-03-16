@@ -47,6 +47,7 @@
 <div class="dashboard">
     <h1>Settings</h1>
 
+
     <!-- Dark Mode Toggle -->
     <div class="theme-switcher">
         <input type="radio" id="light-theme" name="themes" checked />
@@ -69,48 +70,44 @@
         </label>
         <span class="slider"></span>
     </div>
-    <div class="settings-card">
-        <h2>Change Avatar</h2>
-        <p>Current Avatar:</p>
-        <img id="currentAvatar" src="" alt="Current Avatar" width="100">
 
-        <label for="avatarSelector">Select Avatar:</label>
-        <select id="avatarSelector">
-            <option value="1" data-img="https://randomuser.me/api/portraits/lego/1.jpg">Avatar 1</option>
-            <option value="2" data-img="https://randomuser.me/api/portraits/lego/2.jpg">Avatar 2</option>
-            <option value="3" data-img="https://randomuser.me/api/portraits/lego/3.jpg">Avatar 3</option>
-            <option value="4" data-img="https://randomuser.me/api/portraits/lego/4.jpg">Avatar 4</option>
-            <option value="5" data-img="https://randomuser.me/api/portraits/lego/5.jpg">Avatar 5</option>
-            <option value="6" data-img="https://randomuser.me/api/portraits/lego/6.jpg">Avatar 6</option>
-            <option value="7" data-img="https://randomuser.me/api/portraits/lego/7.jpg">Avatar 7</option>
-            <option value="8" data-img="https://randomuser.me/api/portraits/lego/8.jpg">Avatar 8</option>
-            <option value="9" data-img="https://randomuser.me/api/portraits/lego/9.jpg">Avatar 9</option>
-            <option value="10" data-img="https://randomuser.me/api/portraits/lego/10.jpg">Avatar 10</option>
-        </select>
-        <button id="updateAvatarBtn" class="save-btn">Update Avatar</button>
-    </div>
+
     <!-- Account Settings -->
 
-    <div class="settings-card">
-        <h2>Account Settings</h2>
-        <form id="accountForm">
-            <label for="username">Username:</label>
-            <input type="text" id="username" placeholder="Enter your username">
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="Enter your email">
+            <h2>Account Settings</h2>
+            <form id="accountForm">
+                <h2>Avatar</h2>
+                <img style="border-radius: 50%" id="currentAvatar" src="" alt="Current Avatar" width="100">
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" placeholder="Enter new password (optional)">
+                <label for="avatarSelector">Select Avatar:</label>
+                <select id="avatarSelector">
+                    <option value="1" data-img="https://randomuser.me/api/portraits/lego/1.jpg">Avatar 1</option>
+                    <option value="2" data-img="https://randomuser.me/api/portraits/lego/2.jpg">Avatar 2</option>
+                    <option value="3" data-img="https://randomuser.me/api/portraits/lego/3.jpg">Avatar 3</option>
+                    <option value="4" data-img="https://randomuser.me/api/portraits/lego/4.jpg">Avatar 4</option>
+                    <option value="5" data-img="https://randomuser.me/api/portraits/lego/5.jpg">Avatar 5</option>
+                    <option value="6" data-img="https://randomuser.me/api/portraits/lego/6.jpg">Avatar 6</option>
+                    <option value="7" data-img="https://randomuser.me/api/portraits/lego/7.jpg">Avatar 7</option>
+                    <option value="8" data-img="https://randomuser.me/api/portraits/lego/8.jpg">Avatar 8</option>
+                    <option value="9" data-img="https://randomuser.me/api/portraits/lego/9.jpg">Avatar 9</option>
+                </select>
+                <button id="updateAvatarBtn" class="save-btn">Update Avatar</button>
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
 
-            <button type="submit" class="save-btn">Save Changes</button>
-        </form>
-        <!-- Logout Button -->
-        <div class="settings-card">
-            <h2>Logout</h2>
-            <button id="logout-btn" class="logout-btn">Logout</button>
-        </div>
-    </div>
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email">
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter new password (optional)">
+
+                <button type="submit">Save Changes</button>
+                <label for="email">Logout</label>
+                    <button id="logout-btn" class="logout-btn">Logout</button>
+
+            </form>
+
 
     <!-- Device Management -->
     <div class="settings-card">

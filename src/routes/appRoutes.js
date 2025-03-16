@@ -1,6 +1,5 @@
 import express from 'express';
 import path, {dirname} from 'node:path';
-import * as fs from 'node:fs';
 import EnergyUsage from '../models/energy.model.js';
 import {fileURLToPath} from 'node:url';
 import User from '../models/user.model.js';
@@ -19,7 +18,6 @@ import { error } from 'node:console';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const devicesFile = path.join(__dirname, '../public/exampleData/device.json');
 
 const router = express.Router();
 let notifications = [];
@@ -145,7 +143,11 @@ router.get('/api/user', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const user = await User.findById(userId).select("-hashed_password");
+        // `role_name`
+        const user = await User.findById(userId)
+            .select("name email phone role_id user_avatar")
+            .populate("role_id", "role_name");
+
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -156,8 +158,6 @@ router.get('/api/user', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
-
-
 /*
   Sign in
   NOTE: requires jwt & SECRET_KEY if you truly use token logic
@@ -277,6 +277,11 @@ const mainRole = 'manager';
 const subRole = 'dweller';
 
 /*
+  Add a new sub-user under an existing parent user
+*/
+
+
+/*
   Delete user by ID
   - If manager, also deletes subusers
   - If dweller, just that user
@@ -328,29 +333,26 @@ router.delete('/api/users/:id', async (req, res) => {
   Get all users under a certain manager
 */
 router.get('/api/users/parent/:id', async (req, res) => {
-    console.log('[DEBUG] GET /api/users/parent/:id ->', req.params);
-    logDbState('/api/users/parent/:id');
     try {
         const { id } = req.params;
         const parentUser = await User.findById(id);
         if (!parentUser) {
-            console.log(`[DEBUG] Parent user not found with id: ${id}`);
-            return res.status(404).json({ success: false, message: 'Parent user not found' });
+            return res.status(404).json({ success: false, message: "Parent user not found" });
         }
 
-        const subUsers = await User.find({ parentUser: id });
-        console.log(`[DEBUG] Found ${subUsers.length} subusers for manager: ${id}`);
+
+        const subUsers = await User.find({ parentUser: id }).populate("role_id", "role_name");
+
         res.status(200).json({
             success: true,
             parent: parentUser,
             subUsers
         });
     } catch (error) {
-        console.error('[ERROR] GET /api/users/parent/:id ->', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error("[ERROR] GET /api/users/parent/:id ->", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
-
 /*
   Get all users
 */
@@ -421,12 +423,12 @@ router.delete('/api/device/:id', async (req, res) => {
 });
 
 /*
-  Get the list of devices 
+  Get the list of devices
 */
 router.get('/api/devices', async (req, res) => {
     console.log('[DEBUG] GET /api/devices -> Fetching devices from MongoDB');
     try {
-        const devices = await Device.find(); 
+        const devices = await Device.find();
         if (!devices || devices.length === 0) {
             console.error('[ERROR] Finding devices in the database ->', error);
             return res.status(404).json({ error: 'No devices found' });
@@ -455,9 +457,9 @@ router.post('/api/update-device', async (req, res) => {
 
     try {
         const updatedDevice = await Device.findOneAndUpdate(
-            { device_name: name }, 
-            { status: status }, 
-            { new: true } 
+            { device_name: name },
+            { status: status },
+            { new: true }
         );
         if (!updatedDevice) {
             console.log(`[DEBUG] Device not found with name: ${name}`);
@@ -490,9 +492,9 @@ router.post('/api/update-temperature', async (req, res) => {
         // Find and update the AC device in MongoDB
         console.log(`[DEBUG] Finding AC device of name: ${name}`);
         const updatedDevice = await Device.findOneAndUpdate(
-            { device_name: name, device_type: 'AC' }, 
+            { device_name: name, device_type: 'AC' },
             { temperature: temperature },             // Update temperature field
-            { new: true }                             
+            { new: true }
         );
 
         if (!updatedDevice) {
@@ -578,7 +580,7 @@ router.post("/api/device/reset", (req, res) => {
     res.json(deviceController.resetDevice(req.body.id));
 });
 
-module.exports = router;
+
 
 /* ============================================================
    ROOMS CONFIG
