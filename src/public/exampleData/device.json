@@ -105,11 +105,60 @@
         {
             "id": "AirConditioner1",
             "name": "Air Conditioner",
-            "type": "AC",
-            "icon": "../icons/device-page/air-conditioner.svg",
-            "status": false,
-            "temperature": 24
+            "type": "Air",
+            "category": "air-treatment",
+            "icon": "../icons/air-treatment/air-conditioner.svg",
+            "status": false
         },
+
+    {
+        "id": "Heater1",
+        "name": "Heater",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/heater-heat.svg",
+        "status": false
+    },
+
+    {
+        "id": "Humidifier1",
+        "name": "Humidifier",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/humidifier.svg",
+        "status": false
+    },
+
+
+    {
+        "id": "Fan1",
+        "name": "Fan",
+        "type": "Air",
+        "category": "air-treatment",
+        "icon": "../icons/air-treatment/fan-2.svg",
+        "status": false
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         {
             "id": "Socket1",
             "name": "Socket",
