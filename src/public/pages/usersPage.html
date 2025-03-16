@@ -123,9 +123,25 @@
             </form>
         </div>
     </div>
+    <div id="roleEdit" class="details2">
+        <p class="back2" onclick="showMenu()">&larr; Back</p>
 
-    <button id="addUserBtn">+ Add User</button>
+        <div>
+            <h2>Notification Preferences</h2>
+            <label>
+                <input type="checkbox" id="push-notifications"> Enable Push Notifications
+            </label>
 
+            <label>
+                <input type="checkbox" id="email-alerts"> Receive Email Alerts
+            </label>
+
+            <div align="center">
+                <button id="updateNotificationBtn" class="save-btn" >Update</button>
+            </div>
+        </div>
+    </div>
+    <button id="addUserBtn">Add Member</button>
 
 </div>
 <script src="/js/sidebar.js"></script>
