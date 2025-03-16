@@ -65,17 +65,43 @@
         "status": false
     },
 
-
-
-
-
         {
             "id": "DoorLock1",
             "name": "Smart Door Lock",
-            "type": "lock",
-            "icon": "../icons/device-page/door-lock-svgrepo-com.svg",
+            "type": "security",
+            "category": "household-security",
+            "icon": "../icons/household-security/door-lock-svgrepo-com.svg",
             "status": true
         },
+
+    {
+        "id": "cctv1",
+        "name": "cctv",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-electronics/cctv.svg",
+        "status": true
+    },
+
+    {
+        "id": "Doorbell1",
+        "name": "Doorbell",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-security/doorbell.svg",
+        "status": true
+    },
+
+    {
+        "id": "safe-box1",
+        "name": "safe-box",
+        "type": "security",
+        "category": "household-security",
+        "icon": "../icons/household-security/safebox-2.svg",
+        "status": true
+    },
+
+
         {
             "id": "AirConditioner1",
             "name": "Air Conditioner",
