@@ -5,7 +5,6 @@ import Permission from '../models/permission.model.js';
 import Role from '../models/role.model.js';
 import RolePermission from '../models/rolePermission.model.js';
 import { faker } from '@faker-js/faker';
-import fs from 'fs';
 dotenv.config();
 
 /**
@@ -40,55 +39,36 @@ export const connectDB = async () => {
  */
 export const insertData = async (count = 365) => {
     try {
+        console.log("[DEBUG] Starting insertData function with count:", count);
+
         // Clear existing data
         await EnergyUsage.deleteMany({});
-        console.log("Existing data cleared!");
+        console.log("[DEBUG] Existing energy usage data cleared");
 
+        const energyData = [];
+        const today = new Date();
+        console.log("[DEBUG] Today's date:", today);
 
-        /*use the fake data at energy_usage.json first*/
-
-        //
-        // // Create an array of fake docs
-        // const energyData = [];
-        // for (let i = 0; i < count; i++) {
-        //     energyData.push({
-        //         date: faker.date.past(),
-        //         energyusage: faker.number.float({ min: 70, max: 90, precision: 5 })
-        //     });
-        // }
-        //
-        // // Insert them in one go
-        // await EnergyUsage.insertMany(energyData);
-        // console.log(`${count} data inserted successfully!`);
-    } catch (error) {
-        console.error(`Error inserting data: ${error.message}`);
-        process.exit(1);
-    }
-};
-//365days mock data
-export const insertDataFromJSON = async (filePath) => {
-    try {
-
-        const rawData = fs.readFileSync(filePath, 'utf8');
-        const jsonData = JSON.parse(rawData);
-
-        if (!Array.isArray(jsonData) || jsonData.length === 0) {
-            throw new Error("Invalid JSON data: Must be a non-empty array.");
+        // Generate a document for each day from 364 days ago to today
+        for (let i = 0; i < count; i++) {
+            const dayDate = new Date(today);
+            dayDate.setDate(today.getDate() - (count - 1 - i));
+            const usageValue = faker.number.float({ min: 70, max: 90, precision: 5 });
+            energyData.push({
+                date: dayDate,
+                energyusage: usageValue
+            });
         }
 
-        const formattedData = jsonData.map(item => ({
-            date: new Date(item.date),
-            energyusage: parseFloat(item.energyusage)
-        }));
-
-
-        await EnergyUsage.insertMany(formattedData);
-        console.log(`${formattedData.length} records inserted from JSON file.`);
+        console.log("[DEBUG] Inserting generated data into MongoDB...");
+        await EnergyUsage.insertMany(energyData);
+        console.log(`[DEBUG] ${count} documents inserted successfully!`);
     } catch (error) {
-        console.error(`Error inserting data from JSON: ${error.message}`);
+        console.error(`[ERROR] Error inserting data: ${error.message}`);
         process.exit(1);
     }
 };
+
 
 const permissions = [
     "addDevice",
@@ -119,36 +99,6 @@ const rolePermissionsMapping = {
     "Developer": ["switchOn", "switchOff", "adjustTemp", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "editDevice", "changeSettings", "updateSystem", "backupSystem"]
 };
 
-// export async function addPermissions() {
-//     try {
-//         // Insert permissions
-//         const insertedPermissions = await Permission.insertMany(
-//             permissions.map(name => ({ name }))
-//         );
-
-//         // Insert roles
-//         const insertedRoles = await Role.insertMany(roles);
-
-//         // Map role names to IDs
-//         const permissionMap = Object.fromEntries(insertedPermissions.map(p => [p.name, p._id]));
-//         const roleMap = Object.fromEntries(insertedRoles.map(r => [r.name, r._id]));
-
-//         // Insert role-permission mappings
-//         const rolePermissions = [];
-//         for (const [roleName, permissionList] of Object.entries(rolePermissionsMapping)) {
-//             const roleId = roleMap[roleName];
-//             permissionList.forEach(permissionName => {
-//                 rolePermissions.push({ role_id: roleId, permission_id: permissionMap[permissionName] });
-//             });
-//         }
-
-//         await RolePermission.insertMany(rolePermissions);
-
-//         console.log("Roles and permissions seeded successfully!");
-//     } catch (error) {
-//         console.error("Error serole_eding database:", error);
-//     }
-// }
 export async function addPermissions() {
     try {
         console.log('[DEBUG] Starting permissions and role-permission mapping insertion...');

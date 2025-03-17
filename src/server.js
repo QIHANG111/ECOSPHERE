@@ -2,7 +2,6 @@
 import dotenv from 'dotenv';
 import app from './app.js';
 import { connectDB, insertData , addPermissions } from './database/db.js';
-import { insertDataFromJSON } from './database/db.js';
 dotenv.config();
 
 const PORT = process.env.PORT || 4000;
@@ -17,9 +16,7 @@ async function startServer() {
 
 
         await insertData();
-        await insertDataFromJSON('src/database/energy_usage.json');
         await addPermissions();
-        // await insertData();
         console.log('[DEBUG] Initial data inserted (if needed).');
 
         // Finally, start listening on the specified port
