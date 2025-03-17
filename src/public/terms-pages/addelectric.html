@@ -354,41 +354,45 @@
         document.getElementById('addModal').style.display = 'flex';
     }
 
-    async function confirmAdd() {
-        if (!currentDeviceId) {
-            alert("设备 ID 为空，无法添加！");
-            return;
-        }
-
-        console.log(`🚀 正在添加设备: ${currentDeviceId}`);
-
-        try {
-            const response = await fetch("http://localhost:4000/api/device", {  // ✅ 确保 4000 端口
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ device_id: currentDeviceId })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP 错误！状态码: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("📩 服务器返回:", data);
-
-            if (data.success) {
-                alert(`✅ 设备 ${data.data.device_name} 已成功添加！`);
-                window.location.href = "devicePage.html";
-            } else {
-                alert(`❌ 添加失败: ${data.message}`);
-            }
-        } catch (error) {
-            console.error("❌ 添加设备时出错:", error);
-            alert("❌ 添加设备时出错，请检查控制台！");
-        }
-
-        closeModal();
+async function confirmAdd() {
+    if (!currentDeviceId) {
+        alert("Device ID is empty, cannot add!");
+        return;
     }
+
+    console.log(`🚀 Adding device: ${currentDeviceId}`);
+
+    try {
+        const response = await fetch("http://localhost:4000/api/device", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                device_name: currentDeviceId,
+                device_type: "unknown",
+                status: true
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("📩 Server response:", data);
+
+        if (data.success) {
+            alert(`✅ Device ${data.data.device_name} added successfully!`);
+            window.location.href = "devicePage.html";
+        } else {
+            alert(`❌ Failed to add: ${data.message}`);
+        }
+    } catch (error) {
+        console.error("❌ Error adding device:", error);
+        alert("❌ Error adding device, please check the console!");
+    }
+
+    closeModal();
+}
 
 
 
