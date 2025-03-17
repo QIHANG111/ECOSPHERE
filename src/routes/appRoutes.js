@@ -23,8 +23,6 @@ const __dirname = dirname(__filename);
 const router = express.Router();
 let notifications = [];
 const SECRET_KEY = "your_secret_key";
-const devicesFile = path.join(__dirname, '../device.json');
-
 
 // Enable JSON body parsing
 router.use(express.json());
@@ -279,10 +277,6 @@ router.post('/api/subusers', async (req, res) => {
 const mainRole = 'manager';
 const subRole = 'dweller';
 
-/*
-  Add a new sub-user under an existing parent user
-*/
-
 
 /*
   Delete user by ID
@@ -356,6 +350,7 @@ router.get('/api/users/parent/:id', async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
     }
 });
+
 /*
   Get all users
 */
@@ -494,7 +489,6 @@ router.get('/api/devices', async (req, res) => {
     }
 });
 
-
 /*
   Update the status of a specific device
 */
@@ -579,7 +573,6 @@ router.post('/api/update-temperature', async (req, res) => {
     }
 });
 
-
 /*
     Adjust light brightness
 */
@@ -629,6 +622,31 @@ router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
     }
 });
 
+// ✅ 这里加上新的 API，避免重复 `/api/update-temperature`
+router.get("/api/devices", (req, res) => {
+    res.json(deviceController.getAllDevices());
+});
+
+router.get("/api/device/status/:id", (req, res) => {
+    res.json({ status: deviceController.getStatus(req.params.id) });
+});
+
+router.post("/api/device/toggle", (req, res) => {
+    res.json(deviceController.toggleStatus(req.body.id));
+});
+
+
+router.post("/api/device/fanSpeed", (req, res) => {
+    res.json(deviceController.setFanSpeed(req.body.id, req.body.fanSpeed));
+});
+
+router.post("/api/device/mode", (req, res) => {
+    res.json(deviceController.setMode(req.body.id, req.body.mode));
+});
+
+router.post("/api/device/reset", (req, res) => {
+    res.json(deviceController.resetDevice(req.body.id));
+});
 
 
 
