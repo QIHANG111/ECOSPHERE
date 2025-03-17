@@ -5,7 +5,6 @@ import Permission from '../models/permission.model.js';
 import Role from '../models/role.model.js';
 import RolePermission from '../models/rolePermission.model.js';
 import { faker } from '@faker-js/faker';
-import fs from 'fs';
 dotenv.config();
 
 /**
@@ -40,52 +39,36 @@ export const connectDB = async () => {
  */
 export const insertData = async (count = 365) => {
     try {
+        console.log("[DEBUG] Starting insertData function with count:", count);
+
         // Clear existing data
         await EnergyUsage.deleteMany({});
-        console.log("Existing data cleared!");
-        
-        // Create an array of fake docs
+        console.log("[DEBUG] Existing energy usage data cleared");
+
         const energyData = [];
+        const today = new Date();
+        console.log("[DEBUG] Today's date:", today);
+
+        // Generate a document for each day from 364 days ago to today
         for (let i = 0; i < count; i++) {
+            const dayDate = new Date(today);
+            dayDate.setDate(today.getDate() - (count - 1 - i));
+            const usageValue = faker.number.float({ min: 70, max: 90, precision: 5 });
             energyData.push({
-                date: faker.date.past(),
-                energyusage: faker.number.float({ min: 70, max: 90, precision: 5 })
+                date: dayDate,
+                energyusage: usageValue
             });
         }
-        
-        // Insert them in one go
+
+        console.log("[DEBUG] Inserting generated data into MongoDB...");
         await EnergyUsage.insertMany(energyData);
-        console.log(`${count} data inserted successfully!`);
+        console.log(`[DEBUG] ${count} documents inserted successfully!`);
     } catch (error) {
-        console.error(`Error inserting data: ${error.message}`);
+        console.error(`[ERROR] Error inserting data: ${error.message}`);
         process.exit(1);
     }
 };
 
-//365days mock data
-export const insertDataFromJSON = async (filePath) => {
-    try {
-
-        const rawData = fs.readFileSync(filePath, 'utf8');
-        const jsonData = JSON.parse(rawData);
-
-        if (!Array.isArray(jsonData) || jsonData.length === 0) {
-            throw new Error("Invalid JSON data: Must be a non-empty array.");
-        }
-
-        const formattedData = jsonData.map(item => ({
-            date: new Date(item.date),
-            energyusage: parseFloat(item.energyusage)
-        }));
-
-
-        await EnergyUsage.insertMany(formattedData);
-        console.log(`${formattedData.length} records inserted from JSON file.`);
-    } catch (error) {
-        console.error(`Error inserting data from JSON: ${error.message}`);
-        process.exit(1);
-    }
-};
 
 const permissions = [
     "addDevice",
