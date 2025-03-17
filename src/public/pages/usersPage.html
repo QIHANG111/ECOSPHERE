@@ -94,6 +94,7 @@
     <div class="user-list" id="userListContainer">
 
     </div>
+
     <div id="addUserModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAddUserModal()">&times;</span>
@@ -139,6 +140,34 @@
             <div align="center">
                 <button id="updateNotificationBtn" class="save-btn" >Update</button>
             </div>
+        </div>
+    </div>
+
+    <div id="userSettingsModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span id="closeUserSettings" class="close">&times;</span>
+            <h2>Permission Settings</h2>
+            <img id="settingsAvatar" style="border-radius:50%; width:100px;" src="" alt="">
+            <h3 id="settingsUserName"></h3>
+            <h3 id="settingUserRole"></h3>
+            <h4 id="settingsUserEmail"></h4>
+
+<!--                <button onclick="showUserDetail('role')">Role</button>-->
+<!--                <button onclick="showUserDetail('notification')">Notification Preferences</button>-->
+            <div class="settings-menu">
+<!--                <button onclick="showUserDetail('account')">Account Information</button>-->
+<!--                <button onclick="showUserDetail('password')">Change Password</button>-->
+<!--                <button onclick="showUserDetail('avatar')">Change Avatar</button>-->
+                <div>
+                    <label for="roleSelector">Change Role:</label>
+                    <select id="roleSelector">
+                        <option value="1">Home Owner</option>
+                        <option value="2">Home Dweller </option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="userSettingsDetail"></div>
         </div>
     </div>
     <button id="addUserBtn">Add Member</button>
