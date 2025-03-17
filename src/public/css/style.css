@@ -23,6 +23,7 @@
     --c-bg-card-hover: rgba(200, 196, 186, 0.47);
     --c-glow: rgba(225, 225, 225, 0.7);
     --normal-card-border: rgba(255, 255, 255, 0.5);
+    --c-bg-modal: rgba(255, 255, 255, 0.8);
 }
 :root.dark-theme {
     --c-text-primary: #eee;
@@ -37,6 +38,7 @@
     --c-bg-card-hover: rgba(73, 82, 97, 0.94);
     --c-glow: rgba(255, 255, 255, 0.7);
     --normal-card-border: rgb(175, 173, 173);
+    --c-bg-modal: rgba(0, 0, 0, 0.8);
 }
 :root.black-theme {
     --button-background: #2c2a26;
@@ -51,6 +53,7 @@
     --c-bg-card-hover: rgba(60, 60, 60, 0.6);
     --c-glow: rgba(255, 255, 255, 0.7);
     --normal-card-border: rgba(255, 255, 255, 0.5);
+    --c-bg-modal: rgba(0, 0, 0, 0.8);
 }
 /* Default SVG color */
 .ui-menu-icon img {
@@ -731,7 +734,7 @@ body {
     width: 100vw;
     height: 100%;
     color: var(--c-text-primary);
-    background-color: rgba(0, 0, 0, 0.2); /* Dark overlay */
+    /*background-color: rgba(0, 0, 0, 0.2); !* Dark overlay *!*/
     border: 0.1vw solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 1vw 2vw rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(0.5vw);
@@ -744,23 +747,7 @@ body {
 
 
 
-/* Modal Content */
-.modal-content {
-    background-color: var(--c-bg-sidebar);
-    padding: 2vw;
-    border-radius: 3vw;
-    width: 200vw;
-    height: 80%;
-    max-width: 500px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65);
-    animation: fadeIn 0.3s ease-in-out;
-    transition: 0.3s;
-}
-.modal-content:hover {
-    transform: scale(1.01);
-    box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
 
-}
 
 /* Close Button */
 .close {

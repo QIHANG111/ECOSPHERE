@@ -96,7 +96,6 @@ function addUserToAvatarList(user) {
     avatarList.appendChild(avatar);
 }
 
-
 function addUserToList(user, isMainUser = false) {
     const avatarUrl = `https://randomuser.me/api/portraits/lego/${user.user_avatar || 1}.jpg`;
     const listItem = document.createElement("div");
@@ -114,11 +113,19 @@ function addUserToList(user, isMainUser = false) {
             <p class="user-role">${user.role_id?.role_name || "User"}</p>
         </div>
         <div style="align-content: end">
-        <img src="/icons/setting-3-svgrepo-com.svg" onclick="showDetails(roleEdit)"  alt="Vector Icon" width="30" height="30" style="flex: 1; text-align: center;">
+            <div class="ui-menu-icon">
+                <img src="/icons/setting-3-svgrepo-com.svg" 
+                    data-user-id="${user._id}" 
+                    alt="Settings Icon" width="30" height="30" class="settings-btn">
+            </div>
         </div>
     `;
 
     userListContainer.appendChild(listItem);
+
+
+    const settingsBtn = listItem.querySelector('.settings-btn');
+    settingsBtn.addEventListener('click', () => showUserSettings(user));
 }
 
 
@@ -186,17 +193,91 @@ async function addSubUser() {
         alert("Server error");
     }
 
-
     closeAddUserModal();
 }
-function showDetails(id) {
-    history.pushState({ section: id }, "", `#${id}`);
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById(id).style.display = 'block';
+
+function showUserSettings(user) {
+    document.getElementById("userSettingsModal").style.display = "block";
+    document.getElementById("settingsAvatar").src = `https://randomuser.me/api/portraits/lego/${user.user_avatar || 1}.jpg`;
+    document.getElementById("settingsUserName").innerText = user.name;
+    document.getElementById("settingsUserEmail").innerText = user.email;
+    document.getElementById("settingUserRole").innerText = user.role_id?.role_name || "User";
+
+    document.getElementById("userSettingsDetail").innerHTML = '';
 }
 
-function showMenu() {
-    history.pushState(null, "", window.location.pathname);
-    document.querySelectorAll('.details2').forEach(detail => detail.style.display = 'none');
-    document.getElementById('menu').style.display = 'block';
+
+document.getElementById("closeUserSettings").onclick = () => {
+    document.getElementById("userSettingsModal").style.display = "none";
+};
+
+
+function showUserDetail(type) {
+    let detailHTML = '';
+    switch(type) {
+        case 'account':
+            detailHTML = `
+                <h3>Update Account Information</h3>
+                <input type="text" id="detailUsername" placeholder="New Username">
+                <input type="email" id="detailEmail" placeholder="New Email">
+                <button onclick="updateUserDetail('account')">Save Changes</button>
+            `;
+            break;
+        case 'password':
+            detailHTML = `
+                <h3>Change Password</h3>
+                <input type="password" id="newPassword" placeholder="New Password">
+                <button onclick="updateUserDetail('password')">Change Password</button>
+            `;
+            break;
+        case 'avatar':
+            detailHTML = `
+                <h3>Change Avatar</h3>
+                <select id="detailAvatar">
+                    ${[1,2,3,4,5,6,7,8,9].map(num => `<option value="${num}">Avatar ${num}</option>`).join('')}
+                </select>
+                <button onclick="updateUserDetail('avatar')">Change Avatar</button>
+            `;
+            break;
+    }
+
+    document.getElementById("userSettingsDetail").innerHTML = detailHTML;
+}
+
+
+async function updateUserDetail(type) {
+    const userId = document.querySelector(".settings-btn[data-user-id]").dataset.userId;
+    const updateData = {};
+
+    if (type === 'account') {
+        updateData.name = document.getElementById("detailUsername").value;
+        updateData.email = document.getElementById("detailEmail").value;
+    } else if (type === 'password') {
+        updateData.password = document.getElementById("newPassword").value;
+    } else if (type === 'avatar') {
+        updateData.user_avatar = document.getElementById("detailAvatar").value;
+    }
+
+    try {
+        const response = await fetch(`/api/update-user/${userId}`, {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updateData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("Update successful!");
+            document.getElementById("userSettingsModal").style.display = "none";
+            window.location.reload();
+        } else {
+            alert("Update failed: " + result.message);
+        }
+    } catch (error) {
+        alert("Server error, please try again later.");
+    }
 }
