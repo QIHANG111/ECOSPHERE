@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             name: usernameInput.value,
             email: emailInput.value,
             password: passwordInput.value || undefined,
-            user_avatar: parseInt(avatarSelector.value) // 更新头像
+            user_avatar: parseInt(avatarSelector.value)
         };
 
         try {

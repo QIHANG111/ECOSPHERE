@@ -745,7 +745,22 @@ body {
     transform-origin: center;
 }
 
-
+/* Modal Content */
+.modal-content {
+    background-color: var(--c-bg-modal);
+    padding: 2vw;
+    border-radius: 3vw;
+    width: 200vw;
+    height: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65);
+    animation: fadeIn 0.3s ease-in-out;
+    transition: 0.3s;
+}
+.modal-content:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0.5vw 1.5vw rgba(255, 255, 255, 0.2);
+}
 
 
 
