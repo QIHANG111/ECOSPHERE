@@ -43,28 +43,25 @@ export const insertData = async (count = 365) => {
         // Clear existing data
         await EnergyUsage.deleteMany({});
         console.log("Existing data cleared!");
-
-
-        /*use the fake data at energy_usage.json first*/
-
-        //
-        // // Create an array of fake docs
-        // const energyData = [];
-        // for (let i = 0; i < count; i++) {
-        //     energyData.push({
-        //         date: faker.date.past(),
-        //         energyusage: faker.number.float({ min: 70, max: 90, precision: 5 })
-        //     });
-        // }
-        //
-        // // Insert them in one go
-        // await EnergyUsage.insertMany(energyData);
-        // console.log(`${count} data inserted successfully!`);
+        
+        // Create an array of fake docs
+        const energyData = [];
+        for (let i = 0; i < count; i++) {
+            energyData.push({
+                date: faker.date.past(),
+                energyusage: faker.number.float({ min: 70, max: 90, precision: 5 })
+            });
+        }
+        
+        // Insert them in one go
+        await EnergyUsage.insertMany(energyData);
+        console.log(`${count} data inserted successfully!`);
     } catch (error) {
         console.error(`Error inserting data: ${error.message}`);
         process.exit(1);
     }
 };
+
 //365days mock data
 export const insertDataFromJSON = async (filePath) => {
     try {
@@ -119,36 +116,6 @@ const rolePermissionsMapping = {
     "Developer": ["switchOn", "switchOff", "adjustTemp", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "editDevice", "changeSettings", "updateSystem", "backupSystem"]
 };
 
-// export async function addPermissions() {
-//     try {
-//         // Insert permissions
-//         const insertedPermissions = await Permission.insertMany(
-//             permissions.map(name => ({ name }))
-//         );
-
-//         // Insert roles
-//         const insertedRoles = await Role.insertMany(roles);
-
-//         // Map role names to IDs
-//         const permissionMap = Object.fromEntries(insertedPermissions.map(p => [p.name, p._id]));
-//         const roleMap = Object.fromEntries(insertedRoles.map(r => [r.name, r._id]));
-
-//         // Insert role-permission mappings
-//         const rolePermissions = [];
-//         for (const [roleName, permissionList] of Object.entries(rolePermissionsMapping)) {
-//             const roleId = roleMap[roleName];
-//             permissionList.forEach(permissionName => {
-//                 rolePermissions.push({ role_id: roleId, permission_id: permissionMap[permissionName] });
-//             });
-//         }
-
-//         await RolePermission.insertMany(rolePermissions);
-
-//         console.log("Roles and permissions seeded successfully!");
-//     } catch (error) {
-//         console.error("Error serole_eding database:", error);
-//     }
-// }
 export async function addPermissions() {
     try {
         console.log('[DEBUG] Starting permissions and role-permission mapping insertion...');
