@@ -1376,6 +1376,7 @@ canvas {
     margin-top: 20px;
 }
 
+/*CustomizedPage Settings*/
 .addFunctionButton {
     padding: 10px;
     background-color: #007bff;
@@ -1386,19 +1387,21 @@ canvas {
 }
 
 .standbyModalCP {
-    display: none;
-    position: fixed;
-    top: 20%;
-    left: 42%;
-    width: 30%;
+    position: absolute;
+    top: 18%;
+    left: 16%;
+    width: 40%;
     height: auto;
     border-radius: 15px;
     background: rgba(250, 198, 158, 1.0);
+    overflow-y: auto;
+    max-height: 80vh;
 
 }
+
 .standbyModalCP-content {
     background: #f6c97a;
-    padding: 30px;
+    padding: 5%;
     width: 100%;
 
     border-radius: 40px;
@@ -1411,29 +1414,35 @@ canvas {
     justify-content: space-between;
     box-sizing: border-box;
 
+    flex-direction: column; /* Stack elements */
+
 }
 .h3Button{
-    margin-left: 10px;
-    padding-left: 10px;
+    margin-left: 5%;
+    margin-top: 5%;
 }
+
+
 
 .closeButton {
     position: absolute;
-    margin-left: 90%;
+    right: 5%;
     background: rgba(255,255,255,0.5);
     border: none;
     cursor: pointer;
-    width: 30px;
-    height: 30px;
+    width: 8%; /* Fixed width */
+    height: 10%; /* Fixed height */
     display: flex;
     align-items: center;
     justify-content: center;
+    transform: translateY(-4%);
 }
 
-.closeButton-img{
-    width: 100%;
-    height: 100%;
+.closeButton img {
+    width: 200%; /* Scales inside button */
+    height: 200%; /* Keeps proportion */
 }
+
 
 .addButton, .removeButton {
     margin-left: 180px;
@@ -1445,12 +1454,17 @@ canvas {
 .standbyItem {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 3%;
     border-bottom: 1px solid #eee;
 }
 
 .standbyItem span {
     margin-left: 10px; /* Adjust as needed */
+}
+
+#standbyList {
+    max-height: 300px; /* Adjust as needed */
+    overflow-y: auto; /* Enable scrolling */
 }
 
 .function-header {
@@ -1461,21 +1475,21 @@ canvas {
 
 .removeFunctionButton {
     position: absolute;
-    width: 50px;
+    width: 15%;
+    height: 15%; /* Adjust based on button size */
     margin-left: 80%;
     background: red;
-    font-size: 11px;
-    color: white;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    height: 30px; /* Adjust based on button size */
-    min-width: 60px; /* Adjust based on content */
+
 }
+
+.removeFunctionButton img {
+    width: 300%;
+    height: 300%;
+}
+
 
 .StandbyAddButton {
     margin-left: 80%;
