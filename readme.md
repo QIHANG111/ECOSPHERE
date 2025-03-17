@@ -7,6 +7,7 @@
 5. run the command `npm start` to start the server.
 
 
+
 ## Structure
 public: contains the static files.
 src: contains the source code.
