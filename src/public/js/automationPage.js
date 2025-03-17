@@ -24,8 +24,9 @@ function openModal() {
     document.getElementById('standbyModal').style.display = 'block';
 }
 
-function closeModal() {
+function closeModalAutomationPage() {
     document.getElementById('standbyModal').style.display = 'none';
+
 }
 
 // Populate standby list
@@ -61,7 +62,7 @@ function renderAddedFunctions() {
                     <img src="${func.icon}" width="30" height="30">
                     <h4>${func.name}</h4>
                     <button onclick="removeFunction(${func.id})" class="removeFunctionButton">
-                        Remove
+                        <img src="/icons/remove.svg" width="100%" height="100%">
                     </button>
                 </div>
                 <!-- Add function-specific UI elements here -->
