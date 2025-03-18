@@ -2,21 +2,7 @@
 const API_KEY = "AIzaSyDoSgt53bNbO6Rlqs0QMJjCr9zHofxLtwA"; // Replace with a secure environment variable
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
 
-//fetchData from API(energy-usage)
-async function fetchData() {
-    try {
-        const response = await fetch('/api/energy-usage'); // API
-        const data = await response.json();
 
-        if (!Array.isArray(data)) {
-            throw new TypeError('Expected an array but received ' + typeof data);
-        }
-
-        return data;
-    } catch (error) {
-        console.error("❌ Error fetching data:", error);
-    }
-}
 
 
 // Fetch AI Response from Gemini API
@@ -43,6 +29,26 @@ async function fetchGeminiResponse(prompt) {
 }
 
 // Device Control
+function updateDeviceTemperature(deviceName, newTemperature) {
+    fetch("/api/update-temperature", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name: deviceName, temperature: newTemperature })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                console.error("Failed to update device temperature:", data.message);
+            } else {
+                console.log(`[INFO] Updated ${deviceName} temperature to ${newTemperature}°C`);
+            }
+        })
+        .catch(error => console.error("Error updating device temperature:", error));
+}
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const deviceList = document.getElementById("deviceList");
 
@@ -60,125 +66,90 @@ document.addEventListener("DOMContentLoaded", function () {
                     nameSpan.textContent = device.device_name;
                     nameSpan.style.marginRight = "10px";
 
-                    const isOn = device.status === "true";
-
                     const statusBtn = document.createElement("button");
                     statusBtn.classList.add("device-status-btn");
                     statusBtn.dataset.deviceName = device.device_name;
 
-                    if (isOn) {
-                        statusBtn.classList.add("device-status-on");
-                        statusBtn.textContent = "ON";
-                    } else {
-                        statusBtn.classList.add("device-status-off");
-                        statusBtn.textContent = "OFF";
-                    }
-                    // statusBtn.dataset.deviceName = device.device_name;
+                    updateButtonAppearance(statusBtn, device.status === "true");
 
                     statusBtn.addEventListener("click", function () {
-                        const newStatus = !isOn;
-                        updateDeviceStatus(device.device_name, newStatus);
+                        const currentStatus = device.status === "true";
+                        const newStatus = !currentStatus; // 每次点击都重新从device获取状态
 
-                        if (newStatus) {
-                            statusBtn.classList.remove("device-status-off");
-                            statusBtn.classList.add("device-status-on");
-                            statusBtn.textContent = "ON";
-                        } else {
-                            statusBtn.classList.remove("device-status-on");
-                            statusBtn.classList.add("device-status-off");
-                            statusBtn.textContent = "OFF";
-                        }
+                        updateDeviceStatus(device.device_name, newStatus).then(() => {
 
-                        device.status = newStatus.toString();
-                    });
+                            updateButtonAppearance(statusBtn, newStatus);
+                            device.status = newStatus.toString();
 
 
-
-                    const deleteBtn = document.createElement("button");
-                    deleteBtn.textContent = "delete";
-                    deleteBtn.classList.add("delete-btn");
-                    deleteBtn.dataset.deviceId = device._id;
-
-                    deleteBtn.addEventListener("click", function () {
-                        if (confirm(`Are you sure? Delete  "${device.device_name}"`)) {
-                            deleteDevice(device._id);
-                        }
+                            if (device.device_type === "AC") {
+                                const tempControls = deviceItem.querySelector(".temperature-control");
+                                const tempDisplay = deviceItem.querySelector(".temperature-display");
+                                const displayStyle = newStatus ? "flex" : "none";
+                                const tempDisplayStyle = newStatus ? "block" : "none";
+                                if (tempControls) tempControls.style.display = displayStyle;
+                                if (tempDisplay) tempDisplay.style.display = tempDisplayStyle;
+                            }
+                        }).catch(error => {
+                            console.error("Error updating device status:", error);
+                        });
                     });
 
                     deviceItem.appendChild(nameSpan);
                     deviceItem.appendChild(statusBtn);
-                    // deviceItem.appendChild(deleteBtn);
                     deviceList.appendChild(deviceItem);
 
-
                     if (device.device_type === "AC") {
-                        const tempControlContainer = document.createElement("div");
-                        tempControlContainer.classList.add("temperature-control");
-                        tempControlContainer.style.display = device.status ? "flex" : "none";
-
-
-                        const tempDisplay = document.createElement("div");
-                        tempDisplay.classList.add("temperature-display");
-                        tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
-
-
-                        const decreaseBtn = document.createElement("button");
-                        decreaseBtn.classList.add("temp-btn");
-                        decreaseBtn.textContent = "−";
-                        decreaseBtn.addEventListener("click", function() {
-                            if (device.temperature > 16) {
-                                device.temperature -= 1;
-                                updateDeviceTemperature(device.device_name, device.temperature);
-                                tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
-                            }
-                        });
-
-
-                        const increaseBtn = document.createElement("button");
-                        increaseBtn.classList.add("temp-btn");
-                        increaseBtn.textContent = "+";
-                        increaseBtn.addEventListener("click", function() {
-                            if (device.temperature < 30) {
-                                device.temperature += 1;
-                                updateDeviceTemperature(device.device_name, device.temperature);
-                                tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
-                            }
-                        });
-
-                        tempControlContainer.appendChild(decreaseBtn);
-                        tempControlContainer.appendChild(increaseBtn);
-                        deviceItem.appendChild(tempDisplay);
-                        tempDisplay.style.display = device.status ? "block" : "none";
-                        deviceItem.appendChild(tempControlContainer);
+                        createTempControls(device, deviceItem);
                     }
                 });
             })
             .catch(error => console.error("Error loading devices:", error));
     }
 
-    function updateDeviceStatus(deviceName, newStatus) {
-        fetch("/api/update-device", {
-            method: "POST", // POST
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name: deviceName, status: newStatus }) // 适配后端 API 参数
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error("Failed to update device status:", data.message);
-                }
-            })
-            .catch(error => console.error("Error updating device status:", error));
+
+    function createTempControls(device, deviceItem) {
+        const tempControlContainer = document.createElement("div");
+        tempControlContainer.classList.add("temperature-control");
+        tempControlContainer.style.display = device.status === "true" ? "flex" : "none";
+
+        const tempDisplay = document.createElement("div");
+        tempDisplay.classList.add("temperature-display");
+        tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
+        tempDisplay.style.display = device.status === "true" ? "block" : "none";
+
+        const decreaseBtn = document.createElement("button");
+        decreaseBtn.classList.add("temp-btn");
+        decreaseBtn.textContent = "−";
+        decreaseBtn.addEventListener("click", function() {
+            if (device.temperature > 16) {
+                device.temperature -= 1;
+                updateDeviceTemperature(device.device_name, device.temperature);
+                tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
+            }
+        });
+
+        const increaseBtn = document.createElement("button");
+        increaseBtn.classList.add("temp-btn");
+        increaseBtn.textContent = "+";
+        increaseBtn.addEventListener("click", function() {
+            if (device.temperature < 30) {
+                device.temperature += 1;
+                updateDeviceTemperature(device.device_name, device.temperature);
+                tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
+            }
+        });
+
+        tempControlContainer.appendChild(decreaseBtn);
+        tempControlContainer.appendChild(increaseBtn);
+        deviceItem.appendChild(tempDisplay);
+        deviceItem.appendChild(tempControlContainer);
     }
 
     function updateDeviceTemperature(deviceName, newTemperature) {
         fetch("/api/update-device", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: deviceName, temperature: newTemperature })
         })
             .then(response => response.json())
@@ -190,28 +161,42 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Error updating device temperature:", error));
     }
 
-    function deleteDevice(deviceId) {
-        fetch(`/api/device/${deviceId}`, {
-            method: "DELETE"
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log("Device deleted successfully");
-                    loadDevices();
-                } else {
-                    console.error("Failed to delete device:", data.message);
-                }
-            })
-            .catch(error => console.error("Error deleting device:", error));
-    }
-
     loadDevices();
 });
 
+
+function updateButtonAppearance(button, isOn) {
+    if (isOn) {
+        button.classList.add("device-status-on");
+        button.classList.remove("device-status-off");
+        button.textContent = "ON";
+    } else {
+        button.classList.add("device-status-off");
+        button.classList.remove("device-status-on");
+        button.textContent = "OFF";
+    }
+}
+
+
+
+function updateDeviceStatus(deviceName, newStatus) {
+    return fetch("/api/update-device", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: deviceName, status: newStatus })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+        });
+}
+
+
 // AI Theme & Device Control
 function handleGeminiRequest() {
-    const userPrompt = document.getElementById("userPrompt").value.trim().toLowerCase();
+    const userPrompt = document.getElementById("userPrompt").value.trim();
     const responseElement = document.getElementById("apiResponse");
     const aiCard = document.querySelector(".aiCard");
 
@@ -225,61 +210,105 @@ You are an AI assistant. Follow these instructions carefully:
 - Do Not generate more than 100 words.
 - If the user wants to know the energy usage or reports, reply with "reportPage."
 - If the user wants to set profile settings or edit passward / email or log out, reply with "settingsPage."
-- Tf the user wants to add or delete a device, reply with "devicePage".
+- If the user wants to add or delete a device, reply with "devicePage".
 - If the user's message wants to change to a specific theme mode, reply only with "Ok, changed to"+light/dark/black+theme.
 - If the message does not, respond normally.
 - If the message wants to know what you can do/who are you, reply with "I am ECOSPHERE AI, I can help you with energy reports, change settings, and more.".
 - if want to turn on or off devices, reply with "Ok, turned on/off the "+devicename.
 User Input: "${userPrompt}"
 AI Response:`;
-// - if want to see or check the report, reply with "Ok, this is the report "+reportname.(not usable right now)
+
     responseElement.innerText = "Fetching response...";
     fetchGeminiResponse(fullPrompt).then(responseText => {
         aiCard.style.height = "auto";
-        let aiResponseText = responseText;
+        const aiResponseText = responseText;
         responseElement.innerText = "";
         typeTextEffect(responseElement, aiResponseText, 50, aiCard);
 
-        // Device Control by AI
-        const deviceActionMatch = aiResponseText.match(/Ok, turned (on|off) the ([a-zA-Z0-9\s]+)/i);
+        // AI Device Control
+        const deviceActionMatch = aiResponseText.match(/Ok,\s*turned\s*(on|off)\s*the\s*([a-zA-Z0-9\s]+)/i);
         if (deviceActionMatch) {
-            const action = deviceActionMatch[1]; // "on" "off"
-            const deviceName = deviceActionMatch[2].trim();
+            const action = deviceActionMatch[1].toLowerCase();
+            const deviceNameFromAI = deviceActionMatch[2].trim().toLowerCase();
 
-            const status = action === "on"; // "on" -> true, "off" -> false
-            console.log(`Updating Device: ${deviceName}, Status: ${status}`);
+            fetch("/api/devices")
+                .then(res => res.json())
+                .then(devices => {
+                    const matchedDevice = devices.find(d => d.device_name.toLowerCase() === deviceNameFromAI);
 
-            updateDeviceStatus(deviceName.toUpperCase(), status);
-            // loadDevices();
+                    if (matchedDevice) {
+                        const status = action === "on";
+                        updateDeviceStatus(matchedDevice.device_name, status).then(() => {
+                            console.log("Device status updated successfully.");
+                            refreshButtonStatus(matchedDevice.device_name, status);
+                        }).catch(err => {
+                            console.error("Error updating device status:", err);
+                        });
+                    } else {
+                        console.error("No matching device found:", deviceNameFromAI);
+                    }
+                }).catch(err => {
+                console.error("Error fetching devices:", err);
+            });
         }
-        //temperature control by AI
-        const tempMatch = aiResponseText.match(/Set ([a-zA-Z0-9\s]+) to (\d+)°C/i);
+
+        // AI Temperature Control
+        const tempMatch = aiResponseText.match(/Set\s*([a-zA-Z0-9\s]+)\s*to\s*(\d+)°C/i);
         if (tempMatch) {
-            const deviceName = tempMatch[1].trim().toUpperCase();
+            const deviceNameFromAI = tempMatch[1].trim().toLowerCase();
             const temperature = parseInt(tempMatch[2]);
-            console.log(`Updating ${deviceName} temperature to: ${temperature}`);
-            updateDeviceTemperature(deviceName, temperature);
-            // UI will be updated by the updateDeviceTemperature function
+
+            fetch("/api/devices")
+                .then(res => res.json())
+                .then(devices => {
+                    const matchedDevice = devices.find(d => d.device_name.toLowerCase() === deviceNameFromAI && d.device_type === "AC");
+                    if (matchedDevice) {
+                        updateDeviceTemperature(matchedDevice.device_name, temperature).then(() => {
+                            console.log("Temperature updated successfully.");
+                            refreshTemperatureDisplay(matchedDevice.device_name, temperature);
+                        });
+                    } else {
+                        console.error("No matching AC device found:", deviceNameFromAI);
+                    }
+                }).catch(err => console.error("Error fetching devices:", err));
         }
 
-// theme control by AI
-        if (aiResponseText.includes("Ok, changed to dark theme")) {
-            switchTheme("dark-theme");
-        } else if (aiResponseText.includes("Ok, changed to black theme")) {
-            switchTheme("black-theme");
-        } else if (aiResponseText.includes("Ok, changed to light theme")) {
-            switchTheme("light-theme");
-        }
+        // AI theme control, pages
+        if (aiResponseText.includes("Ok, changed to dark theme")) switchTheme("dark-theme");
+        else if (aiResponseText.includes("Ok, changed to black theme")) switchTheme("black-theme");
+        else if (aiResponseText.includes("Ok, changed to light theme")) switchTheme("light-theme");
 
-        // AI page jump
-        if (aiResponseText.includes("reportPage")) {
-            window.location.href = "../pages/reportPage.html";
+        if (aiResponseText.includes("reportPage")) window.location.href = "../pages/reportPage.html";
+        if (aiResponseText.includes("settingsPage")) window.location.href = "../pages/settingPage.html";
+        if (aiResponseText.includes("devicePage")) window.location.href = "../pages/devicesPage.html";
+    });
+}
+
+function refreshButtonStatus(deviceName, isOn) {
+    const buttons = document.querySelectorAll(".device-status-btn");
+    buttons.forEach(btn => {
+        if (btn.dataset.deviceName === deviceName) {
+            btn.textContent = isOn ? "ON" : "OFF";
+            btn.classList.toggle("device-status-on", isOn);
+            btn.classList.toggle("device-status-off", !isOn);
+
+            const deviceItem = btn.parentElement;
+            const tempControl = deviceItem.querySelector(".temperature-control");
+            const tempDisplay = deviceItem.querySelector(".temperature-display");
+            if (tempControl) tempControl.style.display = isOn ? "flex" : "none";
+            if (tempDisplay) tempDisplay.style.display = isOn ? "block" : "none";
         }
-        if (aiResponseText.includes("settingsPage")) {
-            window.location.href = "../pages/settingPage.html";
-        }
-        if (aiResponseText.includes("devicePage")) {
-            window.location.href = "../pages/devicesPage.html";
+    });
+}
+
+
+function refreshTemperatureDisplay(deviceName, newTemperature) {
+    const buttons = document.querySelectorAll(".device-status-btn");
+    buttons.forEach(btn => {
+        if (btn.dataset.deviceName === deviceName) {
+            const deviceItem = btn.parentElement;
+            const tempDisplay = deviceItem.querySelector(".temperature-display");
+            if (tempDisplay) tempDisplay.textContent = `${String(newTemperature).padStart(2, ' ')}°C`;
         }
     });
 }

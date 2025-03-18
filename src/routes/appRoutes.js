@@ -494,16 +494,20 @@ router.get('/api/devices', async (req, res) => {
 /*
   Update the status of a specific device
 */
+
+
 router.post('/api/update-device', async (req, res) => {
     console.log('[DEBUG] POST /api/update-device -> req.body:', req.body);
-    if (!req.body || typeof req.body.name !== 'string' || typeof req.body.status !== 'boolean') {
-        console.error('[ERROR] Parsing body', error);
-        res.status(400).json({
-            error: "Invalid request format. 'name' must be a string and 'status' must be a boolean."
-        });
+
+
+    if (!req.body || typeof req.body.name !== 'string' || (typeof req.body.status !== 'boolean' && req.body.status !== "true" && req.body.status !== "false")) {
+        console.error('[ERROR] Parsing body:', req.body);
+        return res.status(400).json({ error: "Invalid request format. 'name' must be a string and 'status' must be a boolean or a valid string ('true'/'false')." });
     }
 
-    const { name, status } = req.body;
+
+    const name = req.body.name;
+    const status = req.body.status === "true" || req.body.status === true;
 
     try {
         // Check if user has permission to delete devices
@@ -512,24 +516,25 @@ router.post('/api/update-device', async (req, res) => {
         //     console.log(`[DEBUG] Permission denied for user ${userId}`);
         //     return res.status(403).json({ success: false, message: 'Permission denied' });
         // }
-
         const updatedDevice = await Device.findOneAndUpdate(
             { device_name: name },
             { status: status },
             { new: true }
         );
+
         if (!updatedDevice) {
             console.log(`[DEBUG] Device not found with name: ${name}`);
             return res.status(404).json({ error: 'Device not found' });
         }
+
         console.log(`[DEBUG] Updated device '${name}' status to: ${status}`);
-        res.json({ success: true, updatedDevice });
+        return res.json({ success: true, updatedDevice });
+
     } catch (error) {
         console.error('[ERROR] Updating device status in MongoDB ->', error);
-        res.status(500).json({ error: 'Server error while updating device status' });
+        return res.status(500).json({ error: 'Server error while updating device status' });
     }
 });
-
 /*
     Update the temperature of a specific AC device
 */
