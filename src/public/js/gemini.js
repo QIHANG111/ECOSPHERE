@@ -57,26 +57,28 @@ document.addEventListener("DOMContentLoaded", function () {
                     deviceItem.classList.add("hBar");
 
                     const nameSpan = document.createElement("span");
-                    nameSpan.textContent = device.name;
+                    nameSpan.textContent = device.device_name;
                     nameSpan.style.marginRight = "10px";
 
-                    // Create status button instead of switch
+                    const isOn = device.status === "true";
+
                     const statusBtn = document.createElement("button");
                     statusBtn.classList.add("device-status-btn");
-                    if (device.status) {
+                    statusBtn.dataset.deviceName = device.device_name;
+
+                    if (isOn) {
                         statusBtn.classList.add("device-status-on");
                         statusBtn.textContent = "ON";
                     } else {
                         statusBtn.classList.add("device-status-off");
                         statusBtn.textContent = "OFF";
                     }
-                    statusBtn.dataset.deviceName = device.name;
+                    // statusBtn.dataset.deviceName = device.device_name;
 
                     statusBtn.addEventListener("click", function () {
-                        const newStatus = !device.status;
-                        updateDeviceStatus(device.name, newStatus);
-                        
-                        // Update button appearance
+                        const newStatus = !isOn;
+                        updateDeviceStatus(device.device_name, newStatus);
+
                         if (newStatus) {
                             statusBtn.classList.remove("device-status-off");
                             statusBtn.classList.add("device-status-on");
@@ -86,69 +88,67 @@ document.addEventListener("DOMContentLoaded", function () {
                             statusBtn.classList.add("device-status-off");
                             statusBtn.textContent = "OFF";
                         }
-                        
-                        // Show/hide temperature controls
-                        if (device.type === "AC") {
-                            tempControlContainer.style.display = newStatus ? "flex" : "none";
-                            tempDisplay.style.display = newStatus ? "block" : "none";
+
+                        device.status = newStatus.toString();
+                    });
+
+
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.textContent = "delete";
+                    deleteBtn.classList.add("delete-btn");
+                    deleteBtn.dataset.deviceId = device._id;
+
+                    deleteBtn.addEventListener("click", function () {
+                        if (confirm(`Are you sure? Delete  "${device.device_name}"`)) {
+                            deleteDevice(device._id);
                         }
-                        
-                        device.status = newStatus;
                     });
 
                     deviceItem.appendChild(nameSpan);
                     deviceItem.appendChild(statusBtn);
+                    // deviceItem.appendChild(deleteBtn);
                     deviceList.appendChild(deviceItem);
-                    
-                    // Add temperature controls for AC devices
-                    if (device.type === "AC") {
+
+
+                    if (device.device_type === "AC") {
                         const tempControlContainer = document.createElement("div");
                         tempControlContainer.classList.add("temperature-control");
                         tempControlContainer.style.display = device.status ? "flex" : "none";
-                        
-                        // Temperature display
+
+
                         const tempDisplay = document.createElement("div");
                         tempDisplay.classList.add("temperature-display");
-                        // Format temperature to always show 2 digits
                         tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
-                        
-                        // Decrease temperature button
+
+
                         const decreaseBtn = document.createElement("button");
                         decreaseBtn.classList.add("temp-btn");
                         decreaseBtn.textContent = "−";
                         decreaseBtn.addEventListener("click", function() {
                             if (device.temperature > 16) {
                                 device.temperature -= 1;
-                                updateDeviceTemperature(device.name, device.temperature);
-                                // Format temperature to always show 2 digits
+                                updateDeviceTemperature(device.device_name, device.temperature);
                                 tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
                             }
                         });
-                        
-                        // Increase temperature button
+
+
                         const increaseBtn = document.createElement("button");
                         increaseBtn.classList.add("temp-btn");
                         increaseBtn.textContent = "+";
                         increaseBtn.addEventListener("click", function() {
                             if (device.temperature < 30) {
                                 device.temperature += 1;
-                                updateDeviceTemperature(device.name, device.temperature);
-                                // Format temperature to always show 2 digits
+                                updateDeviceTemperature(device.device_name, device.temperature);
                                 tempDisplay.textContent = `${String(device.temperature).padStart(2, ' ')}°C`;
                             }
                         });
-                        
-                        // Add elements in the correct order
-                        // Add decrease and increase buttons to the control container first (before temperature display)
+
                         tempControlContainer.appendChild(decreaseBtn);
                         tempControlContainer.appendChild(increaseBtn);
-                        
-                        // Add temperature display directly to the device item for absolute positioning
                         deviceItem.appendChild(tempDisplay);
-                        // Set initial display based on device status
                         tempDisplay.style.display = device.status ? "block" : "none";
-                        
-                        // Add temperature controls to device item
                         deviceItem.appendChild(tempControlContainer);
                     }
                 });
@@ -158,32 +158,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateDeviceStatus(deviceName, newStatus) {
         fetch("/api/update-device", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: deviceName, status: newStatus })
+            method: "POST", // POST
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name: deviceName, status: newStatus }) // 适配后端 API 参数
         })
             .then(response => response.json())
             .then(data => {
-                console.log("Updated:", data);
-                // Immediately reload devices to update UI
-                loadDevices();
+                if (!data.success) {
+                    console.error("Failed to update device status:", data.message);
+                }
             })
-            .catch(error => console.error("Error updating device:", error));
+            .catch(error => console.error("Error updating device status:", error));
     }
-    function updateDeviceTemperature(deviceName, temperature) {
-        fetch("/api/update-temperature", {
+
+    function updateDeviceTemperature(deviceName, newTemperature) {
+        fetch("/api/update-device", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: deviceName, temperature: temperature })
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name: deviceName, temperature: newTemperature })
         })
             .then(response => response.json())
             .then(data => {
-                console.log(`Updated ${deviceName} temperature to:`, temperature);
-                // Immediately reload devices to update UI
-                loadDevices();
+                if (!data.success) {
+                    console.error("Failed to update device temperature:", data.message);
+                }
             })
-            .catch(error => console.error("Error updating temperature:", error));
+            .catch(error => console.error("Error updating device temperature:", error));
     }
+
+    function deleteDevice(deviceId) {
+        fetch(`/api/device/${deviceId}`, {
+            method: "DELETE"
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Device deleted successfully");
+                    loadDevices();
+                } else {
+                    console.error("Failed to delete device:", data.message);
+                }
+            })
+            .catch(error => console.error("Error deleting device:", error));
+    }
+
+    loadDevices();
 });
 
 // AI Theme & Device Control
