@@ -65,13 +65,8 @@ router.get('/api/users', async (req, res) => {
 */
 router.post('/api/signup', async (req, res) => {
     try {
-        let { name, email, phone, password, role_id, parentUser, user_avatar } = req.body;
+        let { name, email, phone, password, parentUser, user_avatar } = req.body;
         console.log("[DEBUG] Received signup data:", req.body);
-
-        if (!role_id || role_id.length !== 24) {
-            console.error("[ERROR] Invalid role_id:", role_id);
-            return res.status(400).json({ message: "Invalid role_id" });
-        }
 
         if (!phone) {
             phone = "1234567890";
@@ -80,37 +75,44 @@ router.post('/api/signup', async (req, res) => {
         if (typeof user_avatar === "undefined" || user_avatar === null) {
             user_avatar = 1;
         }
-        const role = await Role.findById(role_id);
-        if (!role) {
-            console.error("[ERROR] Role ID not found:", role_id);
-            return res.status(400).json({ message: "Role ID not found" });
-        }
-        console.log("[DEBUG] Role ID is valid, proceeding with signup...");
 
+        // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: "Email already registered" });
         }
+
+        // Automatically assign the "Home Owner" role
+        const role = await Role.findOne({ role_name: "Home Owner" });
+        if (!role) {
+            console.error("[ERROR] Home Owner role not found in database.");
+            return res.status(500).json({ message: "Home Owner role not found" });
+        }
+        console.log("[DEBUG] Found Home Owner role id:", role._id);
+
+        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log("[DEBUG] Hashed password:", hashedPassword);
+
+        // Create new user with the role _id from the "Home Owner" role
         const newUser = new User({
             name,
             email,
             phone,
             hashed_password: hashedPassword,
-            role_id: ObjectId('67d780dc013adb2b52309ea9'),
+            role_id: role._id,
             parentUser: parentUser || null,
             user_avatar
         });
 
         await newUser.save();
         res.status(201).json({ message: "User registered successfully", data: newUser });
-
     } catch (error) {
         console.error("[ERROR] POST /api/signup ->", error);
         res.status(500).json({ message: "Server error" });
     }
 });
+
 
 router.get('/api/getRoleId/:roleName', async (req, res) => {
     try {
@@ -274,8 +276,8 @@ router.post('/api/subusers', async (req, res) => {
     }
 });
 
-const mainRole = 'manager';
-const subRole = 'dweller';
+const mainRole = 'Home Owner';
+const subRole = 'Home Dweller';
 
 
 /*

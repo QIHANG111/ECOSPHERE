@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            const roleResponse = await fetch("/api/getRoleId/manager");
+            const roleResponse = await fetch("/api/getRoleId/Home Owner");
             const roleResult = await roleResponse.json();
 
             if (!roleResponse.ok || !roleResult.role_id) {
