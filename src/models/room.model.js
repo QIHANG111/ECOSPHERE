@@ -6,11 +6,15 @@ const roomSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    room_type: { //master, toilet, etc
+    room_type: {
         type: String,
         required: true,
         trim: true
-    }
+    },
+    devices: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Device'
+    }]
 });
 
 const Room = mongoose.model('Room', roomSchema);
