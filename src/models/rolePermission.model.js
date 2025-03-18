@@ -15,5 +15,7 @@ const rolePermissionSchema = new mongoose.Schema({
     }
 });
 
+rolePermissionSchema.index({ role_id: 1, permission_id: 1 }, { unique: true });
+
 const RolePermission = mongoose.model('RolePermission', rolePermissionSchema);
 export default RolePermission;
