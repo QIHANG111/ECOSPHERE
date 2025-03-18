@@ -11,10 +11,16 @@ import jwt from 'jsonwebtoken';
 import { error } from 'node:console';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
+import path from 'node:path';
 
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
 // And have SECRET_KEY either from env or config
+
+/*notes
+-finish building APIs requested by yanzi
+-build api for houses - add house at signup, add house at user settings, delete house, get all houses under a user, get list of houses in mongodb
+-build api for password recovery(forgot password) */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

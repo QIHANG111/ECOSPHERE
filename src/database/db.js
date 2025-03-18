@@ -70,162 +70,112 @@ export const insertData = async (count = 365) => {
 };
 
 
-// const permissions = [
-//     "addDevice",
-//     "deleteDevice",
-//     "editDevice",
-//     "viewReport",
-//     "addRoom",
-//     "deleteRoom",
-//     "adjustTemp",
-//     "switchOn",
-//     "switchOff",
-//     "addUser",
-//     "deleteUser",
-//     "changeSettings",
-//     "updateSystem",
-//     "backupSystem"
-// ];
+const permissions = [
+    "addDevice",
+    "deleteDevice",
+    "editDevice",
+    "viewReport",
+    "addRoom",
+    "deleteRoom",
+    "adjustTemp",
+    "switchOn",
+    "switchOff",
+    "addUser",
+    "deleteUser",
+    "changeSettings",
+    "updateSystem",
+    "adjustBrightness",
+    "backupSystem"
+];
 
-// const roles = [
-//     { role_name: "Home Dweller" },  // Basic user
-//     { role_name: "Home Owner" },    // Home owner with full control
-//     { role_name: "Developer" }      // Developer for system management
-// ];
+const roles = [
+    { role_name: "Home Dweller" },  // Basic user
+    { role_name: "Home Owner" },    // Home owner with full control
+    { role_name: "Developer" }      // Developer for system management
+];
 
-// const rolePermissionsMapping = {
-//     "Home Dweller": ["switchOff", "viewReport"],
-//     "Home Owner": ["switchOn", "switchOff", "adjustTemp", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "editDevice", "changeSettings"],
-//     "Developer": ["switchOn", "switchOff", "adjustTemp", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "editDevice", "changeSettings", "updateSystem", "backupSystem"]
-// };
+const rolePermissionsMapping = {
+    "Home Dweller": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", ],
+    "Home Owner": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "changeSettings"],
+    "Developer": ["viewReport", "updateSystem", "backupSystem"]
+};
 
-// export async function addPermissions() {
-//     try {
-//         console.log('[DEBUG] Starting permissions and role-permission mapping insertion...');
+export async function clearRolePermissions() {
+    try {
+        console.log("[DEBUG] Clearing all rolePermission documents...");
+        const result = await RolePermission.deleteMany({});
+        console.log(`[DEBUG] Successfully cleared ${result.deletedCount} rolePermission documents.`);
+    } catch (error) {
+        console.error("[ERROR] Error clearing rolePermission documents:", error);
+    }
+}
 
-
-//         for (const permission of permissions) {
-//             await Permission.updateOne(
-//                 { name: permission },
-//                 { $setOnInsert: { name: permission } },
-//                 { upsert: true }
-//             );
-//         }
-//         console.log('[DEBUG] Permissions inserted (new ones only).');
-
-
-//         const existingRoles = await Role.find();
-//         const existingPermissions = await Permission.find();
-
-
-//         const roleMap = Object.fromEntries(existingRoles.map(r => [r.role_name, r._id]));
-//         const permissionMap = Object.fromEntries(existingPermissions.map(p => [p.name, p._id]));
-
-
-//         for (const [roleName, permissionList] of Object.entries(rolePermissionsMapping)) {
-//             const roleId = roleMap[roleName];
-//             if (!roleId) {
-//                 console.warn(`[WARNING] Role '${roleName}' does not exist, skipping.`);
-//                 continue;
-//             }
-
-//             for (const permissionName of permissionList) {
-//                 const permissionId = permissionMap[permissionName];
-//                 if (!permissionId) {
-//                     console.warn(`[WARNING] Permission '${permissionName}' does not exist, skipping.`);
-//                     continue;
-//                 }
-
-//                 await RolePermission.updateOne(
-//                     { role_id: roleId, permission_id: permissionId },
-//                     { $setOnInsert: { role_id: roleId, permission_id: permissionId } },
-//                     { upsert: true }
-//                 );
-//             }
-//         }
-
-//         console.log("Roles and permissions mapping updated (without modifying roles).");
-//     } catch (error) {
-//         console.error("Error updating permissions and role-permission mappings:", error);
-//     }
-// }
-
-// export async function clearRolePermissions() {
-//     try {
-//         console.log("[DEBUG] Clearing all rolePermission documents...");
-//         const result = await RolePermission.deleteMany({});
-//         console.log(`[DEBUG] Successfully cleared ${result.deletedCount} rolePermission documents.`);
-//     } catch (error) {
-//         console.error("[ERROR] Error clearing rolePermission documents:", error);
-//     }
-// }
-
-// export async function addPermissions() {
-//     try {
-//         console.log('[DEBUG] Starting permissions, roles, and role-permission mapping insertion...');
+export async function addPermissions() {
+    try {
+        console.log('[DEBUG] Starting permissions, roles, and role-permission mapping insertion...');
         
-//         // Clear existing rolePermission documents first
-//         await clearRolePermissions();
+        // Clear existing rolePermission documents first
+        await clearRolePermissions();
 
-//         // Insert permissions
-//         for (const permission of permissions) {
-//             await Permission.updateOne(
-//                 { name: permission },
-//                 { $setOnInsert: { name: permission } },
-//                 { upsert: true }
-//             );
-//             console.log(`[DEBUG] Processed permission: ${permission}`);
-//         }
-//         console.log('[DEBUG] Permissions inserted (new ones only).');
+        // Insert permissions
+        for (const permission of permissions) {
+            await Permission.updateOne(
+                { name: permission },
+                { $setOnInsert: { name: permission } },
+                { upsert: true }
+            );
+            console.log(`[DEBUG] Processed permission: ${permission}`);
+        }
+        console.log('[DEBUG] Permissions inserted (new ones only).');
 
-//         // Insert roles
-//         for (const role of roles) {
-//             await Role.updateOne(
-//                 { role_name: role.role_name },
-//                 { $setOnInsert: role },
-//                 { upsert: true }
-//             );
-//             console.log(`[DEBUG] Processed role: ${role.role_name}`);
-//         }
-//         console.log('[DEBUG] Roles inserted (new ones only).');
+        // Insert roles
+        for (const role of roles) {
+            await Role.updateOne(
+                { role_name: role.role_name },
+                { $setOnInsert: role },
+                { upsert: true }
+            );
+            console.log(`[DEBUG] Processed role: ${role.role_name}`);
+        }
+        console.log('[DEBUG] Roles inserted (new ones only).');
 
-//         // Fetch the updated roles and permissions from the database
-//         const existingRoles = await Role.find();
-//         const existingPermissions = await Permission.find();
+        // Fetch the updated roles and permissions from the database
+        const existingRoles = await Role.find();
+        const existingPermissions = await Permission.find();
 
-//         // Build maps for quick lookup
-//         const roleMap = Object.fromEntries(existingRoles.map(r => [r.role_name, r._id]));
-//         const permissionMap = Object.fromEntries(existingPermissions.map(p => [p.name, p._id]));
+        // Build maps for quick lookup
+        const roleMap = Object.fromEntries(existingRoles.map(r => [r.role_name, r._id]));
+        const permissionMap = Object.fromEntries(existingPermissions.map(p => [p.name, p._id]));
 
-//         // Insert role-permission mappings
-//         for (const [roleName, permissionList] of Object.entries(rolePermissionsMapping)) {
-//             const roleId = roleMap[roleName];
-//             if (!roleId) {
-//                 console.warn(`[WARNING] Role '${roleName}' does not exist, skipping.`);
-//                 continue;
-//             }
+        // Insert role-permission mappings
+        for (const [roleName, permissionList] of Object.entries(rolePermissionsMapping)) {
+            const roleId = roleMap[roleName];
+            if (!roleId) {
+                console.warn(`[WARNING] Role '${roleName}' does not exist, skipping.`);
+                continue;
+            }
 
-//             for (const permissionName of permissionList) {
-//                 const permissionId = permissionMap[permissionName];
-//                 if (!permissionId) {
-//                     console.warn(`[WARNING] Permission '${permissionName}' does not exist, skipping.`);
-//                     continue;
-//                 }
+            for (const permissionName of permissionList) {
+                const permissionId = permissionMap[permissionName];
+                if (!permissionId) {
+                    console.warn(`[WARNING] Permission '${permissionName}' does not exist, skipping.`);
+                    continue;
+                }
 
-//                 await RolePermission.updateOne(
-//                     { role_id: roleId, permission_id: permissionId },
-//                     { $setOnInsert: { role_id: roleId, permission_id: permissionId } },
-//                     { upsert: true }
-//                 );
-//                 console.log(`[DEBUG] Mapped role '${roleName}' to permission '${permissionName}'.`);
-//             }
-//         }
+                await RolePermission.updateOne(
+                    { role_id: roleId, permission_id: permissionId },
+                    { $setOnInsert: { role_id: roleId, permission_id: permissionId } },
+                    { upsert: true }
+                );
+                console.log(`[DEBUG] Mapped role '${roleName}' to permission '${permissionName}'.`);
+            }
+        }
 
-//         console.log("[DEBUG] Roles and permissions mapping updated successfully.");
-//     } catch (error) {
-//         console.error("Error updating permissions and role-permission mappings:", error);
-//     }
-// }
+        console.log("[DEBUG] Roles and permissions mapping updated successfully.");
+    } catch (error) {
+        console.error("Error updating permissions and role-permission mappings:", error);
+    }
+}
 
 /** 
  * Optional function to close the connection.
