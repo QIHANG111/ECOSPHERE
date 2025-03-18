@@ -98,7 +98,7 @@ router.post('/api/signup', async (req, res) => {
             email,
             phone,
             hashed_password: hashedPassword,
-            role_id: role._id,
+            role_id: ObjectId('67d780dc013adb2b52309ea9'),
             parentUser: parentUser || null,
             user_avatar
         });
