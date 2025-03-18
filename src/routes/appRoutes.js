@@ -20,7 +20,17 @@ import path from 'node:path';
 /*notes
 -finish building APIs requested by yanzi
 -build api for houses - add house at signup, add house at user settings, delete house, get all houses under a user, get list of houses in mongodb
--build api for password recovery(forgot password) */
+-build api for password recovery(forgot password) 
+-edit add room to add the room to associated house id
+-edit the add device to append the deviceid to the array of devices in the associated room 
+-build automation APIs
+-API for push notifications and email alerts
+-api for device energy usage(not overall)
+-change charting format for user experience -for weekly, every day in the week
+                                            -for monthly, every day in the month/week in the month
+                                            -for year, every month in the year(showing all 365 days hurts the eye?)
+                                            -maybe can change get energy usage api to cater to type of user, if owner, every day, if dweller then simplified 
+-add room api doesnt add it to the database, modify*/
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
