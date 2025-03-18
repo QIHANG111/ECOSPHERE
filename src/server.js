@@ -1,7 +1,7 @@
 // server.js
 import dotenv from 'dotenv';
 import app from './app.js';
-import { connectDB, insertData/*addPermissions*/ } from './database/db.js';
+import { connectDB, insertData, addPermissions } from './database/db.js';
 dotenv.config();
 
 const PORT = process.env.PORT || 4000;
