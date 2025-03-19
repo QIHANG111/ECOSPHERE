@@ -35,7 +35,8 @@
             "type": "light",
             "category": "Lighting",
             "icon": "../icons/lighting/light-svgrepo-com.svg",
-            "status": false
+            "status": false,
+            "methods": ["turnOn", "turnOff", "adjustBrightness"]
         },
 
     {
@@ -44,7 +45,8 @@
         "type": "light",
         "category": "Lighting",
         "icon": "../icons/lighting/desk-lamp-lamp.svg",
-        "status": false
+        "status": false,
+        "methods": ["turnOn", "turnOff", "adjustBrightness"]
     },
 
     {
@@ -53,7 +55,8 @@
         "type": "light",
         "category": "Lighting",
         "icon": "../icons/lighting/ceiling-light.svg",
-        "status": false
+        "status": false,
+        "methods": ["turnOn", "turnOff", "adjustBrightness"]
     },
 
     {
@@ -62,7 +65,8 @@
         "type": "light",
         "category": "Lighting",
         "icon": "../icons/lighting/energy-saving-light-bulbs.svg",
-        "status": false
+        "status": false,
+        "methods": ["turnOn", "turnOff", "adjustBrightness"]
     },
 
         {
@@ -71,7 +75,8 @@
             "type": "security",
             "category": "household-security",
             "icon": "../icons/household-security/door-lock-svgrepo-com.svg",
-            "status": true
+            "status": true,
+            "methods": ["lock", "unlock", "alarm"]
         },
 
     {
@@ -80,7 +85,8 @@
         "type": "security",
         "category": "household-security",
         "icon": "../icons/household-security/cctv.svg",
-        "status": true
+        "status": true,
+        "methods": ["lock", "unlock", "alarm"]
     },
 
     {
@@ -89,7 +95,8 @@
         "type": "security",
         "category": "household-security",
         "icon": "../icons/household-security/doorbell.svg",
-        "status": true
+        "status": true,
+        "methods": ["lock", "unlock", "alarm"]
     },
 
     {
@@ -98,7 +105,8 @@
         "type": "security",
         "category": "household-security",
         "icon": "../icons/household-security/safebox-2.svg",
-        "status": true
+        "status": true,
+        "methods": ["lock", "unlock", "alarm"]
     },
 
 
@@ -117,7 +125,8 @@
         "type": "Air",
         "category": "air-treatment",
         "icon": "../icons/air-treatment/heater-heat.svg",
-        "status": false
+        "status": false,
+        "methods": ["turnOn", "turnOff", "adjustTemperature", "adjustFanSpeed"]
     },
 
     {
@@ -126,7 +135,8 @@
         "type": "Air",
         "category": "air-treatment",
         "icon": "../icons/air-treatment/humidifier.svg",
-        "status": false
+        "status": false,
+        "methods": ["turnOn", "turnOff", "adjustTemperature", "adjustFanSpeed"]
     },
 
 
@@ -136,7 +146,8 @@
         "type": "Air",
         "category": "air-treatment",
         "icon": "../icons/air-treatment/fan-2.svg",
-        "status": false
+        "status": false,
+        "methods": ["turnOn", "turnOff", "adjustTemperature", "adjustFanSpeed"]
     },
 
 
@@ -146,7 +157,8 @@
             "type": "switch",
             "category": "power-switch",
             "icon": "../icons/power-switch/socket-i-svgrepo-com.svg",
-            "status": true
+            "status": true,
+            "methods": ["turnOn", "turnOff"]
         },
 
     {
@@ -155,7 +167,8 @@
         "type": "switch",
         "category": "power-switch",
         "icon": "../icons/power-switch/switch-off-switch.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff"]
     },
 
     {
@@ -164,17 +177,11 @@
         "type": "switch",
         "category": "power-switch",
         "icon": "../icons/power-switch/remote-control.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff"]
     },
 
-    {
-        "id": "plug-outlet1",
-        "name": "Plug Outlet",
-        "type": "switch",
-        "category": "power-switch",
-        "icon": "../icons/power-switch/plug-outlet-1.svg",
-        "status": true
-    },
+
 
     {
         "id": "Cook-pot1",
@@ -182,7 +189,9 @@
         "type": "kitchen",
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/cooking-pot-outline-with-cover.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setTemperature", "setTimer"]
+
     },
 
     {
@@ -191,7 +200,8 @@
         "type": "kitchen",
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/fridge.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setTemperature", "setTimer"]
     },
 
     {
@@ -200,7 +210,8 @@
         "type": "kitchen",
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/oven-bake.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setTemperature", "setTimer"]
     },
 
     {
@@ -209,7 +220,8 @@
         "type": "kitchen",
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/microwave-oven-microwave.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setTemperature", "setTimer"]
     },
 
 
@@ -219,7 +231,8 @@
         "type": "kitchen",
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/kettle.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setTemperature", "setTimer"]
     },
 
     {
@@ -228,7 +241,8 @@
         "type": "kitchen",
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/dishwasher-2.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setTemperature", "setTimer"]
     },
 
     {
@@ -237,35 +251,10 @@
         "type": "kitchen",
         "category": "kitchen-electronics",
         "icon": "../icons/kitchen-electronics/stove.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setTemperature", "setTimer"]
     },
 
-    {
-        "id": "watch1",
-        "name": "Watch",
-        "type": "Health",
-        "category": "health",
-        "icon": "../icons/health/watch-status.svg",
-        "status": true
-    },
-
-    {
-        "id": "scale1",
-        "name": "Weighing Scale",
-        "type": "Health",
-        "category": "health",
-        "icon": "../icons/health/weight-scale-1.svg",
-        "status": true
-    },
-
-    {
-        "id": "Bike1",
-        "name": "Smart Bike",
-        "type": "Health",
-        "category": "health",
-        "icon": "../icons/health/bicycle-man.svg",
-        "status": true
-    },
 
     {
         "id": "Washer1",
@@ -273,7 +262,9 @@
         "type": "cleaning",
         "category": "cleaning-appliances",
         "icon": "../icons/cleaning-appliances/washing-machine.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setMode"]
+
     },
 
     {
@@ -282,7 +273,9 @@
         "type": "cleaning",
         "category": "cleaning-appliances",
         "icon": "../icons/cleaning-appliances/vacuum-robot.svg",
-        "status": true
+        "status": true,
+        "methods": ["turnOn", "turnOff", "setMode"]
+
     }
 ]
 
