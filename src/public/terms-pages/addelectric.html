@@ -102,6 +102,164 @@
             color: #333;
         }
 
+        .device-actions {
+            display: flex;
+            align-items: center; /* 垂直居中 */
+            gap: 40px; /* 设置按钮和图标之间的间距 */
+            margin-top: 10px;
+        }
+
+        .add-button {
+            width: 70px;
+            height: 40px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex-shrink: 0; /* 防止按钮被压缩 */
+            margin-left: 20px;
+        }
+
+        .setting-container {
+            position: relative;
+            flex-shrink: 0; /* 防止图标被压缩 */
+        }
+
+        .setting-icon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            position: relative;
+            top: 10px; /* 向下移动 5px */
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .dropdown-menu .settings-option {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .dropdown-menu .settings-option:hover {
+            background-color: #f4f4f4;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            width: 240px;
+            z-index: 1;
+        }
+
+        .settings-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+
+        /* 滑动开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* 温度调节按钮样式 */
+        .temperature-control, .fan-speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .temp-btn, .speed-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .temp-btn:hover, .speed-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .temp-value, .speed-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
@@ -140,11 +298,49 @@
     <div class="category-title">Household Security</div>
     <div class="category-divider"></div>
     <div class="device-container">
+
         <div class="device-card">
             <img src="../icons/household-security/door-lock-svgrepo-com.svg" alt="Smart Door Lock">
             <h3>Smart Door Lock</h3>
-            <button onclick="showAddModal('Smart Door Lock')">Add</button>
+            <div class="device-actions">
+                <button class="add-button" onclick="showAddModal('Smart Door Lock')">Add</button>
+                <div class="setting-container">
+                    <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon" onclick="toggleDropdown(this)">
+                    <div class="dropdown-menu">
+                        <!-- 滑动开关按钮 -->
+                        <div class="settings-option">
+                            <span>Power</span>
+                            <label class="switch">
+                                <input type="checkbox" onclick="event.stopPropagation()">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <!-- 温度上下调节按钮 -->
+                        <div class="settings-option">
+                            <span>Temperature</span>
+                            <div class="temperature-control">
+                                <button class="temp-btn" onclick="adjustTemperature(-1); event.stopPropagation()">-</button>
+                                <span class="temp-value">20</span>°C
+                                <button class="temp-btn" onclick="adjustTemperature(1); event.stopPropagation()">+</button>
+                            </div>
+                        </div>
+
+                        <!-- 调节风速按钮 -->
+                        <div class="settings-option">
+                            <span>Fan Speed</span>
+                            <div class="fan-speed-control">
+                                <button class="speed-btn" onclick="adjustFanSpeed(-1); event.stopPropagation()">-</button>
+                                <span class="speed-value">1</span>
+                                <button class="speed-btn" onclick="adjustFanSpeed(1); event.stopPropagation()">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
+
         <div class="device-card">
             <img src="../icons/household-security/cctv.svg" alt="CCTV">
             <h3>CCTV</h3>
@@ -279,67 +475,67 @@
 <!-- Modal -->
 <div id="addModal" class="modal">
     <div class="modal-content">
-        <p>Sure to Add？</p>
+        <p>Sure to Add?</p>
         <button class="confirm" onclick="confirmAdd()">Yes</button>
         <button class="cancel" onclick="cancelAdd()">Cancel</button>
     </div>
 </div>
 
 <script>
-    function addDevice(deviceId) {
-        // Implement the logic to add the device
-        console.log(`Adding device: ${deviceId}`);
-        // You can add AJAX calls or other logic here to add the device
-    }
+    let currentDevice = null;
 
-    let currentDeviceId = null;
-
-    function showAddModal(deviceId) {
-        currentDeviceId = deviceId;
+    function showAddModal(deviceId, deviceName, deviceIcon) {
+        currentDevice = { id: deviceId, name: deviceName, icon: deviceIcon };
         document.getElementById('addModal').style.display = 'flex';
     }
 
-async function confirmAdd() {
-    if (!currentDeviceId) {
-        alert("Device ID is empty, cannot add!");
-        return;
-    }
-
-    console.log(`🚀 Adding device: ${currentDeviceId}`);
-
-    try {
-        const response = await fetch("http://localhost:4000/api/device", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                device_name: currentDeviceId,
-                device_type: "unknown",
-                status: true
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+    async function confirmAdd() {
+        if (!currentDevice) {
+            alert("Device ID is empty, cannot add!");
+            return;
         }
 
-        const data = await response.json();
-        console.log("📩 Server response:", data);
+        console.log(`🚀 Adding device: ${currentDevice.id}`);
 
-        if (data.success) {
-            alert(`✅ Device ${data.data.device_name} added successfully!`);
-            window.location.href = "devicePage.html";
-        } else {
-            alert(`❌ Failed to add: ${data.message}`);
+        try {
+            const response = await fetch("http://localhost:4000/api/device", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    device_name: currentDevice.id,
+                    device_type: "unknown",
+                    status: true
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("📩 Server response:", data);
+
+            if (data.success) {
+                alert(`✅ Device ${data.data.device_name} added successfully!`);
+
+                // 将设备存入 localStorage
+                let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
+                if (!devices.some(device => device.id === currentDevice.id)) {
+                    devices.push(currentDevice);
+                    localStorage.setItem("savedDevices", JSON.stringify(devices));
+                }
+
+                window.location.href = "../pages/devicesPage.html"; // 跳转到设备页面
+            } else {
+                alert(`❌ Failed to add: ${data.message}`);
+            }
+        } catch (error) {
+            console.error("❌ Error adding device:", error);
+            alert("❌ Error adding device, please check the console!");
         }
-    } catch (error) {
-        console.error("❌ Error adding device:", error);
-        alert("❌ Error adding device, please check the console!");
+
+        closeModal();
     }
-
-    closeModal();
-}
-
-
 
     function cancelAdd() {
         closeModal();
@@ -347,9 +543,45 @@ async function confirmAdd() {
 
     function closeModal() {
         document.getElementById('addModal').style.display = 'none';
-        currentDeviceId = null;
+        currentDevice = null;
     }
 
+    // 下拉菜单
+    function toggleDropdown(element) {
+        const dropdownMenu = element.nextElementSibling;
+        document.querySelectorAll(".dropdown-menu").forEach(menu => {
+            if (menu !== dropdownMenu) menu.style.display = "none";
+        });
+        dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+    }
+
+    // 关闭下拉菜单（当点击页面其他地方）
+    window.addEventListener("click", function (event) {
+        if (!event.target.matches('.setting-icon') && !event.target.closest('.dropdown-menu')) {
+            document.querySelectorAll(".dropdown-menu").forEach(menu => menu.style.display = "none");
+        }
+    });
+
+    // 温度调节
+    function adjustTemperature(change) {
+        const tempValue = document.querySelector('.temp-value');
+        let currentTemp = parseInt(tempValue.textContent);
+        currentTemp += change;
+        if (currentTemp < 10) currentTemp = 10; // 最低温度
+        if (currentTemp > 30) currentTemp = 30; // 最高温度
+        tempValue.textContent = currentTemp;
+    }
+
+    // 风速调节
+    function adjustFanSpeed(change) {
+        const speedValue = document.querySelector('.speed-value');
+        let currentSpeed = parseInt(speedValue.textContent);
+        currentSpeed += change;
+        if (currentSpeed < 1) currentSpeed = 1; // 最低风速
+        if (currentSpeed > 5) currentSpeed = 5; // 最高风速
+        speedValue.textContent = currentSpeed;
+    }
 </script>
+
 </body>
 </html>

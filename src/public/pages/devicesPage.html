@@ -572,6 +572,12 @@
     </div>
 
 
+
+
+
+
+
+
 </div>
 <script src="../js/devicesPage.js"></script>
 <script>
@@ -706,6 +712,32 @@
     // reset furniture
     renderFurniture();
 
+
+    function loadDevices() {
+        let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
+        let container = document.getElementById("furnitureContainer"); // ✅ 修改目标容器
+        container.innerHTML = devices.length ? "" : "<p>No devices added yet.</p>";
+
+        devices.forEach(device => {
+            let deviceElement = document.createElement("div");
+            deviceElement.classList.add("device-card");
+            deviceElement.innerHTML = `
+            <img src="${device.icon}" alt="${device.name}">
+            <h3>${device.name}</h3>
+            <button onclick="removeDevice('${device.id}')">Remove</button>
+        `;
+            container.appendChild(deviceElement);
+        });
+    }
+
+    function removeDevice(deviceId) {
+        let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
+        devices = devices.filter(device => device.id !== deviceId);
+        localStorage.setItem("savedDevices", JSON.stringify(devices));
+        loadDevices(); // 重新渲染设备列表
+    }
+
+    window.onload = loadDevices;
 
 
 
