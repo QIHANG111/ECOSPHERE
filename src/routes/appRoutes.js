@@ -4,6 +4,7 @@ import User from '../models/user.model.js';
 import Device from '../models/device.model.js';
 import bcrypt from 'bcryptjs';
 import Room from '../models/room.model.js';
+import House from '../models/house.model.js';
 import mongoose from 'mongoose';
 import Role from '../models/role.model.js'
 import RolePermission from '../models/rolePermission.model.js';
@@ -620,9 +621,51 @@ router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
     }
 });
 
-// ✅ 这里加上新的 API，避免重复 `/api/update-temperature`
-router.get("/api/devices", (req, res) => {
-    res.json(deviceController.getAllDevices());
+/*
+  get all devices under a room
+*/
+router.get('/api/rooms/:roomId/devices', async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        console.log(`[DEBUG] GET /api/rooms/${roomId}/devices -> Fetching devices for room: ${roomId}`);
+
+        const devices = await Device.find({ room: roomId });
+        console.log(`[DEBUG] Found ${devices.length} devices for room ${roomId}`);
+
+        res.status(200).json({ success: true, devices });
+    } catch (error) {
+        console.error('[ERROR] GET /api/rooms/:roomId/devices ->', error);
+        res.status(500).json({ success: false, message: "Server error while fetching devices" });
+    }
+});
+
+/*
+  get all devices under a house
+*/
+router.get('/api/houses/:houseId/devices', async (req, res) => {
+    try {
+        const { houseId } = req.params;
+        console.log(`[DEBUG] GET /api/houses/${houseId}/devices -> Fetching devices for house: ${houseId}`);
+        
+        const house = await House.findById(houseId);
+        if (!house) {
+            console.log(`[DEBUG] House not found: ${houseId}`);
+            return res.status(404).json({ success: false, message: "House not found" });
+        }
+        
+        if (!house.rooms || house.rooms.length === 0) {
+            console.log(`[DEBUG] No rooms found in house: ${houseId}`);
+            return res.status(200).json({ success: true, devices: [] });
+        }
+        
+        const devices = await Device.find({ room: { $in: house.rooms } });
+        console.log(`[DEBUG] Found ${devices.length} devices for house ${houseId}`);
+        
+        res.status(200).json({ success: true, devices });
+    } catch (error) {
+        console.error(`[ERROR] GET /api/houses/:houseId/devices ->`, error);
+        res.status(500).json({ success: false, message: "Server error while fetching house devices" });
+    }
 });
 
 router.get("/api/device/status/:id", (req, res) => {
