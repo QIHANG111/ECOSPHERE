@@ -654,7 +654,7 @@
                  <div class="setting-container">
                      <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon">
                      <div class="dropdown-menu">
-                         <div class="settings-option">Option 1</div>
+                         <div class="settings-option">Option 1</div>e
                          <div class="settings-option">Option 2</div>
                          <div class="settings-option">Option 3</div>
     </div>
@@ -703,85 +703,10 @@
     });
 
 
-
-
     // reset furniture
     renderFurniture();
 
 
-
-
-
-    async function loadDevices() {
-        try {
-            const response = await fetch('/api/user/devices'); // ✅ 获取数据库里的设备
-            if (!response.ok) {
-                throw new Error('Failed to load device data');
-            }
-
-            const devices = await response.json();
-            console.log("Loaded devices:", devices);
-
-            // ✅ 清空旧的 `furnitureContainer`
-            furnitureContainer.innerHTML = "";
-
-            devices.forEach(device => {
-                const box = document.createElement("div");
-                box.classList.add("furniture-box");
-
-                const furnitureItem = document.createElement("div");
-                furnitureItem.classList.add("furniture-item");
-                furnitureItem.innerHTML = `
-                <div class="furniture-icon">
-                    <img src="${device.icon}" alt="${device.device_name}" class="icon-image">
-                </div>
-                <div class="furniture-content">
-                    <div class="furniture-name">${device.device_name}</div>
-                    <div class="setting-container">
-                        <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon">
-                    </div>
-                    <div class="delete-container" onclick="deleteFurniture('${device._id}')">
-                        <div class="delete-button">
-                            <div class="delete-icon">
-                                <img src="../icons/device-page/minus-circle.svg" alt="delete-button">
-                            </div>
-                            <span class="delete-text">Delete</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-                box.appendChild(furnitureItem);
-                furnitureContainer.appendChild(box);
-            });
-
-        } catch (error) {
-            console.error('Error loading device data:', error);
-        }
-    }
-
-    // ✅ 页面加载时自动获取设备
-    document.addEventListener("DOMContentLoaded", loadDevices);
-
-    function deleteFurniture(id) {
-        if (!confirm("Are you sure you want to delete this device?")) return;
-
-        fetch("/api/device/delete", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: id }) // ✅ 发送要删除的设备 ID
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Device deleted successfully!`);
-                    loadDevices(); // ✅ 重新加载设备
-                } else {
-                    alert(`Failed to delete: ${data.message}`);
-                }
-            })
-            .catch(error => console.error("Error deleting device:", error));
-    }
 
 
 
