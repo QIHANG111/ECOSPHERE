@@ -27,10 +27,6 @@ import path from 'node:path';
 -build automation APIs
 -API for push notifications and email alerts
 -api for device energy usage(not overall)
--change charting format for user experience -for weekly, every day in the week
-                                            -for monthly, every day in the month/week in the month
-                                            -for year, every month in the year(showing all 365 days hurts the eye?)
-                                            -maybe can change get energy usage api to cater to type of user, if owner, every day, if dweller then simplified 
 -add room api doesnt add it to the database, modify*/
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,9 +36,6 @@ const __dirname = dirname(__filename);
 const router = express.Router();
 let notifications = [];
 const SECRET_KEY = "your_secret_key";
-
-// Enable JSON body parsing
-router.use(express.json());
 
 /* ------------------------------------------------------------
    Debugging Helper: log the Mongoose connection state
@@ -646,21 +639,21 @@ router.get('/api/houses/:houseId/devices', async (req, res) => {
     try {
         const { houseId } = req.params;
         console.log(`[DEBUG] GET /api/houses/${houseId}/devices -> Fetching devices for house: ${houseId}`);
-        
+
         const house = await House.findById(houseId);
         if (!house) {
             console.log(`[DEBUG] House not found: ${houseId}`);
             return res.status(404).json({ success: false, message: "House not found" });
         }
-        
+
         if (!house.rooms || house.rooms.length === 0) {
             console.log(`[DEBUG] No rooms found in house: ${houseId}`);
             return res.status(200).json({ success: true, devices: [] });
         }
-        
+
         const devices = await Device.find({ room: { $in: house.rooms } });
         console.log(`[DEBUG] Found ${devices.length} devices for house ${houseId}`);
-        
+
         res.status(200).json({ success: true, devices });
     } catch (error) {
         console.error(`[ERROR] GET /api/houses/:houseId/devices ->`, error);
@@ -668,28 +661,73 @@ router.get('/api/houses/:houseId/devices', async (req, res) => {
     }
 });
 
-router.get("/api/device/status/:id", (req, res) => {
-    res.json({ status: deviceController.getStatus(req.params.id) });
+/*
+  Get status of a device
+*/
+router.get("/api/device/status/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(`[DEBUG] GET /api/device/status/${id} -> Fetching device status`);
+
+        const device = await Device.findById(id).select("status");
+        if (!device) {
+            console.error(`[ERROR] Device not found: ${id}`, error);
+            res.status(404).json({ error: "Device not found" });
+        }
+
+        console.log(`[DEBUG] Device status for ${id}: ${device.status}`);
+        res.status(200).json({ success: true, status: device.status });
+    } catch (error) {
+        console.error(`[ERROR] Fetching device status ->`, error);
+        res.status(500).json({error: "Server error" });
+    }
 });
 
-router.post("/api/device/toggle", (req, res) => {
-    res.json(deviceController.toggleStatus(req.body.id));
-});
+/*
+  adjust fan speed
+*/
+router.put("/api/devices/:id/fan-speed", async (req, res) => {
+    try {
+        const { fanSpeed } = req.body;
+        const deviceId = req.params.id;
 
+        console.log(`[DEBUG] PUT /api/devices/${deviceId}/fan-speed -> Received fanSpeed: ${fanSpeed}`);
 
-router.post("/api/device/fanSpeed", (req, res) => {
-    res.json(deviceController.setFanSpeed(req.body.id, req.body.fanSpeed));
+        // Validate fanSpeed value: must be a number between 1 and 8
+        if (typeof fanSpeed !== "number" || fanSpeed < 1 || fanSpeed > 8) {
+            console.error("[ERROR] Invalid fan speed value. Must be between 1 and 8.", error);
+            res.status(400).json({ error: "Fan speed must be between 1 and 8" });
+        }
+
+        // Find the device by ID
+        const device = await Device.findById(deviceId);
+        if (!device) {
+            console.log(`[ERROR] Device not found: ${deviceId}`, error);
+            res.status(404).json({ error: "Device not found" });
+        }
+
+        // Check if the device is of type "fan"
+        if (device.device_type !== "fan") {
+            console.error(`[ERROR] Device type mismatch. Expected "fan", but found "${device.device_type}"`, error);
+            res.status(400).json({ error: "This device is not a fan" });
+        }
+
+        // Update the fan speed
+        console.log(`[DEBUG] Updating fan speed from ${device.fan_speed} to ${fanSpeed}`);
+        device.fan_speed = fanSpeed;
+        await device.save();
+
+        console.log(`[DEBUG] Device ${deviceId} fan speed updated successfully to ${device.fan_speed}`);
+        res.status(200).json({ success: true, message: "Fan speed updated successfully", data: device });
+    } catch (error) {
+        console.error(`[ERROR] PUT /api/devices/:id/fan-speed ->`, error);
+        res.status(500).json({ success: false, message: "Server error while updating fan speed" });
+    }
 });
 
 router.post("/api/device/mode", (req, res) => {
     res.json(deviceController.setMode(req.body.id, req.body.mode));
 });
-
-router.post("/api/device/reset", (req, res) => {
-    res.json(deviceController.resetDevice(req.body.id));
-});
-
-
 
 /* ============================================================
    ROOMS CONFIG

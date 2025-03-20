@@ -37,6 +37,15 @@ const deviceSchema = new mongoose.Schema({
         },
         default: null
     },
+    fan_speed: {
+        type: Number,
+        min: 1,
+        max: 8,
+        required: function () {
+            return this.device_type === "fan";
+        },
+        default: null
+    },
     room: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room',
