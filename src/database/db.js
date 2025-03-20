@@ -95,7 +95,7 @@ const roles = [
 ];
 
 const rolePermissionsMapping = {
-    "Home Dweller": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", ],
+    "Home Dweller": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport",],
     "Home Owner": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "changeSettings"],
     "Developer": ["viewReport", "updateSystem", "backupSystem"]
 };
@@ -113,7 +113,7 @@ export async function clearRolePermissions() {
 export async function addPermissions() {
     try {
         console.log('[DEBUG] Starting permissions, roles, and role-permission mapping insertion...');
-        
+
         // Clear existing rolePermission documents first
         await clearRolePermissions();
 
