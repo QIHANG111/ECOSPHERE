@@ -1,10 +1,16 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import {EnergyUsage, User, Device, House, Room, Device, HouseUser, Role, RolePermission } from '../models';
+import EnergyUsage from '../models/energy.model.js';
+import User from '../models/user.model.js';
+import Device from '../models/device.model.js';
+import House from '../models/house.model.js';
+import Room from '../models/room.model.js';
+import HouseUser from '../models/houseUser.model.js';
+import Role from '../models/role.model.js';
+import RolePermission from '../models/rolePermission.model.js';
 import mongoose from 'mongoose';
-import authMiddleware from '../middleware/authMiddleware.js';
+import authMiddleware from '../authMiddleware.js';
 import jwt from 'jsonwebtoken';
-import { error } from 'node:console';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import path from 'node:path';
@@ -20,6 +26,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 /*
 notes
+-correct delete device if needed
 -factory reset
 -build automation APIs
 -api for device energy usage(not overall)
