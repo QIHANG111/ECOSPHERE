@@ -15,8 +15,10 @@ import { dirname } from 'node:path';
 import path from 'node:path';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import HouseUser from '../models/houseUser.model.js';
 
 dotenv.config();
+const SECRET_KEY = process.env.SECRET_KEY;
 
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
@@ -24,10 +26,8 @@ dotenv.config();
 
 /*notes
 -build api for houses - add house at signup, add house at user settings, delete house, get all houses under a user, get list of houses in mongodb
--build api for password recovery(forgot password) 
 -edit add room to add the room to associated house id
 -build automation APIs
--API for push notifications and email alerts
 -api for device energy usage(not overall)
 -get list of rooms under a house, list of houses under a user*/
 
@@ -57,6 +57,10 @@ router.get('/', (req, res) => {
 
 /*
   Sign up
+  - Automatically assigns the "Home Owner" role.
+  - Automatically creates a house for the new user.
+  - Inserts a mapping in the HouseUser collection.
+  - Updates the user's houses array with the newly created house ID.
 */
 router.post('/api/signup', async (req, res) => {
     try {
@@ -66,7 +70,6 @@ router.post('/api/signup', async (req, res) => {
         if (!phone) {
             phone = "1234567890";
         }
-
         if (typeof user_avatar === "undefined" || user_avatar === null) {
             user_avatar = 1;
         }
@@ -89,7 +92,7 @@ router.post('/api/signup', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log("[DEBUG] Hashed password:", hashedPassword);
 
-        // Create new user with the role _id from the "Home Owner" role
+        // Create new user with the "Home Owner" role
         const newUser = new User({
             name,
             email,
@@ -97,17 +100,49 @@ router.post('/api/signup', async (req, res) => {
             hashed_password: hashedPassword,
             role_id: role._id,
             parentUser: parentUser || null,
-            user_avatar
+            user_avatar,
+            houses: [] // Initialize houses array
         });
-
         await newUser.save();
-        res.status(201).json({ message: "User registered successfully", data: newUser });
+        console.log("[DEBUG] New user created:", newUser._id);
+
+        // Automatically create a house for the new Home Owner.
+        const houseName = `${newUser.name}'s House`;
+        const newHouse = new House({
+            house_name: houseName,
+            rooms: [],
+            owner_id: newUser._id
+        });
+        await newHouse.save();
+        console.log("[DEBUG] New house created:", newHouse._id);
+
+        // Insert mapping into the HouseUser collection: the user is mapped to the house as Home Owner
+        const houseUserMapping = new HouseUser({
+            house_id: newHouse._id,
+            user_id: newUser._id,
+            role: "Home Owner"
+        });
+        await houseUserMapping.save();
+        console.log("[DEBUG] Created HouseUser mapping:", houseUserMapping._id);
+
+        // Update the user's houses array with the new house ID
+        newUser.houses.push(newHouse._id);
+        await newUser.save();
+        console.log("[DEBUG] Updated user's houses array:", newUser.houses);
+
+        // Optionally, generate a JWT token for the new user (to sign them in immediately)
+        const token = jwt.sign(
+            { userId: newUser._id, email: newUser.email, role: newUser.role_id },
+            SECRET_KEY,
+            { expiresIn: '2h' }
+        );
+
+        res.status(201).json({ message: "User registered successfully", token, data: newUser });
     } catch (error) {
         console.error("[ERROR] POST /api/signup ->", error);
         res.status(500).json({ message: "Server error" });
     }
 });
-
 
 router.get('/api/getRoleId/:roleName', async (req, res) => {
     try {
@@ -296,40 +331,74 @@ router.put('/api/update-user', async (req, res) => {
     }
 });
 
-
-
 /*
-  Add new sub-user
+  Add new sub-user (e.g., Home Dweller) without separate credentials.
+  Expected request body:
+  {
+    "name": "Sub User Name",
+    "phone": "1234567890",
+    "parentEmail": "parent@example.com",  // Parent user's email
+    "role": "Home Dweller",               // Role for the sub-user (must exist in Role collection)
+    "user_avatar": 2                      // Sub-user's avatar provided explicitly
+  }
 */
 router.post('/api/subusers', async (req, res) => {
     console.log('[DEBUG] POST /api/subusers -> req.body:', req.body);
-    logDbState('/api/subusers');
-    try {
-        const { name, phone, role_id, mainUserEmail } = req.body;
 
-        if (!name || !phone || !role_id || !mainUserEmail) {
+    try {
+        const { name, phone, parentEmail, role: roleName, user_avatar } = req.body;
+
+        if (!name || !phone || !parentEmail || !roleName) {
             return res.status(400).json({
                 success: false,
-                message: 'Please enter all fields: name, phone, roleID, and main user email'
+                message: 'Please provide name, phone, parentEmail, and role'
             });
         }
 
-        const mainUser = await User.findOne({ email: mainUserEmail });
+        // Look up the parent user by email
+        const mainUser = await User.findOne({ email: parentEmail });
         if (!mainUser) {
-            console.log(`[DEBUG] Main user not found by email: ${mainUserEmail}`);
-            return res.status(400).json({ success: false, message: 'Main user not found' });
+            console.log(`[DEBUG] Parent user not found with email: ${parentEmail}`);
+            return res.status(400).json({ success: false, message: 'Parent user not found' });
         }
 
-        // Potential mismatch between role_id and roleID if your schema differs
+        // Look up the role provided in the request body
+        const roleDoc = await Role.findOne({ role_name: roleName });
+        if (!roleDoc) {
+            console.error(`[ERROR] Role "${roleName}" not found in database.`);
+            return res.status(500).json({ success: false, message: `Role "${roleName}" not found` });
+        }
+        console.log(`[DEBUG] Found role "${roleName}" with id: ${roleDoc._id}`);
+
+        // Create the sub-user by inheriting parent's email and hashed password,
+        // but using the role provided and user_avatar from req.body.
         const newSubUser = new User({
             name,
             phone,
-            roleID: role_id,
-            parentUser: mainUser._id
+            email: mainUser.email,                   
+            hashed_password: mainUser.hashed_password, 
+            role_id: roleDoc._id,                      
+            parentUser: mainUser._id,                  
+            user_avatar                             
         });
-
         await newSubUser.save();
         console.log('[DEBUG] Sub-user created:', newSubUser._id);
+
+        // Retrieve the parent's house mapping (assuming the parent is a Home Owner)
+        const mainHouseMapping = await HouseUser.findOne({ user_id: mainUser._id, role: "Home Owner" });
+        if (mainHouseMapping) {
+            // Create a mapping for the sub-user with the provided role in the same house
+            const subUserMapping = new HouseUser({
+                house_id: mainHouseMapping.house_id,
+                user_id: newSubUser._id,
+                role: roleName
+            });
+            await subUserMapping.save();
+            console.log("[DEBUG] Created HouseUser mapping for sub-user:", subUserMapping._id);
+        } else {
+            console.warn("[WARNING] Parent user's house mapping not found; sub-user will not be linked to a house.");
+        }
+
         res.status(201).json({ success: true, message: 'Sub-user created successfully', data: newSubUser });
     } catch (error) {
         console.error('[ERROR] POST /api/subusers ->', error);
@@ -340,19 +409,19 @@ router.post('/api/subusers', async (req, res) => {
 const mainRole = 'Home Owner';
 const subRole = 'Home Dweller';
 
-
 /*
   Delete user by ID
-  - If manager, also deletes subusers
-  - If dweller, just that user
-  - Otherwise, just that user
+  - If manager, also deletes subusers and all House documents registered under that manager.
+  - If dweller, just that user.
+  - Otherwise, just that user.
+  Additionally, deletes the mapping(s) for the deleted user(s) from the HouseUser collection.
 */
 router.delete('/api/users/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/users/:id ->', req.params);
     logDbState('/api/users/:id');
     try {
         const { id } = req.params;
-        const requestingUserRole = req.user && req.user.roleID;
+        const requestingUserRole = req.user && req.user.role_id;
 
         const userToDelete = await User.findById(id);
         if (!userToDelete) {
@@ -360,27 +429,49 @@ router.delete('/api/users/:id', async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        if (userToDelete.roleID === mainRole) {
+        if (userToDelete.role_id === mainRole) {
             if (requestingUserRole !== mainRole) {
                 console.log('[DEBUG] Non-manager attempting to delete a manager');
                 return res
                     .status(403)
                     .json({ success: false, message: 'Only managers can delete a manager account.' });
             }
-            const result = await User.deleteMany({
+            // Find all users to delete (manager + subusers)
+            const usersToDelete = await User.find({
                 $or: [{ _id: id }, { parentUser: id }]
-            });
+            }).select('_id');
+            const idsToDelete = usersToDelete.map(u => u._id);
+
+            // Delete users from the User collection
+            const result = await User.deleteMany({ _id: { $in: idsToDelete } });
             console.log('[DEBUG] Manager + subusers delete result:', result);
-            return res
-                .status(200)
-                .json({ success: true, message: 'Manager and all associated dwellers have been deleted.' });
-        } else if (userToDelete.roleID === subRole) {
+
+            // Delete corresponding HouseUser mappings for these user ids
+            const mappingResult = await HouseUser.deleteMany({ user_id: { $in: idsToDelete } });
+            console.log('[DEBUG] Deleted HouseUser mappings for ids:', idsToDelete, mappingResult);
+
+            // Delete all House documents where the owner_id matches the manager's id
+            const housesResult = await House.deleteMany({ owner_id: id });
+            console.log('[DEBUG] Deleted houses result:', housesResult);
+
+            return res.status(200).json({ success: true, message: 'Manager, all associated dwellers, and all registered houses have been deleted.' });
+        } else if (userToDelete.role_id === subRole) {
             await User.findByIdAndDelete(id);
             console.log(`[DEBUG] Deleted dweller with id: ${id}`);
+
+            // Delete the HouseUser mapping for this dweller
+            const mappingResult = await HouseUser.deleteMany({ user_id: id });
+            console.log(`[DEBUG] Deleted HouseUser mapping for dweller id: ${id}`, mappingResult);
+
             return res.status(200).json({ success: true, message: 'Dweller has been deleted.' });
         } else {
             await User.findByIdAndDelete(id);
             console.log(`[DEBUG] Deleted user with id: ${id} (unrecognized role)`);
+
+            // Delete the HouseUser mapping for this user
+            const mappingResult = await HouseUser.deleteMany({ user_id: id });
+            console.log(`[DEBUG] Deleted HouseUser mapping for user id: ${id}`, mappingResult);
+
             return res.status(200).json({ success: true, message: 'User has been deleted.' });
         }
     } catch (error) {
@@ -390,7 +481,7 @@ router.delete('/api/users/:id', async (req, res) => {
 });
 
 /*
-  Get all users under a certain manager
+  Get all users under a certain owner
 */
 router.get('/api/users/parent/:id', async (req, res) => {
     try {
@@ -399,7 +490,6 @@ router.get('/api/users/parent/:id', async (req, res) => {
         if (!parentUser) {
             return res.status(404).json({ success: false, message: "Parent user not found" });
         }
-
 
         const subUsers = await User.find({ parentUser: id }).populate("role_id", "role_name");
 
@@ -430,7 +520,35 @@ router.get('/api/allusers', async (req, res) => {
     }
 });
 
+/*
+  Get all users under a house
+*/
+router.get('/api/house-users/:houseId', async (req, res) => {
+    try {
+        const { houseId } = req.params;
+        console.log(`[DEBUG] GET /api/house-users/${houseId} -> Fetching house details`);
 
+        // Find the house by ID and populate the owners and dwellers arrays.
+        const house = await House.findById(houseId)
+            .populate('owners', 'name email phone') // Adjust fields as necessary
+            .populate('dwellers', 'name email phone'); // Adjust fields as necessary
+
+        if (!house) {
+            console.log(`[DEBUG] House not found with id: ${houseId}`);
+            return res.status(404).json({ success: false, message: 'House not found' });
+        }
+
+        console.log(`[DEBUG] Found house: ${house.house_name} with ${house.owners.length} owner(s) and ${house.dwellers.length} dweller(s)`);
+        res.status(200).json({ success: true, owners: house.owners, dwellers: house.dwellers });
+    } catch (error) {
+        console.error('[ERROR] GET /api/house-users/:houseId ->', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+/*
+  assign role to user
+*/
 router.post('/api/users/:userId/assign-role', async (req, res) => {
     try {
         const { userId } = req.params;

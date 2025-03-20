@@ -42,11 +42,11 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 1
     },
-    houses:[{
-        type: mongoose.Schema.Types.ObjectId,
+    houses: {
+        type: [mongoose.Schema.Types.ObjectId],
         ref: 'House',
-        default: null
-    }]
+        default: []
+    }
 });
 
 const User = mongoose.model('User', userSchema);
