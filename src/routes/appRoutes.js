@@ -11,7 +11,6 @@ import EnergyUsage from '../models/energy.model.js';
 import mongoose from 'mongoose';
 import authMiddleware from '../authMiddleware.js';
 import jwt from 'jsonwebtoken';
-import { error } from 'node:console';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import path from 'node:path';
@@ -27,6 +26,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 /*
 notes
+-correct delete device if needed
 -factory reset
 -build automation APIs
 -api for device energy usage(not overall)
