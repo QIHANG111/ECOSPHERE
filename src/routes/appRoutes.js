@@ -19,15 +19,14 @@ import path from 'node:path';
 // And have SECRET_KEY either from env or config
 
 /*notes
--finish building APIs requested by yanzi
 -build api for houses - add house at signup, add house at user settings, delete house, get all houses under a user, get list of houses in mongodb
 -build api for password recovery(forgot password) 
 -edit add room to add the room to associated house id
--edit the add device to append the deviceid to the array of devices in the associated room 
 -build automation APIs
 -API for push notifications and email alerts
 -api for device energy usage(not overall)
--add room api doesnt add it to the database, modify*/
+-add room api doesnt add it to the database, modify
+-get list of rooms under a house, list of houses under a user, list of devices under a room*/
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -426,32 +425,58 @@ const checkPermission = async (userId, permissionName) => {
 /*
   Add device
 */
+/*
+  Add device and update the room's devices list if a roomName is provided.
+  Expected request body should include:
+    - device_name
+    - device_type
+    - roomName: the name of the room where this device belongs. if not specified, doesnt add it to rooms
+*/
 router.post('/api/device', async (req, res) => {
     console.log('[DEBUG] POST /api/device -> req.body:', req.body);
-    logDbState('/api/device');
-    const device = req.body;
 
-    if (!device.device_name || !device.device_type || !device.status) {
-        console.log('[DEBUG] Missing required device fields');
-        return res
-            .status(400)
-            .json({ success: false, message: 'Please enter all fields' });
+    // Destructure roomName from the request body; the rest is deviceData.
+    const { roomName, ...deviceData } = req.body;
+
+    // Validate required fields for the device (do not require status as default is "off")
+    if (!deviceData.device_name || !deviceData.device_type) {
+        console.error('[ERROR] Missing required device fields (device_name or device_type)', error);
+        res.status(400).json({ error: 'Please enter all required fields (device_name and device_type)' });
     }
 
-    const newDevice = new Device(device);
+    const newDevice = new Device(deviceData);
 
     try {
+        // Save the device first; status will be set to default ("off")
         await newDevice.save();
         console.log('[DEBUG] Created new device:', newDevice._id);
+
+        // If a roomName is provided, update the room document accordingly
+        if (roomName) {
+            const room = await Room.findOne({ room_name: roomName });
+            if (room) {
+                // Add the device id to the room's devices array
+                room.devices.push(newDevice._id);
+                await room.save();
+
+                // Also update the new device's room field to reference this room
+                newDevice.room = room._id;
+                await newDevice.save();
+                console.log(`[DEBUG] Added device ${newDevice._id} to room "${room.room_name}"`);
+            } else {
+                console.warn(`[WARNING] Room with name "${roomName}" not found.`);
+            }
+        }
+
         res.status(201).json({ success: true, data: newDevice });
     } catch (error) {
         console.error('[ERROR] POST /api/device ->', error);
-        res.status(500).json({ success: false, message: 'Server Error' });
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
 /*
-  Delete device by id
+  Delete device by id and remove its reference from the room's devices array (if room specified)
 */
 router.delete('/api/device/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/device/:id ->', req.params);
@@ -466,21 +491,34 @@ router.delete('/api/device/:id', async (req, res) => {
             return res.status(403).json({ success: false, message: 'Permission denied' });
         }
 
-        const device = await Device.findByIdAndDelete(id);
+        const device = await Device.findById(id);
         if (!device) {
-            console.log(`[DEBUG] Device not found with id: ${id}`);
-            return res.status(404).json({ success: false, message: 'Device not found' });
+            console.error(`[ERROR] Fetching device by id: ${id}`, error);
+            res.status(404).json({ error: 'Device not found' });
         }
+
+        // If the device is associated with a room, remove its id from the room's devices array
+        if (device.room) {
+            const room = await Room.findById(device.room);
+            if (room) {
+                room.devices = room.devices.filter(devId => devId.toString() !== id);
+                await room.save();
+                console.log(`[DEBUG] Removed device ${id} from room "${room.room_name}" (${room._id})`);
+            }
+        }
+
+        // Delete the device from the devices collection
+        await Device.findByIdAndDelete(id);
         console.log(`[DEBUG] Deleted device with id: ${id}`);
         res.status(200).json({ success: true, message: 'Device deleted successfully' });
     } catch (error) {
         console.error('[ERROR] DELETE /api/device/:id ->', error);
-        res.status(500).json({ success: false, message: 'Server Error' });
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
 /*
-  Get the list of devices
+  Get the list of devices in mongodb
 */
 router.get('/api/devices', async (req, res) => {
     console.log('[DEBUG] GET /api/devices -> Fetching devices from MongoDB');
@@ -495,6 +533,29 @@ router.get('/api/devices', async (req, res) => {
     } catch (error) {
         console.error('[ERROR] Fetching devices from MongoDB ->', error);
         res.status(500).json({ error: 'Server error while fetching devices' });
+    }
+});
+
+/* 
+  GET all devices under a room by room id using population 
+*/
+router.get('/api/rooms/:roomId/devices', async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        console.log(`[DEBUG] GET /api/rooms/${roomId}/devices -> Fetching room with devices`);
+
+        // Find the room by its ID and populate the devices array
+        const room = await Room.findById(roomId).populate('devices');
+        if (!room) {
+            console.error(`[ERROR] Fetching room: ${roomId}`, error);
+            res.status(404).json({ error: 'Room not found' });
+        }
+
+        console.log(`[DEBUG] Found room "${room.room_name}" with ${room.devices.length} devices`);
+        res.status(200).json({ success: true, devices: room.devices });
+    } catch (error) {
+        console.error(`[ERROR] Fetching devices ->`, error);
+        res.status(500).json({ error: 'Server error while fetching devices for room' });
     }
 });
 
@@ -786,6 +847,12 @@ router.delete('/api/rooms/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete room' });
     }
 });
+
+/* ============================================================
+   HOUSE CONFIG
+============================================================ */
+
+
 
 /*
 Get energy usage data
