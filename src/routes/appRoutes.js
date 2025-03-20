@@ -56,23 +56,17 @@ router.get('/', (req, res) => {
 });
 
 /*
-  Sign up
+  Sign up:
   - Automatically assigns the "Home Owner" role.
-  - Automatically creates a house for the new user.
+  - Creates a house for the new user.
   - Inserts a mapping in the HouseUser collection.
-  - Updates the user's houses array with the newly created house ID.
+  - Updates the user's houses array with the new house ID.
 */
 router.post('/api/signup', async (req, res) => {
     try {
         let { name, email, phone, password, parentUser, user_avatar } = req.body;
-        console.log("[DEBUG] Received signup data:", req.body);
-
-        if (!phone) {
-            phone = "1234567890";
-        }
-        if (typeof user_avatar === "undefined" || user_avatar === null) {
-            user_avatar = 1;
-        }
+        if (!phone) phone = "1234567890";
+        if (typeof user_avatar === "undefined" || user_avatar === null) user_avatar = 1;
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
@@ -83,14 +77,11 @@ router.post('/api/signup', async (req, res) => {
         // Automatically assign the "Home Owner" role
         const role = await Role.findOne({ role_name: "Home Owner" });
         if (!role) {
-            console.error("[ERROR] Home Owner role not found in database.");
             return res.status(500).json({ message: "Home Owner role not found" });
         }
-        console.log("[DEBUG] Found Home Owner role id:", role._id);
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-        console.log("[DEBUG] Hashed password:", hashedPassword);
 
         // Create new user with the "Home Owner" role
         const newUser = new User({
@@ -101,36 +92,33 @@ router.post('/api/signup', async (req, res) => {
             role_id: role._id,
             parentUser: parentUser || null,
             user_avatar,
-            houses: [] // Initialize houses array
+            houses: []
         });
         await newUser.save();
-        console.log("[DEBUG] New user created:", newUser._id);
 
         // Automatically create a house for the new Home Owner.
         const houseName = `${newUser.name}'s House`;
         const newHouse = new House({
             house_name: houseName,
             rooms: [],
-            owner_id: newUser._id
+            owners: [newUser._id],
+            dwellers: []
         });
         await newHouse.save();
-        console.log("[DEBUG] New house created:", newHouse._id);
 
-        // Insert mapping into the HouseUser collection: the user is mapped to the house as Home Owner
+        // Insert mapping into the HouseUser collection
         const houseUserMapping = new HouseUser({
             house_id: newHouse._id,
             user_id: newUser._id,
             role: "Home Owner"
         });
         await houseUserMapping.save();
-        console.log("[DEBUG] Created HouseUser mapping:", houseUserMapping._id);
 
         // Update the user's houses array with the new house ID
         newUser.houses.push(newHouse._id);
         await newUser.save();
-        console.log("[DEBUG] Updated user's houses array:", newUser.houses);
 
-        // Optionally, generate a JWT token for the new user (to sign them in immediately)
+        // Generate JWT token
         const token = jwt.sign(
             { userId: newUser._id, email: newUser.email, role: newUser.role_id },
             SECRET_KEY,
@@ -147,7 +135,7 @@ router.post('/api/signup', async (req, res) => {
 router.get('/api/getRoleId/:roleName', async (req, res) => {
     try {
         const roleName = req.params.roleName;
-        console.log(`[DEBUG] Fetching role_id for: ${roleName}`); // Debugging log
+        console.log(`[DEBUG] Fetching role_id for: ${roleName}`); 
 
         const role = await Role.findOne({ role_name: roleName });
 
@@ -164,67 +152,54 @@ router.get('/api/getRoleId/:roleName', async (req, res) => {
     }
 });
 
-
-router.get('/api/user', async (req, res) => {
-    try {
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-
-        const decoded = jwt.verify(token, SECRET_KEY);
-        const userId = decoded.userId;
-
-        // `role_name`
-        const user = await User.findById(userId)
-            .select("name email phone role_id user_avatar")
-            .populate("role_id", "role_name");
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        res.json(user);
-    } catch (error) {
-        console.error("[ERROR] GET /api/user ->", error);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
 /*
-  Sign in
-  NOTE: requires jwt & SECRET_KEY if you truly use token logic
+  Sign in:
 */
 router.post('/api/signin', async (req, res) => {
-    console.log('[DEBUG] POST /api/signin -> req.body:', req.body);
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-
         if (!user) {
-            console.log(`[DEBUG] Sign in failed - user not found for email: ${email}`);
             return res.status(400).json({ message: 'User not found' });
         }
 
         const isMatch = await bcrypt.compare(password, user.hashed_password);
         if (!isMatch) {
-            console.log('[DEBUG] Sign in failed - incorrect password');
             return res.status(400).json({ message: 'Incorrect password' });
         }
 
-        // ✅ JWT Token
         const token = jwt.sign(
             { userId: user._id, email: user.email, role: user.role_id },
             SECRET_KEY,
-            { expiresIn: '2h' } // 2h
+            { expiresIn: '2h' }
         );
 
-        console.log(`[DEBUG] User signed in successfully: ${user.email}`);
         res.status(200).json({ message: 'Sign in successfully', token, user });
     } catch (error) {
         console.error('[ERROR] POST /api/signin ->', error);
-        res.status(500).json({ message: 'server error' });
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+/*
+  Get authenticated user details:
+*/
+router.get('/api/user', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ message: "Unauthorized" });
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const user = await User.findById(userId)
+            .select("name email phone role_id user_avatar")
+            .populate("role_id", "role_name");
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (error) {
+        console.error("[ERROR] GET /api/user ->", error);
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -240,11 +215,9 @@ router.post('/api/forgot-password', async (req, res) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
-        // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
             console.warn(`[DEBUG] No account found for email: ${email}`);
-            // Always return success to avoid revealing whether the email exists
             return res.status(200).json({ message: "If an account with that email exists, a reset link has been sent." });
         }
 
@@ -252,7 +225,7 @@ router.post('/api/forgot-password', async (req, res) => {
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
         console.log(`[DEBUG] Generated reset token: ${token}`);
 
-        // Construct the reset link. FRONTEND_URL should be set to your application's URL.
+        // Construct the reset link
         const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
         console.log(`[DEBUG] Generated reset link: ${resetLink}`);
 
@@ -273,10 +246,11 @@ router.post('/api/forgot-password', async (req, res) => {
             to: email,
             subject: "Password Reset Request",
             text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
-            html: 
-                `<p>You requested a password reset. Click the link below to reset your password:</p>
+            html: `
+                <p>You requested a password reset. Click the link below to reset your password:</p>
                 <p><a href="${resetLink}">${resetLink}</a></p>
-                <p>If you did not request this, please ignore this email.</p>`
+                <p>If you did not request this, please ignore this email.</p>
+            `
         };
 
         // Send the email
@@ -296,18 +270,17 @@ router.post('/api/forgot-password', async (req, res) => {
    USER CONFIG
 ============================================================ */
 
+/*
+  Update authenticated user details:
+*/
 router.put('/api/update-user', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-
+        if (!token) return res.status(401).json({ message: "Unauthorized" });
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
         const { name, email, password, user_avatar } = req.body;
-
         let updateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
@@ -319,11 +292,7 @@ router.put('/api/update-user', async (req, res) => {
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
-
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
+        if (!updatedUser) return res.status(404).json({ message: "User not found" });
         res.json({ message: "User updated successfully", user: updatedUser });
     } catch (error) {
         console.error("[ERROR] PUT /api/update-user ->", error);
@@ -332,22 +301,14 @@ router.put('/api/update-user', async (req, res) => {
 });
 
 /*
-  Add new sub-user (e.g., Home Dweller) without separate credentials.
-  Expected request body:
-  {
-    "name": "Sub User Name",
-    "phone": "1234567890",
-    "parentEmail": "parent@example.com",  // Parent user's email
-    "role": "Home Dweller",               // Role for the sub-user (must exist in Role collection)
-    "user_avatar": 2                      // Sub-user's avatar provided explicitly
-  }
+  Add new sub-user (e.g., Home Dweller):
+  - Inherits parent's email and hashed password.
+  - Creates a new user with the specified role.
+  - Maps the sub-user to the parent's house via HouseUser.
 */
 router.post('/api/subusers', async (req, res) => {
-    console.log('[DEBUG] POST /api/subusers -> req.body:', req.body);
-
     try {
         const { name, phone, parentEmail, role: roleName, user_avatar } = req.body;
-
         if (!name || !phone || !parentEmail || !roleName) {
             return res.status(400).json({
                 success: false,
@@ -355,48 +316,35 @@ router.post('/api/subusers', async (req, res) => {
             });
         }
 
-        // Look up the parent user by email
         const mainUser = await User.findOne({ email: parentEmail });
         if (!mainUser) {
-            console.log(`[DEBUG] Parent user not found with email: ${parentEmail}`);
             return res.status(400).json({ success: false, message: 'Parent user not found' });
         }
 
-        // Look up the role provided in the request body
         const roleDoc = await Role.findOne({ role_name: roleName });
         if (!roleDoc) {
-            console.error(`[ERROR] Role "${roleName}" not found in database.`);
             return res.status(500).json({ success: false, message: `Role "${roleName}" not found` });
         }
-        console.log(`[DEBUG] Found role "${roleName}" with id: ${roleDoc._id}`);
 
-        // Create the sub-user by inheriting parent's email and hashed password,
-        // but using the role provided and user_avatar from req.body.
         const newSubUser = new User({
             name,
             phone,
-            email: mainUser.email,                   
-            hashed_password: mainUser.hashed_password, 
-            role_id: roleDoc._id,                      
-            parentUser: mainUser._id,                  
-            user_avatar                             
+            email: mainUser.email,
+            hashed_password: mainUser.hashed_password,
+            role_id: roleDoc._id,
+            parentUser: mainUser._id,
+            user_avatar
         });
         await newSubUser.save();
-        console.log('[DEBUG] Sub-user created:', newSubUser._id);
 
-        // Retrieve the parent's house mapping (assuming the parent is a Home Owner)
         const mainHouseMapping = await HouseUser.findOne({ user_id: mainUser._id, role: "Home Owner" });
         if (mainHouseMapping) {
-            // Create a mapping for the sub-user with the provided role in the same house
             const subUserMapping = new HouseUser({
                 house_id: mainHouseMapping.house_id,
                 user_id: newSubUser._id,
                 role: roleName
             });
             await subUserMapping.save();
-            console.log("[DEBUG] Created HouseUser mapping for sub-user:", subUserMapping._id);
-        } else {
-            console.warn("[WARNING] Parent user's house mapping not found; sub-user will not be linked to a house.");
         }
 
         res.status(201).json({ success: true, message: 'Sub-user created successfully', data: newSubUser });
@@ -406,72 +354,34 @@ router.post('/api/subusers', async (req, res) => {
     }
 });
 
-const mainRole = 'Home Owner';
-const subRole = 'Home Dweller';
-
 /*
-  Delete user by ID
-  - If manager, also deletes subusers and all House documents registered under that manager.
-  - If dweller, just that user.
-  - Otherwise, just that user.
-  Additionally, deletes the mapping(s) for the deleted user(s) from the HouseUser collection.
+  Delete user by ID:
+  - If the user is a manager ("Home Owner"), also deletes associated sub-users and the owned house.
+  - For sub-users or other roles, deletes only the user and removes their HouseUser mapping.
 */
 router.delete('/api/users/:id', async (req, res) => {
-    console.log('[DEBUG] DELETE /api/users/:id ->', req.params);
-    logDbState('/api/users/:id');
     try {
         const { id } = req.params;
-        const requestingUserRole = req.user && req.user.role_id;
+        const userToDelete = await User.findById(id).populate("role_id", "role_name");
+        if (!userToDelete) return res.status(404).json({ success: false, message: 'User not found' });
 
-        const userToDelete = await User.findById(id);
-        if (!userToDelete) {
-            console.log(`[DEBUG] No user found with id: ${id}`);
-            return res.status(404).json({ success: false, message: 'User not found' });
-        }
-
-        if (userToDelete.role_id === mainRole) {
-            if (requestingUserRole !== mainRole) {
-                console.log('[DEBUG] Non-manager attempting to delete a manager');
-                return res
-                    .status(403)
-                    .json({ success: false, message: 'Only managers can delete a manager account.' });
-            }
-            // Find all users to delete (manager + subusers)
+        if (userToDelete.role_id.role_name === "Home Owner") {
             const usersToDelete = await User.find({
                 $or: [{ _id: id }, { parentUser: id }]
             }).select('_id');
             const idsToDelete = usersToDelete.map(u => u._id);
 
-            // Delete users from the User collection
-            const result = await User.deleteMany({ _id: { $in: idsToDelete } });
-            console.log('[DEBUG] Manager + subusers delete result:', result);
+            await User.deleteMany({ _id: { $in: idsToDelete } });
+            await HouseUser.deleteMany({ user_id: { $in: idsToDelete } });
+            await House.deleteMany({ owners: id });
 
-            // Delete corresponding HouseUser mappings for these user ids
-            const mappingResult = await HouseUser.deleteMany({ user_id: { $in: idsToDelete } });
-            console.log('[DEBUG] Deleted HouseUser mappings for ids:', idsToDelete, mappingResult);
-
-            // Delete all House documents where the owner_id matches the manager's id
-            const housesResult = await House.deleteMany({ owner_id: id });
-            console.log('[DEBUG] Deleted houses result:', housesResult);
-
-            return res.status(200).json({ success: true, message: 'Manager, all associated dwellers, and all registered houses have been deleted.' });
-        } else if (userToDelete.role_id === subRole) {
-            await User.findByIdAndDelete(id);
-            console.log(`[DEBUG] Deleted dweller with id: ${id}`);
-
-            // Delete the HouseUser mapping for this dweller
-            const mappingResult = await HouseUser.deleteMany({ user_id: id });
-            console.log(`[DEBUG] Deleted HouseUser mapping for dweller id: ${id}`, mappingResult);
-
-            return res.status(200).json({ success: true, message: 'Dweller has been deleted.' });
+            return res.status(200).json({
+                success: true,
+                message: 'Manager, all associated sub-users, and registered houses have been deleted.'
+            });
         } else {
             await User.findByIdAndDelete(id);
-            console.log(`[DEBUG] Deleted user with id: ${id} (unrecognized role)`);
-
-            // Delete the HouseUser mapping for this user
-            const mappingResult = await HouseUser.deleteMany({ user_id: id });
-            console.log(`[DEBUG] Deleted HouseUser mapping for user id: ${id}`, mappingResult);
-
+            await HouseUser.deleteMany({ user_id: id });
             return res.status(200).json({ success: true, message: 'User has been deleted.' });
         }
     } catch (error) {
@@ -481,23 +391,16 @@ router.delete('/api/users/:id', async (req, res) => {
 });
 
 /*
-  Get all users under a certain owner
+  Get all sub-users under a certain parent user
 */
 router.get('/api/users/parent/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const parentUser = await User.findById(id);
-        if (!parentUser) {
-            return res.status(404).json({ success: false, message: "Parent user not found" });
-        }
+        if (!parentUser) return res.status(404).json({ success: false, message: "Parent user not found" });
 
         const subUsers = await User.find({ parentUser: id }).populate("role_id", "role_name");
-
-        res.status(200).json({
-            success: true,
-            parent: parentUser,
-            subUsers
-        });
+        res.status(200).json({ success: true, parent: parentUser, subUsers });
     } catch (error) {
         console.error("[ERROR] GET /api/users/parent/:id ->", error);
         res.status(500).json({ success: false, message: "Server error" });
@@ -505,14 +408,11 @@ router.get('/api/users/parent/:id', async (req, res) => {
 });
 
 /*
-  Get all users
+  Get all users from mongodb (developer view)
 */
 router.get('/api/allusers', async (req, res) => {
-    console.log('[DEBUG] GET /api/allusers');
-    logDbState('/api/allusers');
     try {
         const users = await User.find();
-        console.log(`[DEBUG] Found ${users.length} total users`);
         res.status(200).json({ success: true, users });
     } catch (error) {
         console.error('[ERROR] GET /api/allusers ->', error);
@@ -521,54 +421,30 @@ router.get('/api/allusers', async (req, res) => {
 });
 
 /*
-  Get all users under a house
-*/
-router.get('/api/house-users/:houseId', async (req, res) => {
-    try {
-        const { houseId } = req.params;
-        console.log(`[DEBUG] GET /api/house-users/${houseId} -> Fetching house details`);
-
-        // Find the house by ID and populate the owners and dwellers arrays.
-        const house = await House.findById(houseId)
-            .populate('owners', 'name email phone') // Adjust fields as necessary
-            .populate('dwellers', 'name email phone'); // Adjust fields as necessary
-
-        if (!house) {
-            console.log(`[DEBUG] House not found with id: ${houseId}`);
-            return res.status(404).json({ success: false, message: 'House not found' });
-        }
-
-        console.log(`[DEBUG] Found house: ${house.house_name} with ${house.owners.length} owner(s) and ${house.dwellers.length} dweller(s)`);
-        res.status(200).json({ success: true, owners: house.owners, dwellers: house.dwellers });
-    } catch (error) {
-        console.error('[ERROR] GET /api/house-users/:houseId ->', error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
-
-/*
-  assign role to user
+  Assign role to a user
 */
 router.post('/api/users/:userId/assign-role', async (req, res) => {
     try {
         const { userId } = req.params;
         const { roleId } = req.body;
 
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
+        const canAssignRole = await checkPermission(currentUserId, 'assignRole');
+        if (!canAssignRole) {
+        return res.status(403).json({ message: 'Only Home Owners can assign roles' });
         }
 
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
         const role = await Role.findById(roleId);
-        if (!role) {
-            return res.status(404).json({ error: "Role not found" });
-        }
+        if (!role) return res.status(404).json({ error: "Role not found" });
 
         user.role_id = roleId;
         await user.save();
 
         res.json({ message: "Role assigned successfully", user });
     } catch (error) {
+        console.error("[ERROR] POST /api/users/:userId/assign-role ->", error);
         res.status(500).json({ error: "Failed to assign role" });
     }
 });
@@ -593,43 +469,31 @@ const checkPermission = async (userId, permissionName) => {
 };
 
 /*
-  Add device
-*/
-/*
-  Add device and update the room's devices list if a roomName is provided.
-  Expected request body should include:
-    - device_name
-    - device_type
-    - roomName: the name of the room where this device belongs. if not specified, doesnt add it to rooms
+  Add Device
+  - Creates a new device.
+  - If a roomName is provided, it finds the room and:
+      • Adds the device's ID to the room's devices array.
+      • Updates the device's room reference.
 */
 router.post('/api/device', async (req, res) => {
     console.log('[DEBUG] POST /api/device -> req.body:', req.body);
-
-    // Destructure roomName from the request body; the rest is deviceData.
     const { roomName, ...deviceData } = req.body;
 
-    // Validate required fields for the device (do not require status as default is "off")
     if (!deviceData.device_name || !deviceData.device_type) {
-        console.error('[ERROR] Missing required device fields (device_name or device_type)', error);
-        res.status(400).json({ error: 'Please enter all required fields (device_name and device_type)' });
+        console.error('[ERROR] Missing required fields: device_name or device_type');
+        return res.status(400).json({ error: 'Please enter all required fields (device_name and device_type)' });
     }
 
     const newDevice = new Device(deviceData);
-
     try {
-        // Save the device first; status will be set to default ("off")
         await newDevice.save();
         console.log('[DEBUG] Created new device:', newDevice._id);
 
-        // If a roomName is provided, update the room document accordingly
         if (roomName) {
             const room = await Room.findOne({ room_name: roomName });
             if (room) {
-                // Add the device id to the room's devices array
                 room.devices.push(newDevice._id);
                 await room.save();
-
-                // Also update the new device's room field to reference this room
                 newDevice.room = room._id;
                 await newDevice.save();
                 console.log(`[DEBUG] Added device ${newDevice._id} to room "${room.room_name}"`);
@@ -637,7 +501,6 @@ router.post('/api/device', async (req, res) => {
                 console.warn(`[WARNING] Room with name "${roomName}" not found.`);
             }
         }
-
         res.status(201).json({ success: true, data: newDevice });
     } catch (error) {
         console.error('[ERROR] POST /api/device ->', error);
@@ -646,13 +509,17 @@ router.post('/api/device', async (req, res) => {
 });
 
 /*
-  Delete device by id and remove its reference from the room's devices array (if room specified)
+  Delete Device
+  - Checks if the requesting user has "deleteDevice" permission.
+  - Removes the device from the associated room's devices array if applicable.
+  - Deletes the device document.
 */
 router.delete('/api/device/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/device/:id ->', req.params);
-    logDbState('/api/device/:id');
     const { id } = req.params;
-    const userId = req.user && req.user._id;
+    const token = req.headers.authorization?.split(" ")[1];
+    const decoded = token ? jwt.verify(token, SECRET_KEY) : null;
+    const userId = decoded ? decoded.userId : null;
 
     try {
         const hasPermission = await checkPermission(userId, "deleteDevice");
@@ -663,21 +530,18 @@ router.delete('/api/device/:id', async (req, res) => {
 
         const device = await Device.findById(id);
         if (!device) {
-            console.error(`[ERROR] Fetching device by id: ${id}`, error);
-            res.status(404).json({ error: 'Device not found' });
+            console.error(`[ERROR] Device not found with id: ${id}`);
+            return res.status(404).json({ error: 'Device not found' });
         }
 
-        // If the device is associated with a room, remove its id from the room's devices array
         if (device.room) {
             const room = await Room.findById(device.room);
             if (room) {
                 room.devices = room.devices.filter(devId => devId.toString() !== id);
                 await room.save();
-                console.log(`[DEBUG] Removed device ${id} from room "${room.room_name}" (${room._id})`);
+                console.log(`[DEBUG] Removed device ${id} from room "${room.room_name}"`);
             }
         }
-
-        // Delete the device from the devices collection
         await Device.findByIdAndDelete(id);
         console.log(`[DEBUG] Deleted device with id: ${id}`);
         res.status(200).json({ success: true, message: 'Device deleted successfully' });
@@ -688,203 +552,154 @@ router.delete('/api/device/:id', async (req, res) => {
 });
 
 /*
-  Get the list of devices in mongodb
+  Get All Devices from the database.
 */
 router.get('/api/devices', async (req, res) => {
-    console.log('[DEBUG] GET /api/devices -> Fetching devices from MongoDB');
+    console.log('[DEBUG] GET /api/devices -> Fetching devices');
     try {
         const devices = await Device.find();
         if (!devices || devices.length === 0) {
-            console.error('[ERROR] Finding devices in the database ->', error);
+            console.error('[ERROR] No devices found');
             return res.status(404).json({ error: 'No devices found' });
         }
-        console.log(`[DEBUG] /api/devices -> found ${devices.length} devices in MongoDB`);
+        console.log(`[DEBUG] Found ${devices.length} devices`);
         res.json(devices);
     } catch (error) {
-        console.error('[ERROR] Fetching devices from MongoDB ->', error);
+        console.error('[ERROR] GET /api/devices ->', error);
         res.status(500).json({ error: 'Server error while fetching devices' });
     }
 });
 
-/* 
-  GET all devices under a room by room id using population 
+/*
+  Get Devices Under a Specific Room
 */
 router.get('/api/rooms/:roomId/devices', async (req, res) => {
     try {
         const { roomId } = req.params;
         console.log(`[DEBUG] GET /api/rooms/${roomId}/devices -> Fetching room with devices`);
-
-        // Find the room by its ID and populate the devices array
         const room = await Room.findById(roomId).populate('devices');
         if (!room) {
-            console.error(`[ERROR] Fetching room: ${roomId}`, error);
-            res.status(404).json({ error: 'Room not found' });
+            console.error(`[ERROR] Room not found: ${roomId}`);
+            return res.status(404).json({ error: 'Room not found' });
         }
-
-        console.log(`[DEBUG] Found room "${room.room_name}" with ${room.devices.length} devices`);
+        console.log(`[DEBUG] Room "${room.room_name}" has ${room.devices.length} devices`);
         res.status(200).json({ success: true, devices: room.devices });
     } catch (error) {
-        console.error(`[ERROR] Fetching devices ->`, error);
+        console.error('[ERROR] GET /api/rooms/:roomId/devices ->', error);
         res.status(500).json({ error: 'Server error while fetching devices for room' });
     }
 });
 
 /*
-  Update the status of a specific device
+  Update Device Status
 */
 router.post('/api/update-device', async (req, res) => {
     console.log('[DEBUG] POST /api/update-device -> req.body:', req.body);
-
-
     if (!req.body || typeof req.body.name !== 'string' || (typeof req.body.status !== 'boolean' && req.body.status !== "true" && req.body.status !== "false")) {
-        console.error('[ERROR] Parsing body:', req.body);
-        return res.status(400).json({ error: "Invalid request format. 'name' must be a string and 'status' must be a boolean or a valid string ('true'/'false')." });
+        console.error('[ERROR] Invalid request body for update-device');
+        return res.status(400).json({ error: "Invalid request format. 'name' must be a string and 'status' must be a boolean or valid string ('true'/'false')." });
     }
-
-    const name = req.body.name;
-    const status = req.body.status === "true" || req.body.status === true;
+    const { name, status } = req.body;
+    const statusValue = status === "true" || status === true;
 
     try {
         const updatedDevice = await Device.findOneAndUpdate(
             { device_name: name },
-            { status: status },
+            { status: statusValue },
             { new: true }
         );
-
         if (!updatedDevice) {
             console.log(`[DEBUG] Device not found with name: ${name}`);
             return res.status(404).json({ error: 'Device not found' });
         }
-
-        console.log(`[DEBUG] Updated device '${name}' status to: ${status}`);
-        return res.json({ success: true, updatedDevice });
-
+        console.log(`[DEBUG] Updated device '${name}' status to: ${statusValue}`);
+        res.json({ success: true, updatedDevice });
     } catch (error) {
-        console.error('[ERROR] Updating device status in MongoDB ->', error);
-        return res.status(500).json({ error: 'Server error while updating device status' });
+        console.error('[ERROR] POST /api/update-device ->', error);
+        res.status(500).json({ error: 'Server error while updating device status' });
     }
 });
 
 /*
-    Update the temperature of a specific AC device
+  Update Temperature for an AC Device
 */
 router.post('/api/update-temperature', async (req, res) => {
     console.log('[DEBUG] POST /api/update-temperature -> req.body:', req.body);
-
     if (!req.body || typeof req.body.name !== 'string' || typeof req.body.temperature !== 'number') {
-        console.log('[DEBUG] Invalid update-temperature body');
+        console.error('[ERROR] Invalid request format for update-temperature');
         return res.status(400).json({
             error: "Invalid request format. 'name' must be a string and 'temperature' must be a number."
         });
     }
-
     const { name, temperature } = req.body;
-
     try {
-        // Find and update the AC device in MongoDB
-        console.log(`[DEBUG] Finding AC device of name: ${name}`);
         const updatedDevice = await Device.findOneAndUpdate(
             { device_name: name, device_type: 'AC' },
-            { temperature: temperature },             // Update temperature field
+            { temperature: temperature },
             { new: true }
         );
-
         if (!updatedDevice) {
-            console.error(`[ERROR] Finding AC device ${name} ->`, error);
-            res.status(404).json({ error: 'AC device not found' });
+            console.error(`[ERROR] AC device not found with name: ${name}`);
+            return res.status(404).json({ error: 'AC device not found' });
         }
-
         console.log(`[DEBUG] Updated AC device '${name}' temperature to: ${temperature}`);
         res.json({ success: true, updatedDevice });
-
     } catch (error) {
-        console.error('[ERROR] Updating AC temperature ->', error);
+        console.error('[ERROR] POST /api/update-temperature ->', error);
         res.status(500).json({ error: 'Server error while updating temperature' });
     }
 });
 
 /*
-    Adjust light brightness
+  Adjust Light Brightness
 */
 router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
     try {
         const { brightness } = req.body;
         const deviceId = req.params.id;
-        console.log(`[DEBUG] Received request to update brightness for device ID: ${deviceId}`);
-        console.log(`[DEBUG] Requested brightness level: ${brightness}`);
+        console.log(`[DEBUG] Adjust brightness for device ID: ${deviceId} to ${brightness}`);
 
         if (brightness < 1 || brightness > 5) {
-            console.error('[ERROR] Adjusting brightness ->', error);
-            res.status(400).json({ error: "Brightness level must be between 1 and 5" });
+            console.error('[ERROR] Brightness level out of range');
+            return res.status(400).json({ error: "Brightness level must be between 1 and 5" });
         }
-
         const device = await Device.findById(deviceId);
-
         if (!device) {
-            console.error('[ERROR] Finding device. ->', error);
-            res.status(404).json({ error: "Device not found" });
+            console.error('[ERROR] Device not found for brightness adjustment');
+            return res.status(404).json({ error: "Device not found" });
         }
-
-        console.log(`[DEBUG] Device found: ${device.device_name}, (Type: ${device.device_type})`);
-
         if (device.device_type !== "light") {
-            console.error("[ERROR] Getting device type. ->");
-            res.status(400).json({ error: "This device is not a light" });
+            console.error("[ERROR] Device is not a light");
+            return res.status(400).json({ error: "This device is not a light" });
         }
-
-        console.log(`[DEBUG] Updating brightness from ${device.brightness} to ${brightness}`);
         device.brightness = brightness;
-
-        console.log(`[DEBUG] Saving brightness changes to ${device.brightness}`);
         await device.save();
+        console.log(`[DEBUG] Brightness for device ${device.device_name} updated to ${brightness}`);
         res.status(200).json({ success: true, message: "Brightness adjusted successfully", data: device });
-
     } catch (error) {
-        console.error("[ERROR] Adjusting brightness ->", error);
+        console.error("[ERROR] PUT /api/devices/:id/adjust-brightness ->", error);
         res.status(500).json({ error: "Server error" });
     }
 });
 
 /*
-  get all devices under a room
-*/
-router.get('/api/rooms/:roomId/devices', async (req, res) => {
-    try {
-        const { roomId } = req.params;
-        console.log(`[DEBUG] GET /api/rooms/${roomId}/devices -> Fetching devices for room: ${roomId}`);
-
-        const devices = await Device.find({ room: roomId });
-        console.log(`[DEBUG] Found ${devices.length} devices for room ${roomId}`);
-
-        res.status(200).json({ success: true, devices });
-    } catch (error) {
-        console.error('[ERROR] GET /api/rooms/:roomId/devices ->', error);
-        res.status(500).json({ success: false, message: "Server error while fetching devices" });
-    }
-});
-
-/*
-  get all devices under a house
+  Get Devices for a House
 */
 router.get('/api/houses/:houseId/devices', async (req, res) => {
     try {
         const { houseId } = req.params;
-        console.log(`[DEBUG] GET /api/houses/${houseId}/devices -> Fetching devices for house: ${houseId}`);
-
+        console.log(`[DEBUG] GET /api/houses/${houseId}/devices -> Fetching devices for house`);
         const house = await House.findById(houseId);
         if (!house) {
-            console.log(`[DEBUG] House not found: ${houseId}`);
+            console.error(`[ERROR] House not found: ${houseId}`);
             return res.status(404).json({ success: false, message: "House not found" });
         }
-
         if (!house.rooms || house.rooms.length === 0) {
-            console.log(`[DEBUG] No rooms found in house: ${houseId}`);
+            console.log(`[DEBUG] No rooms in house: ${houseId}`);
             return res.status(200).json({ success: true, devices: [] });
         }
-
         const devices = await Device.find({ room: { $in: house.rooms } });
-        console.log(`[DEBUG] Found ${devices.length} devices for house ${houseId}`);
-
+        console.log(`[DEBUG] Found ${devices.length} devices in house ${houseId}`);
         res.status(200).json({ success: true, devices });
     } catch (error) {
         console.error(`[ERROR] GET /api/houses/:houseId/devices ->`, error);
@@ -893,62 +708,49 @@ router.get('/api/houses/:houseId/devices', async (req, res) => {
 });
 
 /*
-  Get status of a device
+  Get Device Status by ID
 */
 router.get("/api/device/status/:id", async (req, res) => {
     try {
         const { id } = req.params;
         console.log(`[DEBUG] GET /api/device/status/${id} -> Fetching device status`);
-
         const device = await Device.findById(id).select("status");
         if (!device) {
-            console.error(`[ERROR] Device not found: ${id}`, error);
-            res.status(404).json({ error: "Device not found" });
+            console.error(`[ERROR] Device not found: ${id}`);
+            return res.status(404).json({ error: "Device not found" });
         }
-
         console.log(`[DEBUG] Device status for ${id}: ${device.status}`);
         res.status(200).json({ success: true, status: device.status });
     } catch (error) {
-        console.error(`[ERROR] Fetching device status ->`, error);
-        res.status(500).json({error: "Server error" });
+        console.error(`[ERROR] GET /api/device/status/:id ->`, error);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
 /*
-  adjust fan speed
+  Adjust Fan Speed
 */
 router.put("/api/devices/:id/fan-speed", async (req, res) => {
     try {
         const { fanSpeed } = req.body;
         const deviceId = req.params.id;
-
         console.log(`[DEBUG] PUT /api/devices/${deviceId}/fan-speed -> Received fanSpeed: ${fanSpeed}`);
-
-        // Validate fanSpeed value: must be a number between 1 and 8
         if (typeof fanSpeed !== "number" || fanSpeed < 1 || fanSpeed > 8) {
-            console.error("[ERROR] Invalid fan speed value. Must be between 1 and 8.", error);
-            res.status(400).json({ error: "Fan speed must be between 1 and 8" });
+            console.error("[ERROR] Invalid fan speed value");
+            return res.status(400).json({ error: "Fan speed must be between 1 and 8" });
         }
-
-        // Find the device by ID
         const device = await Device.findById(deviceId);
         if (!device) {
-            console.log(`[ERROR] Device not found: ${deviceId}`, error);
-            res.status(404).json({ error: "Device not found" });
+            console.error(`[ERROR] Device not found: ${deviceId}`);
+            return res.status(404).json({ error: "Device not found" });
         }
-
-        // Check if the device is of type "fan"
         if (device.device_type !== "fan") {
-            console.error(`[ERROR] Device type mismatch. Expected "fan", but found "${device.device_type}"`, error);
-            res.status(400).json({ error: "This device is not a fan" });
+            console.error(`[ERROR] Device ${deviceId} is not a fan`);
+            return res.status(400).json({ error: "This device is not a fan" });
         }
-
-        // Update the fan speed
-        console.log(`[DEBUG] Updating fan speed from ${device.fan_speed} to ${fanSpeed}`);
         device.fan_speed = fanSpeed;
         await device.save();
-
-        console.log(`[DEBUG] Device ${deviceId} fan speed updated successfully to ${device.fan_speed}`);
+        console.log(`[DEBUG] Device ${deviceId} fan speed updated to ${device.fan_speed}`);
         res.status(200).json({ success: true, message: "Fan speed updated successfully", data: device });
     } catch (error) {
         console.error(`[ERROR] PUT /api/devices/:id/fan-speed ->`, error);
