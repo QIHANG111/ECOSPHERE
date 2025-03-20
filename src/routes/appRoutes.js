@@ -13,6 +13,10 @@ import { error } from 'node:console';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import path from 'node:path';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
@@ -25,8 +29,7 @@ import path from 'node:path';
 -build automation APIs
 -API for push notifications and email alerts
 -api for device energy usage(not overall)
--add room api doesnt add it to the database, modify
--get list of rooms under a house, list of houses under a user, list of devices under a room*/
+-get list of rooms under a house, list of houses under a user*/
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,7 +37,6 @@ const __dirname = dirname(__filename);
 
 const router = express.Router();
 let notifications = [];
-const SECRET_KEY = "your_secret_key";
 
 /* ------------------------------------------------------------
    Debugging Helper: log the Mongoose connection state
@@ -51,22 +53,6 @@ function logDbState(routeLabel) {
 router.get('/', (req, res) => {
     console.log('[DEBUG] GET / -> sending homePage.html');
     res.sendFile(path.join(__dirname, '../public/pages/landingPage.html'));
-});
-
-/*
-  Example endpoint: fetch all users
-*/
-router.get('/api/users', async (req, res) => {
-    console.log('[DEBUG] GET /api/users triggered');
-    logDbState('/api/users');
-    try {
-        const users = await User.find();
-        console.log(`[DEBUG] Found ${users.length} users`);
-        res.json(users);
-    } catch (error) {
-        console.error('[ERROR] Failed to fetch user data:', error);
-        res.status(500).json({ error: 'Failed to fetch user data from database' });
-    }
 });
 
 /*
@@ -170,6 +156,7 @@ router.get('/api/user', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
 /*
   Sign in
   NOTE: requires jwt & SECRET_KEY if you truly use token logic
@@ -205,6 +192,71 @@ router.post('/api/signin', async (req, res) => {
         res.status(500).json({ message: 'server error' });
     }
 });
+
+/*
+  Forgot password recovery option
+*/
+router.post('/api/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        console.log(`[DEBUG] POST /api/forgot-password -> Received email: ${email}`);
+
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        // Find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            console.warn(`[DEBUG] No account found for email: ${email}`);
+            // Always return success to avoid revealing whether the email exists
+            return res.status(200).json({ message: "If an account with that email exists, a reset link has been sent." });
+        }
+
+        // Generate a reset token valid for 1 hour
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        console.log(`[DEBUG] Generated reset token: ${token}`);
+
+        // Construct the reset link. FRONTEND_URL should be set to your application's URL.
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+        console.log(`[DEBUG] Generated reset link: ${resetLink}`);
+
+        // Set up nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT),
+            secure: process.env.SMTP_SECURE === 'true', // true for port 465, false for others
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            }
+        });
+
+        // Define the email options
+        const mailOptions = {
+            from: `"Your App Name" <${process.env.SMTP_USER}>`,
+            to: email,
+            subject: "Password Reset Request",
+            text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
+            html: 
+                `<p>You requested a password reset. Click the link below to reset your password:</p>
+                <p><a href="${resetLink}">${resetLink}</a></p>
+                <p>If you did not request this, please ignore this email.</p>`
+        };
+
+        // Send the email
+        await transporter.sendMail(mailOptions);
+        console.log(`[DEBUG] Password reset email sent to ${email}`);
+
+        return res.status(200).json({
+            message: "If an account with that email exists, a reset link has been sent."
+        });
+    } catch (error) {
+        console.error(`[ERROR] POST /api/forgot-password ->`, error);
+        return res.status(500).json({ message: "Server error" });
+    }
+});
+
 /* ============================================================
    USER CONFIG
 ============================================================ */
