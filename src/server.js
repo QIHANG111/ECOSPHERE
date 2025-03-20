@@ -15,9 +15,9 @@ async function startServer() {
         console.log('[DEBUG] Database connected successfully.');
 
 
-        // await insertData();
-        // await addPermissions();
-        // console.log('[DEBUG] Data inserted.');
+        await insertData();
+        await addPermissions();
+        console.log('[DEBUG] Data inserted.');
 
         // Finally, start listening on the specified port
         app.listen(PORT, () => {
