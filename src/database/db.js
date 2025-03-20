@@ -95,9 +95,9 @@ const roles = [
 ];
 
 const rolePermissionsMapping = {
-    "Home Dweller": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport",],
-    "Home Owner": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "changeSettings"],
-    "Developer": ["viewReport", "updateSystem", "backupSystem"]
+    "Home Dweller": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "deleteUser", "getSubuser", "houseUser", "roomDevices", "updateStatus", "fanSpeed", "viewDevices"],
+    "Home Owner": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "deleteUser", "getSubuser", "houseUser", "roomDevices", "updateStatus", "fanSpeed", "viewDevices", "deleteRoom", "assignRole", "updateUser", "changeSettings", "viewUsers"],
+    "Developer": ["viewReport", "updateSystem", "backupSystem", "getAllUsers", "getAllDevices", "getStatus"]
 };
 
 export async function clearRolePermissions() {

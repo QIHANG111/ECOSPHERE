@@ -956,12 +956,8 @@ router.put("/api/devices/:id/fan-speed", async (req, res) => {
     }
 });
 
-router.post("/api/device/mode", (req, res) => {
-    res.json(deviceController.setMode(req.body.id, req.body.mode));
-});
-
 /* ============================================================
-   ROOMS CONFIG
+   HOUSE CONFIG
 ============================================================ */
 
 /*
@@ -1017,12 +1013,6 @@ router.delete('/api/rooms/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete room' });
     }
 });
-
-/* ============================================================
-   HOUSE CONFIG
-============================================================ */
-
-
 
 /*
 Get energy usage data
