@@ -491,6 +491,17 @@
             text-align: left;
         }
 
+        <!-- -->
+        .device-icon {
+            max-width: 100%;  /* 让图片不会超出容器 */
+            max-height: 100%; /* 让图片不会超出容器 */
+            object-fit: contain; /* 确保整个图片显示，而不会被裁剪 */
+            display: block; /* 避免 inline 元素的额外间距 */
+            margin: auto; /* 居中对齐 */
+        }
+
+
+
     </style>
 </head>
 
@@ -691,54 +702,176 @@
     //</div>
 
     document.addEventListener("DOMContentLoaded", function () {
-        const settingContainer = document.querySelector(".setting-container");
-        const dropdownMenu = document.querySelector(".dropdown-menu");
+        const deviceContainer = document.getElementById("furnitureContainer");
 
-        // Click the Settings button to switch the menu display
-        settingContainer.addEventListener("click", function (event) {
-            dropdownMenu.classList.toggle("active");
-            event.stopPropagation(); // Prevent events from bubbling
-        });
+        async function loadDevices() {
+            try {
+                const response = await fetch("/api/devices"); // 从数据库获取设备
+                const devices = await response.json();
 
-        // Click on the external area to close the menu
-        document.addEventListener("click", function (event) {
-            if (!settingContainer.contains(event.target)) {
-                dropdownMenu.classList.remove("active");
+                if (!devices || devices.length === 0) {
+                    deviceContainer.innerHTML = "<p>No devices added yet.</p>";
+                    return;
+                }
+
+                deviceContainer.innerHTML = ""; // 清空当前设备列表
+                devices.forEach(device => {
+                    renderDevice(device);
+                });
+            } catch (error) {
+                console.error("Error loading devices:", error);
             }
-        });
-    });
+        }
 
+        // **设备名称关键字 -> 对应的文件夹映射**
+        const categoryMap = {
+            "lamp": "lighting", "bulb": "lighting", "ceiling": "lighting",
+            "door lock": "household-security", "cctv": "household-security",
+            "doorbell": "household-security", "safe box": "household-security",
+            "air conditioner": "air-treatment", "heater": "air-treatment",
+            "humidifier": "air-treatment", "fan": "air-treatment",
+            "socket": "power-switch", "switch": "power-switch",
+            "remote control": "power-switch", "cooking pot": "kitchen-electronics",
+            "fridge": "kitchen-electronics", "oven": "kitchen-electronics",
+            "microwave": "kitchen-electronics", "kettle": "kitchen-electronics",
+            "dishwasher": "kitchen-electronics", "stove": "kitchen-electronics",
+            "washer": "cleaning-appliances", "vacuum robot": "cleaning-appliances"
+        };
 
-    // reset furniture
-    renderFurniture();
+        // **获取分类目录**
+        function getCategoryFromName(deviceName) {
+            let lowerName = deviceName.toLowerCase();
 
+            for (let keyword in categoryMap) {
+                if (lowerName.includes(keyword)) {
+                    console.log(`✅ Matched "${deviceName}" -> "${categoryMap[keyword]}"`);
+                    return categoryMap[keyword];
+                }
+            }
+            console.log(`❌ No match for "${deviceName}", using default`);
+            return "default"; // 没找到匹配的类别，使用默认分类
+        }
 
-    function loadDevices() {
-        let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
-        let container = document.getElementById("furnitureContainer"); // ✅ 修改目标容器
-        container.innerHTML = devices.length ? "" : "<p>No devices added yet.</p>";
+        // **检查图片文件名**
+        async function getActualFileName(category, formattedName) {
+            let possibleNames = [
+                formattedName,  // 原始生成的文件名
+                formattedName.replace(/-svgrepo-com/, ""), // 移除 `-svgrepo-com`
+                formattedName.replace(/-\d+/, ""), // 移除 `-2`, `-3` 这类编号
+                formattedName.replace(/ /g, "-") // 处理空格
+            ];
 
-        devices.forEach(device => {
+            console.log(`🔍 Checking possible file names for ${formattedName}:`, possibleNames);
+
+            for (let name of possibleNames) {
+                let testPath = `/icons/${category}/${name}`;
+                console.log("🖼 Trying:", testPath);
+                if (await imageExists(testPath)) {
+                    console.log(`✅ Found match: ${name}`);
+                    return name; // 找到匹配的文件名
+                }
+            }
+
+            console.log(`❌ No match found, using default-icon.svg`);
+            return "default-icon.svg"; // **如果找不到文件，明确返回 default-icon.svg**
+        }
+
+        // **检查图片是否存在**
+        async function imageExists(imagePath) {
+            try {
+                const response = await fetch(imagePath, { method: "HEAD" });
+                return response.ok; // 如果服务器返回 `200 OK`，说明图片存在
+            } catch (error) {
+                console.error(`❌ Error checking image: ${imagePath}`, error);
+                return false; // 出错则认为文件不存在
+            }
+        }
+
+        // **渲染设备**
+        async function renderDevice(device) {
             let deviceElement = document.createElement("div");
             deviceElement.classList.add("device-card");
+
+            let categoryFolder = getCategoryFromName(device.device_name);
+            let formattedName = device.device_name.toLowerCase().replace(/\s+/g, '-') + ".svg";
+
+            // ✅ 确保 `getActualFileName()` 先执行
+            let actualFileName = await getActualFileName(categoryFolder, formattedName);
+            let imageUrl = `/icons/${categoryFolder}/${actualFileName}`;
+
+            console.log(`🖼 Final Image URL: ${imageUrl}`);
+
+            // 设备状态转换
+            const isOn = device.status === "true" || device.status === true;
+
+            // 生成 HTML
             deviceElement.innerHTML = `
-            <img src="${device.icon}" alt="${device.name}">
-            <h3>${device.name}</h3>
-            <button onclick="removeDevice('${device.id}')">Remove</button>
+            <div class="device-left">
+                <img class="device-icon" src="${imageUrl}" alt="${device.device_name}"
+                    onerror="this.onerror=null;this.src='/icons/default-icon.svg'; console.log('⚠️ Image not found, using default:', this.src);">
+                <h3 class="device-name">${device.device_name}</h3>
+            </div>
+            <div class="device-right">
+                <button class="toggle-status ${isOn ? "on" : "off"}" data-id="${device._id}">
+                    ${isOn ? "Turn Off" : "Turn On"}
+                </button>
+                <button class="remove-device" data-id="${device._id}">🗑</button>
+            </div>
         `;
-            container.appendChild(deviceElement);
+
+            deviceContainer.appendChild(deviceElement);
+        }
+
+        async function toggleDeviceStatus(deviceId, newStatus) {
+            try {
+                const response = await fetch("/api/update-device", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: deviceId, status: newStatus })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    console.log("Device status updated successfully.");
+                    loadDevices();
+                } else {
+                    console.error("Failed to update device status:", result.message);
+                }
+            } catch (error) {
+                console.error("Error updating device status:", error);
+            }
+        }
+
+        async function removeDevice(deviceId) {
+            try {
+                const response = await fetch(`/api/device/${deviceId}`, {
+                    method: "DELETE"
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    console.log("Device removed successfully.");
+                    loadDevices();
+                } else {
+                    console.error("Failed to remove device:", result.message);
+                }
+            } catch (error) {
+                console.error("Error removing device:", error);
+            }
+        }
+
+        // 监听 `addelectric.html` 添加的设备
+        window.addEventListener("storage", function (event) {
+            if (event.key === "newDevice") {
+                const newDevice = JSON.parse(event.newValue);
+                console.log("Received new device:", newDevice);
+                loadDevices();
+                localStorage.removeItem("newDevice");
+            }
         });
-    }
 
-    function removeDevice(deviceId) {
-        let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
-        devices = devices.filter(device => device.id !== deviceId);
-        localStorage.setItem("savedDevices", JSON.stringify(devices));
-        loadDevices(); // 重新渲染设备列表
-    }
-
-    window.onload = loadDevices;
-
+        loadDevices();
+    });
 
 
 
