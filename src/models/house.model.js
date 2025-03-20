@@ -10,10 +10,14 @@ const houseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room'
     }],
-    owner_id: {
+    owners: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
+    }],
+    dwellers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 const House = mongoose.model('House', houseSchema);
 export default House;
