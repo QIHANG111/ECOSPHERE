@@ -6,15 +6,14 @@ const roomSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    room_type: {
-        type: String,
-        required: true,
-        trim: true
-    },
     devices: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Device'
-    }]
+    }],
+    house: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'House'
+    }
 });
 
 const Room = mongoose.model('Room', roomSchema);
