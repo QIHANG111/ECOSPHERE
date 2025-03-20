@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import role from './role.model.js'
-import house from './house.model.js'
 
 const userSchema = new mongoose.Schema({
     name: {

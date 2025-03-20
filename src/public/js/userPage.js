@@ -136,6 +136,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
+
+
+
 async function addSubUser() {
     const memberName = document.getElementById("name").value.trim();
     const memberEmail = document.getElementById("email").value.trim();
@@ -214,9 +217,9 @@ function showUserSettings(user) {
     document.getElementById("userSettingsModal").style.display = "block";
     document.getElementById("settingsAvatar").src = `https://randomuser.me/api/portraits/lego/${user.user_avatar || 1}.jpg`;
     document.getElementById("settingsUserName").innerText = user.name;
+    document.getElementById("settingsUserName").dataset.userId = user._id; // Add this line
     document.getElementById("settingsUserEmail").innerText = user.email;
     document.getElementById("settingUserRole").innerText = user.role_id?.role_name || "User";
-
     const roleSelector = document.getElementById("roleSelector");
     roleSelector.value = user.role_id === "1" ? "1" : "2";
 
@@ -262,6 +265,37 @@ function addUserToList(user, isMainUser = false) {
     const settingsBtn = listItem.querySelector('.settings-btn');
     settingsBtn.addEventListener('click', () => showUserSettings(user));
 }
+
+async function deleteSubUser(userId) {
+    try {
+        const response = await fetch(`/api/users/${userId}`, {
+            method: "DELETE",
+        });
+
+        if (response.ok) {
+            alert("User deleted successfully.");
+            location.reload();
+        } else {
+            const result = await response.json();
+            alert("Failed to delete user: " + result.message);
+        }
+    } catch (error) {
+        console.error("[ERROR] Deleting user failed:", error);
+        alert("Server error.");
+    }
+}
+document.getElementById("deleteUserBtn").onclick = () => {
+    const userId = document.getElementById("settingsUserName").dataset.userId;
+    console.log("User ID:", userId);
+    if (userId) {
+        if (confirm("Are you sure you want to delete this user?")) {
+            deleteSubUser(userId).then(r => console.log(r));
+        }
+    } else {
+        alert("User ID is not defined.");
+    }
+};
+
 
 async function changeUserRole(userId) {
     const roleSelector = document.getElementById("roleSelector");
