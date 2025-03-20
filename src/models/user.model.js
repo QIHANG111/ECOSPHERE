@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import role from './role.model.js'
+import house from './house.model.js'
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -39,7 +41,12 @@ const userSchema = new mongoose.Schema({
     group: {
         type: Number,
         default: 1
-    }
+    },
+    houses:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'House',
+        default: null
+    }]
 });
 
 const User = mongoose.model('User', userSchema);
