@@ -1032,36 +1032,98 @@ router.get('/api/energy-usage', async (req, res) => {
     logDbState('/api/energy-usage');
 
     try {
-
         if (mongoose.connection.readyState !== 1) {
             console.log('[DEBUG] Mongoose not connected, returning 500');
             return res.status(500).json({ error: 'Database not connected' });
         }
 
-
+        // Get query parameters
         const range = req.query.range || 'weekly';
-        let limit = 7;
+        const start = req.query.start;
+        const end = req.query.end;
 
-        if (range === 'monthly') limit = 30;
-        else if (range === 'yearly') limit = 365;
+        console.log(`[DEBUG] Request params - range: ${range}, start: ${start}, end: ${end}`);
 
+        // Build the query
+        let query = {};
 
-        const energyData = await EnergyUsage.find().sort({ date: -1 }).limit(limit);
+        // If start and end dates are provided, use them for filtering
+        if (start && end) {
+            query.date = {
+                $gte: new Date(start),
+                $lte: new Date(end)
+            };
+            console.log(`[DEBUG] Filtering by date range: ${start} to ${end}`);
+        } else {
+            // Fallback to default behavior if no date range provided
+            let limit = 7;
+            if (range === 'monthly') limit = 31;
+            else if (range === 'yearly') limit = 365;
 
-        console.log(`[DEBUG] Fetched ${energyData.length} energy records for range: ${range}`);
+            console.log(`[DEBUG] No date range provided, using default limit: ${limit}`);
 
-        if (!Array.isArray(energyData) || energyData.length === 0) {
-            console.log('[DEBUG] No energy usage data found in the collection');
-            return res.status(404).json({ error: 'No energy usage data found' });
+            // Get the most recent data
+            const energyData = await EnergyUsage.find()
+                .sort({ date: -1 })
+                .limit(limit);
+
+            if (!Array.isArray(energyData) || energyData.length === 0) {
+                console.log('[DEBUG] No energy usage data found in the collection');
+                return res.status(404).json({ error: 'No energy usage data found' });
+            }
+
+            // Return the data in chronological order (oldest first)
+            return res.json(energyData.reverse());
         }
 
-        res.json(energyData.reverse());
+        // Execute the query with date filtering
+        const energyData = await EnergyUsage.find(query).sort({ date: 1 });
+
+        console.log(`[DEBUG] Fetched ${energyData.length} energy records for date range: ${start} to ${end}`);
+
+        if (!Array.isArray(energyData) || energyData.length === 0) {
+            console.log('[DEBUG] No energy usage data found for the specified range');
+            return res.status(404).json({ error: 'No energy usage data found for the specified date range' });
+        }
+
+        res.json(energyData);
     } catch (error) {
         console.error('[ERROR] GET /api/energy-usage ->', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
+// Add a new endpoint to get all energy usage data
+router.get('/api/energy-usage/all', async (req, res) => {
+    console.log('[DEBUG] GET /api/energy-usage/all');
+    logDbState('/api/energy-usage/all');
+
+    try {
+        if (mongoose.connection.readyState !== 1) {
+            console.log('[DEBUG] Mongoose not connected, returning 500');
+            return res.status(500).json({ error: 'Database not connected' });
+        }
+
+        // Optional limit parameter with a reasonable default
+        const limit = parseInt(req.query.limit) || 1000;
+
+        const energyData = await EnergyUsage.find()
+            .sort({ date: 1 })
+            .limit(limit);
+
+        console.log(`[DEBUG] Fetched ${energyData.length} total energy records`);
+
+        if (!Array.isArray(energyData) || energyData.length === 0) {
+            console.log('[DEBUG] No energy usage data found in the collection');
+            return res.status(404).json({ error: 'No energy usage data found' });
+        }
+
+        res.json(energyData);
+    } catch (error) {
+        console.error('[ERROR] GET /api/energy-usage/all ->', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 router.get('/api/notifications', (req, res) => {
     res.json({ notifications }); // Ensuring it's an object with an array
 });

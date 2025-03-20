@@ -78,9 +78,12 @@
 <!--  </div>-->
   <div class="dashboard-content" style="grid-template-columns: 2fr 1fr; grid-gap: 2% 10%;">
     <div class="normalCard" style="text-align: left;width: 170%">
-      <div class="leftToRightList">
-        <button class="hidden-button ui-menu-icon " style="width: 5vw; height: 3.5vw" onclick="window.location.href='/pages/reportPage.html';">
-          <img src="/icons/about.svg" alt="Vector Icon" width="20" height="20" style="flex: 1; text-align: center;">
+      <div class="leftToRightList" style="margin-right: 25vw">
+        <button class="hidden-button ui-menu-icon " style="width: 5vw; height: 3vw;" onclick="prevPeriod()">
+          <img src="/icons/caret-left-svgrepo-com.svg" alt="Vector Icon" width="30" height="30" style="flex: 1; text-align: center;">
+        </button>
+        <button class="hidden-button ui-menu-icon " style="width: 5vw; height: 3vw" onclick="nextPeriod()">
+          <img src="/icons/caret-right-svgrepo-com.svg" alt="Vector Icon" width="30" height="30" style="flex: 1; text-align: center;">
         </button>
       </div>
       <!-- Canvas for Chart -->
