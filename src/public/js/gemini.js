@@ -2,7 +2,7 @@
 const API_KEY = "AIzaSyDoSgt53bNbO6Rlqs0QMJjCr9zHofxLtwA"; // Replace with a secure environment variable
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
 
-
+const token = localStorage.getItem("token") || "";
 
 
 // Fetch AI Response from Gemini API
@@ -33,7 +33,8 @@ function updateDeviceTemperature(deviceName, newTemperature) {
     fetch("/api/update-temperature", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({ name: deviceName, temperature: newTemperature })
     })
@@ -53,7 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const deviceList = document.getElementById("deviceList");
 
     function loadDevices() {
-        fetch("/api/devices")
+        fetch("/api/devices", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
             .then(response => response.json())
             .then(devices => {
                 deviceList.innerHTML = "";
