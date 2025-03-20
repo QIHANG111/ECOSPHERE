@@ -286,20 +286,31 @@ router.post('/api/forgot-password', async (req, res) => {
     }
 });
 
+const checkPermission = async (userId, permissionName) => {
+    try {
+        const user = await User.findById(userId).populate('role_id');
+        if (!user || !user.role_id) return false;
+
+        const rolePermissions = await RolePermission.find({ role_id: user.role_id._id }).populate('permission_id');
+        if (!rolePermissions || rolePermissions.length === 0) return false;
+
+        return rolePermissions.some(rp => rp.permission_id.name === permissionName);
+    } catch (error) {
+        console.error('[ERROR] checkPermission ->', error);
+        return false;
+    }
+};
+
 /* ============================================================
    USER CONFIG
 ============================================================ */
 
-router.put('/api/update-user', async (req, res) => {
+/*
+  Update user information
+*/
+router.put('/api/update-user', authMiddleware, async (req, res) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1];
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-
-        const decoded = jwt.verify(token, SECRET_KEY);
-        const userId = decoded.userId;
-
+        const userId = req.user._id; // Extracted from middleware
         const { name, email, password, user_avatar } = req.body;
 
         let updateData = {};
@@ -336,27 +347,22 @@ router.put('/api/update-user', async (req, res) => {
     "user_avatar": 2                      // Sub-user's avatar provided explicitly
   }
 */
-router.post('/api/subusers', async (req, res) => {
+router.post('/api/subusers', authMiddleware, async (req, res) => {
     console.log('[DEBUG] POST /api/subusers -> req.body:', req.body);
 
     try {
-        const { name, phone, parentEmail, role: roleName, user_avatar } = req.body;
+        const { name, phone, role: roleName, user_avatar } = req.body;
 
-        if (!name || !phone || !parentEmail || !roleName) {
+        if (!name || !phone || !roleName) {
             return res.status(400).json({
                 success: false,
-                message: 'Please provide name, phone, parentEmail, and role'
+                message: 'Please provide name, phone, and role'
             });
         }
 
-        // Look up the parent user by email
-        const mainUser = await User.findOne({ email: parentEmail });
-        if (!mainUser) {
-            console.log(`[DEBUG] Parent user not found with email: ${parentEmail}`);
-            return res.status(400).json({ success: false, message: 'Parent user not found' });
-        }
+        const mainUser = req.user;  
+        console.log(`[DEBUG] Parent user authenticated: ${mainUser.email} (ID: ${mainUser._id})`);
 
-        // Look up the role provided in the request body
         const roleDoc = await Role.findOne({ role_name: roleName });
         if (!roleDoc) {
             console.error(`[ERROR] Role "${roleName}" not found in database.`);
@@ -364,13 +370,11 @@ router.post('/api/subusers', async (req, res) => {
         }
         console.log(`[DEBUG] Found role "${roleName}" with id: ${roleDoc._id}`);
 
-        // Create the sub-user by inheriting parent's email and hashed password,
-        // but using the role provided and user_avatar from req.body.
         const newSubUser = new User({
             name,
             phone,
-            email: mainUser.email,
-            hashed_password: mainUser.hashed_password,
+            email: mainUser.email,  
+            hashed_password: mainUser.hashed_password,  
             role_id: roleDoc._id,
             parentUser: mainUser._id,
             user_avatar
@@ -378,10 +382,8 @@ router.post('/api/subusers', async (req, res) => {
         await newSubUser.save();
         console.log('[DEBUG] Sub-user created:', newSubUser._id);
 
-        // Retrieve the parent's house mapping (assuming the parent is a Home Owner)
         const mainHouseMapping = await HouseUser.findOne({ user_id: mainUser._id, role: "Home Owner" });
         if (mainHouseMapping) {
-            // Create a mapping for the sub-user with the provided role in the same house
             const subUserMapping = new HouseUser({
                 house_id: mainHouseMapping.house_id,
                 user_id: newSubUser._id,
@@ -410,12 +412,14 @@ const subRole = 'Home Dweller';
   - Otherwise, just that user.
   Additionally, deletes the mapping(s) for the deleted user(s) from the HouseUser collection.
 */
-router.delete('/api/users/:id', async (req, res) => {
+router.delete('/api/users/:id', authMiddleware, async (req, res) => {
     console.log('[DEBUG] DELETE /api/users/:id ->', req.params);
     logDbState('/api/users/:id');
+
     try {
         const { id } = req.params;
-        const requestingUserRole = req.user && req.user.role_id;
+        const requestingUser = req.user; 
+        const requestingUserRole = requestingUser.role_id;
 
         const userToDelete = await User.findById(id);
         if (!userToDelete) {
@@ -430,13 +434,12 @@ router.delete('/api/users/:id', async (req, res) => {
                     .status(403)
                     .json({ success: false, message: 'Only managers can delete a manager account.' });
             }
-            // Find all users to delete (manager + subusers)
+
             const usersToDelete = await User.find({
                 $or: [{ _id: id }, { parentUser: id }]
             }).select('_id');
             const idsToDelete = usersToDelete.map(u => u._id);
 
-            // Delete users from the User collection
             const result = await User.deleteMany({ _id: { $in: idsToDelete } });
             console.log('[DEBUG] Manager + subusers delete result:', result);
 
@@ -477,9 +480,15 @@ router.delete('/api/users/:id', async (req, res) => {
 /*
   Get all users under a certain owner
 */
-router.get('/api/users/parent/:id', async (req, res) => {
+router.get('/api/users/parent/:id', authMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
+        const requestingUser = req.user; 
+
+        if (requestingUser._id.toString() !== id && requestingUser.role_id !== "Developer") {
+            return res.status(403).json({ success: false, message: "Unauthorized access" });
+        }
+
         const parentUser = await User.findById(id);
         if (!parentUser) {
             return res.status(404).json({ success: false, message: "Parent user not found" });
@@ -499,12 +508,20 @@ router.get('/api/users/parent/:id', async (req, res) => {
 });
 
 /*
-  Get all users
+  Get all users in MongoDB (Only accessible by Developers)
 */
-router.get('/api/allusers', async (req, res) => {
+router.get('/api/allusers', authMiddleware, async (req, res) => {
     console.log('[DEBUG] GET /api/allusers');
     logDbState('/api/allusers');
+
     try {
+        if (req.user.roleName !== "Developer") {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Only Developers can access all users.' 
+            });
+        }
+
         const users = await User.find();
         console.log(`[DEBUG] Found ${users.length} total users`);
         res.status(200).json({ success: true, users });
@@ -517,7 +534,7 @@ router.get('/api/allusers', async (req, res) => {
 /*
   Get all users under a house
 */
-router.get('/api/house-users/:houseId', async (req, res) => {
+router.get('/api/house-users/:houseId', authMiddleware, async (req, res) => {
     try {
         const { houseId } = req.params;
         console.log(`[DEBUG] GET /api/house-users/${houseId} -> Fetching house details`);
@@ -540,11 +557,12 @@ router.get('/api/house-users/:houseId', async (req, res) => {
     }
 });
 
-/*
-  assign role to user
-*/
-router.post('/api/users/:userId/assign-role', async (req, res) => {
+router.post('/api/users/:userId/assign-role', authMiddleware, async (req, res) => {
     try {
+        if (req.user.roleName !== 'Home Owner') {
+            return res.status(403).json({ error: "Access denied. Only Home Owners can assign roles." });
+        }
+
         const { userId } = req.params;
         const { roleId } = req.body;
 
@@ -563,6 +581,7 @@ router.post('/api/users/:userId/assign-role', async (req, res) => {
 
         res.json({ message: "Role assigned successfully", user });
     } catch (error) {
+        console.error('[ERROR] POST /api/users/:userId/assign-role ->', error);
         res.status(500).json({ error: "Failed to assign role" });
     }
 });
@@ -571,59 +590,36 @@ router.post('/api/users/:userId/assign-role', async (req, res) => {
    DEVICES CONFIG
 ============================================================ */
 
-const checkPermission = async (userId, permissionName) => {
-    try {
-        const user = await User.findById(userId).populate('role_id');
-        if (!user || !user.role_id) return false;
-
-        const rolePermissions = await RolePermission.find({ role_id: user.role_id._id }).populate('permission_id');
-        if (!rolePermissions || rolePermissions.length === 0) return false;
-
-        return rolePermissions.some(rp => rp.permission_id.name === permissionName);
-    } catch (error) {
-        console.error('[ERROR] checkPermission ->', error);
-        return false;
-    }
-};
-
-/*
-  Add device
-*/
 /*
   Add device and update the room's devices list if a roomName is provided.
   Expected request body should include:
     - device_name
     - device_type
-    - roomName: the name of the room where this device belongs. if not specified, doesnt add it to rooms
+    - roomName: the name of the room where this device belongs. 
+      If not specified, the device is created without updating a room.
 */
-router.post('/api/device', async (req, res) => {
+router.post('/api/device', authMiddleware, async (req, res) => {
     console.log('[DEBUG] POST /api/device -> req.body:', req.body);
 
-    // Destructure roomName from the request body; the rest is deviceData.
     const { roomName, ...deviceData } = req.body;
 
-    // Validate required fields for the device (do not require status as default is "off")
     if (!deviceData.device_name || !deviceData.device_type) {
-        console.error('[ERROR] Missing required device fields (device_name or device_type)', error);
-        res.status(400).json({ error: 'Please enter all required fields (device_name and device_type)' });
+        console.error('[ERROR] Missing required device fields (device_name or device_type)');
+        return res.status(400).json({ error: 'Please enter all required fields (device_name and device_type)' });
     }
 
     const newDevice = new Device(deviceData);
 
     try {
-        // Save the device first; status will be set to default ("off")
         await newDevice.save();
         console.log('[DEBUG] Created new device:', newDevice._id);
 
-        // If a roomName is provided, update the room document accordingly
         if (roomName) {
             const room = await Room.findOne({ room_name: roomName });
             if (room) {
-                // Add the device id to the room's devices array
                 room.devices.push(newDevice._id);
                 await room.save();
 
-                // Also update the new device's room field to reference this room
                 newDevice.room = room._id;
                 await newDevice.save();
                 console.log(`[DEBUG] Added device ${newDevice._id} to room "${room.room_name}"`);
@@ -640,13 +636,14 @@ router.post('/api/device', async (req, res) => {
 });
 
 /*
-  Delete device by id and remove its reference from the room's devices array (if room specified)
+  Delete device by id and remove its reference from the room's devices array 
 */
-router.delete('/api/device/:id', async (req, res) => {
+router.delete('/api/device/:id', authMiddleware, async (req, res) => {
     console.log('[DEBUG] DELETE /api/device/:id ->', req.params);
     logDbState('/api/device/:id');
+    
     const { id } = req.params;
-    const userId = req.user && req.user._id;
+    const userId = req.user._id; 
 
     try {
         const hasPermission = await checkPermission(userId, "deleteDevice");
@@ -657,11 +654,10 @@ router.delete('/api/device/:id', async (req, res) => {
 
         const device = await Device.findById(id);
         if (!device) {
-            console.error(`[ERROR] Fetching device by id: ${id}`, error);
-            res.status(404).json({ error: 'Device not found' });
+            console.error(`[ERROR] Device not found with id: ${id}`);
+            return res.status(404).json({ error: 'Device not found' });
         }
 
-        // If the device is associated with a room, remove its id from the room's devices array
         if (device.room) {
             const room = await Room.findById(device.room);
             if (room) {
@@ -671,7 +667,6 @@ router.delete('/api/device/:id', async (req, res) => {
             }
         }
 
-        // Delete the device from the devices collection
         await Device.findByIdAndDelete(id);
         console.log(`[DEBUG] Deleted device with id: ${id}`);
         res.status(200).json({ success: true, message: 'Device deleted successfully' });
@@ -684,16 +679,23 @@ router.delete('/api/device/:id', async (req, res) => {
 /*
   Get the list of devices in mongodb
 */
-router.get('/api/devices', async (req, res) => {
+router.get('/api/devices', authMiddleware, async (req, res) => {
     console.log('[DEBUG] GET /api/devices -> Fetching devices from MongoDB');
+
     try {
+        const userId = req.user._id;
+        const hasPermission = await checkPermission(userId, 'Developer');
+        if (!hasPermission) {
+            return res.status(403).json({ error: 'Access denied. Only Developers can access all devices.' });
+        }
+
         const devices = await Device.find();
         if (!devices || devices.length === 0) {
-            console.error('[ERROR] Finding devices in the database ->', error);
+            console.error('[ERROR] No devices found in the database');
             return res.status(404).json({ error: 'No devices found' });
         }
-        console.log(`[DEBUG] /api/devices -> found ${devices.length} devices in MongoDB`);
-        res.json(devices);
+        console.log(`[DEBUG] Found ${devices.length} devices in MongoDB`);
+        res.status(200).json({ success: true, devices });
     } catch (error) {
         console.error('[ERROR] Fetching devices from MongoDB ->', error);
         res.status(500).json({ error: 'Server error while fetching devices' });
@@ -703,9 +705,8 @@ router.get('/api/devices', async (req, res) => {
 /*
   Update the status of a specific device
 */
-router.post('/api/update-device', async (req, res) => {
+router.post('/api/update-device', authMiddleware, async (req, res) => {
     console.log('[DEBUG] POST /api/update-device -> req.body:', req.body);
-
 
     if (!req.body || typeof req.body.name !== 'string' || (typeof req.body.status !== 'boolean' && req.body.status !== "true" && req.body.status !== "false")) {
         console.error('[ERROR] Parsing body:', req.body);
@@ -729,7 +730,6 @@ router.post('/api/update-device', async (req, res) => {
 
         console.log(`[DEBUG] Updated device '${name}' status to: ${status}`);
         return res.json({ success: true, updatedDevice });
-
     } catch (error) {
         console.error('[ERROR] Updating device status in MongoDB ->', error);
         return res.status(500).json({ error: 'Server error while updating device status' });
@@ -739,7 +739,7 @@ router.post('/api/update-device', async (req, res) => {
 /*
     Update the temperature of a specific AC device
 */
-router.post('/api/update-temperature', async (req, res) => {
+router.post('/api/update-temperature', authMiddleware, async (req, res) => {
     console.log('[DEBUG] POST /api/update-temperature -> req.body:', req.body);
 
     if (!req.body || typeof req.body.name !== 'string' || typeof req.body.temperature !== 'number') {
@@ -752,7 +752,6 @@ router.post('/api/update-temperature', async (req, res) => {
     const { name, temperature } = req.body;
 
     try {
-        // Find and update the AC device in MongoDB
         console.log(`[DEBUG] Finding AC device of name: ${name}`);
         const updatedDevice = await Device.findOneAndUpdate(
             { device_name: name, device_type: 'AC' },
@@ -761,13 +760,12 @@ router.post('/api/update-temperature', async (req, res) => {
         );
 
         if (!updatedDevice) {
-            console.error(`[ERROR] Finding AC device ${name} ->`, error);
-            res.status(404).json({ error: 'AC device not found' });
+            console.error(`[ERROR] AC device not found with name: ${name}`);
+            return res.status(404).json({ error: 'AC device not found' });
         }
 
         console.log(`[DEBUG] Updated AC device '${name}' temperature to: ${temperature}`);
         res.json({ success: true, updatedDevice });
-
     } catch (error) {
         console.error('[ERROR] Updating AC temperature ->', error);
         res.status(500).json({ error: 'Server error while updating temperature' });
@@ -777,7 +775,7 @@ router.post('/api/update-temperature', async (req, res) => {
 /*
     Adjust light brightness
 */
-router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
+router.put("/api/devices/:id/adjust-brightness", authMiddleware, async (req, res) => {
     try {
         const { brightness } = req.body;
         const deviceId = req.params.id;
@@ -785,89 +783,61 @@ router.put("/api/devices/:id/adjust-brightness", async (req, res) => {
         console.log(`[DEBUG] Requested brightness level: ${brightness}`);
 
         if (brightness < 1 || brightness > 5) {
-            console.error('[ERROR] Adjusting brightness ->', error);
-            res.status(400).json({ error: "Brightness level must be between 1 and 5" });
+            console.error('[ERROR] Invalid brightness level provided:', brightness);
+            return res.status(400).json({ error: "Brightness level must be between 1 and 5" });
         }
 
         const device = await Device.findById(deviceId);
-
         if (!device) {
-            console.error('[ERROR] Finding device. ->', error);
-            res.status(404).json({ error: "Device not found" });
+            console.error('[ERROR] Device not found with id:', deviceId);
+            return res.status(404).json({ error: "Device not found" });
         }
 
         console.log(`[DEBUG] Device found: ${device.device_name}, (Type: ${device.device_type})`);
 
         if (device.device_type !== "light") {
-            console.error("[ERROR] Getting device type. ->");
-            res.status(400).json({ error: "This device is not a light" });
+            console.error("[ERROR] Device type is not light. Received type:", device.device_type);
+            return res.status(400).json({ error: "This device is not a light" });
         }
 
         console.log(`[DEBUG] Updating brightness from ${device.brightness} to ${brightness}`);
         device.brightness = brightness;
-
-        console.log(`[DEBUG] Saving brightness changes to ${device.brightness}`);
         await device.save();
-        res.status(200).json({ success: true, message: "Brightness adjusted successfully", data: device });
+        console.log(`[DEBUG] Saved brightness changes: ${device.brightness}`);
 
+        return res.status(200).json({ success: true, message: "Brightness adjusted successfully", data: device });
     } catch (error) {
         console.error("[ERROR] Adjusting brightness ->", error);
-        res.status(500).json({ error: "Server error" });
-    }
-});
-
-/*
-  Get status of a device
-*/
-router.get("/api/device/status/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        console.log(`[DEBUG] GET /api/device/status/${id} -> Fetching device status`);
-
-        const device = await Device.findById(id).select("status");
-        if (!device) {
-            console.error(`[ERROR] Device not found: ${id}`, error);
-            res.status(404).json({ error: "Device not found" });
-        }
-
-        console.log(`[DEBUG] Device status for ${id}: ${device.status}`);
-        res.status(200).json({ success: true, status: device.status });
-    } catch (error) {
-        console.error(`[ERROR] Fetching device status ->`, error);
-        res.status(500).json({ error: "Server error" });
+        return res.status(500).json({ error: "Server error" });
     }
 });
 
 /*
   adjust fan speed
 */
-router.put("/api/devices/:id/fan-speed", async (req, res) => {
+router.put("/api/devices/:id/fan-speed", authMiddleware, async (req, res) => {
     try {
         const { fanSpeed } = req.body;
         const deviceId = req.params.id;
 
         console.log(`[DEBUG] PUT /api/devices/${deviceId}/fan-speed -> Received fanSpeed: ${fanSpeed}`);
 
-        // Validate fanSpeed value: must be a number between 1 and 8
         if (typeof fanSpeed !== "number" || fanSpeed < 1 || fanSpeed > 8) {
-            console.error("[ERROR] Invalid fan speed value. Must be between 1 and 8.", error);
-            res.status(400).json({ error: "Fan speed must be between 1 and 8" });
+            console.error("[ERROR] Invalid fan speed value. Must be between 1 and 8.");
+            return res.status(400).json({ error: "Fan speed must be between 1 and 8" });
         }
 
-        // Find the device by ID
         const device = await Device.findById(deviceId);
         if (!device) {
-            console.log(`[ERROR] Device not found: ${deviceId}`, error);
-            res.status(404).json({ error: "Device not found" });
+            console.error(`[ERROR] Device not found: ${deviceId}`);
+            return res.status(404).json({ error: "Device not found" });
         }
 
-        // Check if the device is of type "fan"
         if (device.device_type !== "fan") {
-            console.error(`[ERROR] Device type mismatch. Expected "fan", but found "${device.device_type}"`, error);
-            res.status(400).json({ error: "This device is not a fan" });
+            console.error(`[ERROR] Device type mismatch. Expected "fan", but found "${device.device_type}"`);
+            return res.status(400).json({ error: "This device is not a fan" });
         }
 
-        // Update the fan speed
         console.log(`[DEBUG] Updating fan speed from ${device.fan_speed} to ${fanSpeed}`);
         device.fan_speed = fanSpeed;
         await device.save();
@@ -877,6 +847,28 @@ router.put("/api/devices/:id/fan-speed", async (req, res) => {
     } catch (error) {
         console.error(`[ERROR] PUT /api/devices/:id/fan-speed ->`, error);
         res.status(500).json({ success: false, message: "Server error while updating fan speed" });
+    }
+});
+
+/*
+  Get status of a device
+*/
+router.get("/api/device/status/:id", authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(`[DEBUG] GET /api/device/status/${id} -> Fetching device status`);
+
+        const device = await Device.findById(id).select("status");
+        if (!device) {
+            console.error(`[ERROR] Device not found: ${id}`);
+            return res.status(404).json({ error: "Device not found" });
+        }
+
+        console.log(`[DEBUG] Device status for ${id}: ${device.status}`);
+        res.status(200).json({ success: true, status: device.status });
+    } catch (error) {
+        console.error(`[ERROR] Fetching device status ->`, error);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
@@ -1135,28 +1127,25 @@ router.get('/api/houses/:houseId/rooms', authMiddleware, async (req, res) => {
     }
 });
 
-
 /*
-Get energy usage data
+  Get energy usage data (Authenticated users only)
 */
-router.get('/api/energy-usage', async (req, res) => {
-    console.log('[DEBUG] GET /api/energy-usage');
+router.get('/api/energy-usage', authMiddleware, async (req, res) => {
+    console.log('[DEBUG] GET /api/energy-usage by user:', req.user);
+
     logDbState('/api/energy-usage');
 
     try {
-
         if (mongoose.connection.readyState !== 1) {
             console.log('[DEBUG] Mongoose not connected, returning 500');
             return res.status(500).json({ error: 'Database not connected' });
         }
-
 
         const range = req.query.range || 'weekly';
         let limit = 7;
 
         if (range === 'monthly') limit = 30;
         else if (range === 'yearly') limit = 365;
-
 
         const energyData = await EnergyUsage.find().sort({ date: -1 }).limit(limit);
 
@@ -1174,11 +1163,13 @@ router.get('/api/energy-usage', async (req, res) => {
     }
 });
 
-router.get('/api/notifications', (req, res) => {
-    res.json({ notifications }); // Ensuring it's an object with an array
+/*
+  Get notifications (Authenticated users only)
+*/
+router.get('/api/notifications', authMiddleware, (req, res) => {
+    console.log('[DEBUG] GET /api/notifications by user:', req.user);
+    res.json({ notifications });
 });
-
-
 
 export default router;
 
