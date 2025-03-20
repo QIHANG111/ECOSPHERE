@@ -13,21 +13,23 @@ import { error } from 'node:console';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import path from 'node:path';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+import HouseUser from '../models/houseUser.model.js';
+
+dotenv.config();
+const SECRET_KEY = process.env.SECRET_KEY;
 
 // If you're using JWT, make sure to import it:
 // import jwt from 'jsonwebtoken';
 // And have SECRET_KEY either from env or config
 
 /*notes
--finish building APIs requested by yanzi
 -build api for houses - add house at signup, add house at user settings, delete house, get all houses under a user, get list of houses in mongodb
--build api for password recovery(forgot password) 
 -edit add room to add the room to associated house id
--edit the add device to append the deviceid to the array of devices in the associated room 
 -build automation APIs
--API for push notifications and email alerts
 -api for device energy usage(not overall)
--add room api doesnt add it to the database, modify*/
+-get list of rooms under a house, list of houses under a user*/
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,7 +37,6 @@ const __dirname = dirname(__filename);
 
 const router = express.Router();
 let notifications = [];
-const SECRET_KEY = "your_secret_key";
 
 /* ------------------------------------------------------------
    Debugging Helper: log the Mongoose connection state
@@ -55,23 +56,11 @@ router.get('/', (req, res) => {
 });
 
 /*
-  Example endpoint: fetch all users
-*/
-router.get('/api/users', async (req, res) => {
-    console.log('[DEBUG] GET /api/users triggered');
-    logDbState('/api/users');
-    try {
-        const users = await User.find();
-        console.log(`[DEBUG] Found ${users.length} users`);
-        res.json(users);
-    } catch (error) {
-        console.error('[ERROR] Failed to fetch user data:', error);
-        res.status(500).json({ error: 'Failed to fetch user data from database' });
-    }
-});
-
-/*
   Sign up
+  - Automatically assigns the "Home Owner" role.
+  - Automatically creates a house for the new user.
+  - Inserts a mapping in the HouseUser collection.
+  - Updates the user's houses array with the newly created house ID.
 */
 router.post('/api/signup', async (req, res) => {
     try {
@@ -81,7 +70,6 @@ router.post('/api/signup', async (req, res) => {
         if (!phone) {
             phone = "1234567890";
         }
-
         if (typeof user_avatar === "undefined" || user_avatar === null) {
             user_avatar = 1;
         }
@@ -104,7 +92,7 @@ router.post('/api/signup', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log("[DEBUG] Hashed password:", hashedPassword);
 
-        // Create new user with the role _id from the "Home Owner" role
+        // Create new user with the "Home Owner" role
         const newUser = new User({
             name,
             email,
@@ -112,17 +100,49 @@ router.post('/api/signup', async (req, res) => {
             hashed_password: hashedPassword,
             role_id: role._id,
             parentUser: parentUser || null,
-            user_avatar
+            user_avatar,
+            houses: [] // Initialize houses array
         });
-
         await newUser.save();
-        res.status(201).json({ message: "User registered successfully", data: newUser });
+        console.log("[DEBUG] New user created:", newUser._id);
+
+        // Automatically create a house for the new Home Owner.
+        const houseName = `${newUser.name}'s House`;
+        const newHouse = new House({
+            house_name: houseName,
+            rooms: [],
+            owner_id: newUser._id
+        });
+        await newHouse.save();
+        console.log("[DEBUG] New house created:", newHouse._id);
+
+        // Insert mapping into the HouseUser collection: the user is mapped to the house as Home Owner
+        const houseUserMapping = new HouseUser({
+            house_id: newHouse._id,
+            user_id: newUser._id,
+            role: "Home Owner"
+        });
+        await houseUserMapping.save();
+        console.log("[DEBUG] Created HouseUser mapping:", houseUserMapping._id);
+
+        // Update the user's houses array with the new house ID
+        newUser.houses.push(newHouse._id);
+        await newUser.save();
+        console.log("[DEBUG] Updated user's houses array:", newUser.houses);
+
+        // Optionally, generate a JWT token for the new user (to sign them in immediately)
+        const token = jwt.sign(
+            { userId: newUser._id, email: newUser.email, role: newUser.role_id },
+            SECRET_KEY,
+            { expiresIn: '2h' }
+        );
+
+        res.status(201).json({ message: "User registered successfully", token, data: newUser });
     } catch (error) {
         console.error("[ERROR] POST /api/signup ->", error);
         res.status(500).json({ message: "Server error" });
     }
 });
-
 
 router.get('/api/getRoleId/:roleName', async (req, res) => {
     try {
@@ -171,6 +191,7 @@ router.get('/api/user', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
 /*
   Sign in
   NOTE: requires jwt & SECRET_KEY if you truly use token logic
@@ -206,6 +227,71 @@ router.post('/api/signin', async (req, res) => {
         res.status(500).json({ message: 'server error' });
     }
 });
+
+/*
+  Forgot password recovery option
+*/
+router.post('/api/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        console.log(`[DEBUG] POST /api/forgot-password -> Received email: ${email}`);
+
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        // Find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            console.warn(`[DEBUG] No account found for email: ${email}`);
+            // Always return success to avoid revealing whether the email exists
+            return res.status(200).json({ message: "If an account with that email exists, a reset link has been sent." });
+        }
+
+        // Generate a reset token valid for 1 hour
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+        console.log(`[DEBUG] Generated reset token: ${token}`);
+
+        // Construct the reset link. FRONTEND_URL should be set to your application's URL.
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+        console.log(`[DEBUG] Generated reset link: ${resetLink}`);
+
+        // Set up nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT),
+            secure: process.env.SMTP_SECURE === 'true', // true for port 465, false for others
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
+            }
+        });
+
+        // Define the email options
+        const mailOptions = {
+            from: `"Your App Name" <${process.env.SMTP_USER}>`,
+            to: email,
+            subject: "Password Reset Request",
+            text: `You requested a password reset. Click the link below to reset your password:\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
+            html: 
+                `<p>You requested a password reset. Click the link below to reset your password:</p>
+                <p><a href="${resetLink}">${resetLink}</a></p>
+                <p>If you did not request this, please ignore this email.</p>`
+        };
+
+        // Send the email
+        await transporter.sendMail(mailOptions);
+        console.log(`[DEBUG] Password reset email sent to ${email}`);
+
+        return res.status(200).json({
+            message: "If an account with that email exists, a reset link has been sent."
+        });
+    } catch (error) {
+        console.error(`[ERROR] POST /api/forgot-password ->`, error);
+        return res.status(500).json({ message: "Server error" });
+    }
+});
+
 /* ============================================================
    USER CONFIG
 ============================================================ */
@@ -245,40 +331,74 @@ router.put('/api/update-user', async (req, res) => {
     }
 });
 
-
-
 /*
-  Add new sub-user
+  Add new sub-user (e.g., Home Dweller) without separate credentials.
+  Expected request body:
+  {
+    "name": "Sub User Name",
+    "phone": "1234567890",
+    "parentEmail": "parent@example.com",  // Parent user's email
+    "role": "Home Dweller",               // Role for the sub-user (must exist in Role collection)
+    "user_avatar": 2                      // Sub-user's avatar provided explicitly
+  }
 */
 router.post('/api/subusers', async (req, res) => {
     console.log('[DEBUG] POST /api/subusers -> req.body:', req.body);
-    logDbState('/api/subusers');
-    try {
-        const { name, phone, role_id, mainUserEmail } = req.body;
 
-        if (!name || !phone || !role_id || !mainUserEmail) {
+    try {
+        const { name, phone, parentEmail, role: roleName, user_avatar } = req.body;
+
+        if (!name || !phone || !parentEmail || !roleName) {
             return res.status(400).json({
                 success: false,
-                message: 'Please enter all fields: name, phone, roleID, and main user email'
+                message: 'Please provide name, phone, parentEmail, and role'
             });
         }
 
-        const mainUser = await User.findOne({ email: mainUserEmail });
+        // Look up the parent user by email
+        const mainUser = await User.findOne({ email: parentEmail });
         if (!mainUser) {
-            console.log(`[DEBUG] Main user not found by email: ${mainUserEmail}`);
-            return res.status(400).json({ success: false, message: 'Main user not found' });
+            console.log(`[DEBUG] Parent user not found with email: ${parentEmail}`);
+            return res.status(400).json({ success: false, message: 'Parent user not found' });
         }
 
-        // Potential mismatch between role_id and roleID if your schema differs
+        // Look up the role provided in the request body
+        const roleDoc = await Role.findOne({ role_name: roleName });
+        if (!roleDoc) {
+            console.error(`[ERROR] Role "${roleName}" not found in database.`);
+            return res.status(500).json({ success: false, message: `Role "${roleName}" not found` });
+        }
+        console.log(`[DEBUG] Found role "${roleName}" with id: ${roleDoc._id}`);
+
+        // Create the sub-user by inheriting parent's email and hashed password,
+        // but using the role provided and user_avatar from req.body.
         const newSubUser = new User({
             name,
             phone,
-            roleID: role_id,
-            parentUser: mainUser._id
+            email: mainUser.email,                   
+            hashed_password: mainUser.hashed_password, 
+            role_id: roleDoc._id,                      
+            parentUser: mainUser._id,                  
+            user_avatar                             
         });
-
         await newSubUser.save();
         console.log('[DEBUG] Sub-user created:', newSubUser._id);
+
+        // Retrieve the parent's house mapping (assuming the parent is a Home Owner)
+        const mainHouseMapping = await HouseUser.findOne({ user_id: mainUser._id, role: "Home Owner" });
+        if (mainHouseMapping) {
+            // Create a mapping for the sub-user with the provided role in the same house
+            const subUserMapping = new HouseUser({
+                house_id: mainHouseMapping.house_id,
+                user_id: newSubUser._id,
+                role: roleName
+            });
+            await subUserMapping.save();
+            console.log("[DEBUG] Created HouseUser mapping for sub-user:", subUserMapping._id);
+        } else {
+            console.warn("[WARNING] Parent user's house mapping not found; sub-user will not be linked to a house.");
+        }
+
         res.status(201).json({ success: true, message: 'Sub-user created successfully', data: newSubUser });
     } catch (error) {
         console.error('[ERROR] POST /api/subusers ->', error);
@@ -289,19 +409,19 @@ router.post('/api/subusers', async (req, res) => {
 const mainRole = 'Home Owner';
 const subRole = 'Home Dweller';
 
-
 /*
   Delete user by ID
-  - If manager, also deletes subusers
-  - If dweller, just that user
-  - Otherwise, just that user
+  - If manager, also deletes subusers and all House documents registered under that manager.
+  - If dweller, just that user.
+  - Otherwise, just that user.
+  Additionally, deletes the mapping(s) for the deleted user(s) from the HouseUser collection.
 */
 router.delete('/api/users/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/users/:id ->', req.params);
     logDbState('/api/users/:id');
     try {
         const { id } = req.params;
-        const requestingUserRole = req.user && req.user.roleID;
+        const requestingUserRole = req.user && req.user.role_id;
 
         const userToDelete = await User.findById(id);
         if (!userToDelete) {
@@ -309,27 +429,49 @@ router.delete('/api/users/:id', async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        if (userToDelete.roleID === mainRole) {
+        if (userToDelete.role_id === mainRole) {
             if (requestingUserRole !== mainRole) {
                 console.log('[DEBUG] Non-manager attempting to delete a manager');
                 return res
                     .status(403)
                     .json({ success: false, message: 'Only managers can delete a manager account.' });
             }
-            const result = await User.deleteMany({
+            // Find all users to delete (manager + subusers)
+            const usersToDelete = await User.find({
                 $or: [{ _id: id }, { parentUser: id }]
-            });
+            }).select('_id');
+            const idsToDelete = usersToDelete.map(u => u._id);
+
+            // Delete users from the User collection
+            const result = await User.deleteMany({ _id: { $in: idsToDelete } });
             console.log('[DEBUG] Manager + subusers delete result:', result);
-            return res
-                .status(200)
-                .json({ success: true, message: 'Manager and all associated dwellers have been deleted.' });
-        } else if (userToDelete.roleID === subRole) {
+
+            // Delete corresponding HouseUser mappings for these user ids
+            const mappingResult = await HouseUser.deleteMany({ user_id: { $in: idsToDelete } });
+            console.log('[DEBUG] Deleted HouseUser mappings for ids:', idsToDelete, mappingResult);
+
+            // Delete all House documents where the owner_id matches the manager's id
+            const housesResult = await House.deleteMany({ owner_id: id });
+            console.log('[DEBUG] Deleted houses result:', housesResult);
+
+            return res.status(200).json({ success: true, message: 'Manager, all associated dwellers, and all registered houses have been deleted.' });
+        } else if (userToDelete.role_id === subRole) {
             await User.findByIdAndDelete(id);
             console.log(`[DEBUG] Deleted dweller with id: ${id}`);
+
+            // Delete the HouseUser mapping for this dweller
+            const mappingResult = await HouseUser.deleteMany({ user_id: id });
+            console.log(`[DEBUG] Deleted HouseUser mapping for dweller id: ${id}`, mappingResult);
+
             return res.status(200).json({ success: true, message: 'Dweller has been deleted.' });
         } else {
             await User.findByIdAndDelete(id);
             console.log(`[DEBUG] Deleted user with id: ${id} (unrecognized role)`);
+
+            // Delete the HouseUser mapping for this user
+            const mappingResult = await HouseUser.deleteMany({ user_id: id });
+            console.log(`[DEBUG] Deleted HouseUser mapping for user id: ${id}`, mappingResult);
+
             return res.status(200).json({ success: true, message: 'User has been deleted.' });
         }
     } catch (error) {
@@ -339,7 +481,7 @@ router.delete('/api/users/:id', async (req, res) => {
 });
 
 /*
-  Get all users under a certain manager
+  Get all users under a certain owner
 */
 router.get('/api/users/parent/:id', async (req, res) => {
     try {
@@ -348,7 +490,6 @@ router.get('/api/users/parent/:id', async (req, res) => {
         if (!parentUser) {
             return res.status(404).json({ success: false, message: "Parent user not found" });
         }
-
 
         const subUsers = await User.find({ parentUser: id }).populate("role_id", "role_name");
 
@@ -379,7 +520,35 @@ router.get('/api/allusers', async (req, res) => {
     }
 });
 
+/*
+  Get all users under a house
+*/
+router.get('/api/house-users/:houseId', async (req, res) => {
+    try {
+        const { houseId } = req.params;
+        console.log(`[DEBUG] GET /api/house-users/${houseId} -> Fetching house details`);
 
+        // Find the house by ID and populate the owners and dwellers arrays.
+        const house = await House.findById(houseId)
+            .populate('owners', 'name email phone') // Adjust fields as necessary
+            .populate('dwellers', 'name email phone'); // Adjust fields as necessary
+
+        if (!house) {
+            console.log(`[DEBUG] House not found with id: ${houseId}`);
+            return res.status(404).json({ success: false, message: 'House not found' });
+        }
+
+        console.log(`[DEBUG] Found house: ${house.house_name} with ${house.owners.length} owner(s) and ${house.dwellers.length} dweller(s)`);
+        res.status(200).json({ success: true, owners: house.owners, dwellers: house.dwellers });
+    } catch (error) {
+        console.error('[ERROR] GET /api/house-users/:houseId ->', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+/*
+  assign role to user
+*/
 router.post('/api/users/:userId/assign-role', async (req, res) => {
     try {
         const { userId } = req.params;
@@ -426,32 +595,58 @@ const checkPermission = async (userId, permissionName) => {
 /*
   Add device
 */
+/*
+  Add device and update the room's devices list if a roomName is provided.
+  Expected request body should include:
+    - device_name
+    - device_type
+    - roomName: the name of the room where this device belongs. if not specified, doesnt add it to rooms
+*/
 router.post('/api/device', async (req, res) => {
     console.log('[DEBUG] POST /api/device -> req.body:', req.body);
-    logDbState('/api/device');
-    const device = req.body;
 
-    if (!device.device_name || !device.device_type || !device.status) {
-        console.log('[DEBUG] Missing required device fields');
-        return res
-            .status(400)
-            .json({ success: false, message: 'Please enter all fields' });
+    // Destructure roomName from the request body; the rest is deviceData.
+    const { roomName, ...deviceData } = req.body;
+
+    // Validate required fields for the device (do not require status as default is "off")
+    if (!deviceData.device_name || !deviceData.device_type) {
+        console.error('[ERROR] Missing required device fields (device_name or device_type)', error);
+        res.status(400).json({ error: 'Please enter all required fields (device_name and device_type)' });
     }
 
-    const newDevice = new Device(device);
+    const newDevice = new Device(deviceData);
 
     try {
+        // Save the device first; status will be set to default ("off")
         await newDevice.save();
         console.log('[DEBUG] Created new device:', newDevice._id);
+
+        // If a roomName is provided, update the room document accordingly
+        if (roomName) {
+            const room = await Room.findOne({ room_name: roomName });
+            if (room) {
+                // Add the device id to the room's devices array
+                room.devices.push(newDevice._id);
+                await room.save();
+
+                // Also update the new device's room field to reference this room
+                newDevice.room = room._id;
+                await newDevice.save();
+                console.log(`[DEBUG] Added device ${newDevice._id} to room "${room.room_name}"`);
+            } else {
+                console.warn(`[WARNING] Room with name "${roomName}" not found.`);
+            }
+        }
+
         res.status(201).json({ success: true, data: newDevice });
     } catch (error) {
         console.error('[ERROR] POST /api/device ->', error);
-        res.status(500).json({ success: false, message: 'Server Error' });
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
 /*
-  Delete device by id
+  Delete device by id and remove its reference from the room's devices array (if room specified)
 */
 router.delete('/api/device/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/device/:id ->', req.params);
@@ -466,21 +661,34 @@ router.delete('/api/device/:id', async (req, res) => {
             return res.status(403).json({ success: false, message: 'Permission denied' });
         }
 
-        const device = await Device.findByIdAndDelete(id);
+        const device = await Device.findById(id);
         if (!device) {
-            console.log(`[DEBUG] Device not found with id: ${id}`);
-            return res.status(404).json({ success: false, message: 'Device not found' });
+            console.error(`[ERROR] Fetching device by id: ${id}`, error);
+            res.status(404).json({ error: 'Device not found' });
         }
+
+        // If the device is associated with a room, remove its id from the room's devices array
+        if (device.room) {
+            const room = await Room.findById(device.room);
+            if (room) {
+                room.devices = room.devices.filter(devId => devId.toString() !== id);
+                await room.save();
+                console.log(`[DEBUG] Removed device ${id} from room "${room.room_name}" (${room._id})`);
+            }
+        }
+
+        // Delete the device from the devices collection
+        await Device.findByIdAndDelete(id);
         console.log(`[DEBUG] Deleted device with id: ${id}`);
         res.status(200).json({ success: true, message: 'Device deleted successfully' });
     } catch (error) {
         console.error('[ERROR] DELETE /api/device/:id ->', error);
-        res.status(500).json({ success: false, message: 'Server Error' });
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
 /*
-  Get the list of devices
+  Get the list of devices in mongodb
 */
 router.get('/api/devices', async (req, res) => {
     console.log('[DEBUG] GET /api/devices -> Fetching devices from MongoDB');
@@ -495,6 +703,29 @@ router.get('/api/devices', async (req, res) => {
     } catch (error) {
         console.error('[ERROR] Fetching devices from MongoDB ->', error);
         res.status(500).json({ error: 'Server error while fetching devices' });
+    }
+});
+
+/* 
+  GET all devices under a room by room id using population 
+*/
+router.get('/api/rooms/:roomId/devices', async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        console.log(`[DEBUG] GET /api/rooms/${roomId}/devices -> Fetching room with devices`);
+
+        // Find the room by its ID and populate the devices array
+        const room = await Room.findById(roomId).populate('devices');
+        if (!room) {
+            console.error(`[ERROR] Fetching room: ${roomId}`, error);
+            res.status(404).json({ error: 'Room not found' });
+        }
+
+        console.log(`[DEBUG] Found room "${room.room_name}" with ${room.devices.length} devices`);
+        res.status(200).json({ success: true, devices: room.devices });
+    } catch (error) {
+        console.error(`[ERROR] Fetching devices ->`, error);
+        res.status(500).json({ error: 'Server error while fetching devices for room' });
     }
 });
 
@@ -786,6 +1017,12 @@ router.delete('/api/rooms/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete room' });
     }
 });
+
+/* ============================================================
+   HOUSE CONFIG
+============================================================ */
+
+
 
 /*
 Get energy usage data
