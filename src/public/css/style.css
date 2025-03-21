@@ -21,7 +21,7 @@
     --c-bg-button: #fff;
     --c-bg-sidebar: rgba(255, 255, 255, 0.5);
     --c-bg-card-hover: rgba(200, 196, 186, 0.47);
-    --c-glow: rgba(225, 225, 225, 0.7);
+    --c-glow: rgba(217, 228, 223, 0.7);
     --normal-card-border: rgba(255, 255, 255, 0.5);
     --c-bg-modal: rgba(255, 255, 255, 0.8);
 }
@@ -936,7 +936,7 @@ canvas {
         box-shadow: 0 0 1vw var(--c-glow);
     }
     50% {
-        box-shadow: 0 0 1.5vw rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 1.5vw rgba(244, 172, 156, 0.9);
     }
     100% {
         box-shadow: 0 0 1vw var(--c-glow);
@@ -944,7 +944,7 @@ canvas {
 }
 .aiCard {
     height: 8vh;
-    width: 100%;
+    width: 97%;
     overflow: visible; /* Allow text expansion */
     padding: 1vw;
     flex-direction: column;
@@ -958,10 +958,10 @@ canvas {
     transition: 0.3s ease;
 }
 .aiCard:hover {
-    transform: scale(1.03);
+    transform: scale(1.02);
     height: 40vh;
     border: 0.3vw solid rgba(255, 255, 255, 0.5);
-    animation: glow 1.5s infinite alternate;
+    animation: glow 3s infinite alternate;
 }
 
 
@@ -982,6 +982,81 @@ canvas {
     border-radius: 5vw;
     font-size: 1em;
 }
+
+
+
+.search-container {
+    position: relative;
+    width: 300px;
+}
+
+
+
+
+
+.search-container {
+    position: relative;
+    width: 200%;
+}
+
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+
+#userPrompt {
+    width: 95%;
+    border-radius: 5vw;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    outline: none;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    color: var(--c-text-primary);
+}
+
+
+.suggestion-list {
+    position: absolute;
+    top: 3vh;
+    left: 0;
+    overflow-y: auto;
+    margin-top: 2vw;
+    display: none;
+    backdrop-filter: blur(15px);
+    border-radius: 10px;
+}
+
+.suggestion-item {
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 0.2vw;
+    width: fit-content(100%);
+    border: 0.5px solid #ccc;
+    background: var(--c-bg-sidebar);
+    /*box-shadow: 0.1vw 0.1vw 0.1vw rgba(0, 0, 0, 0.18);*/
+    border-radius: 2vw;
+    display: flex;
+    align-items: center;
+    padding: 0.7vw;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+
+.suggestion-item:hover {
+    background: var(--c-bg-card-hover);
+}
+
+.suggestion-item img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+
 
 /* Prevent input from being cut off */
 #apiResponse {

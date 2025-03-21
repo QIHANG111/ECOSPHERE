@@ -199,12 +199,11 @@ function updateDeviceStatus(deviceName, newStatus) {
         });
 }
 
-
+const aiCard = document.querySelector(".aiCard");
 // AI Theme & Device Control
 function handleGeminiRequest() {
     const userPrompt = document.getElementById("userPrompt").value.trim();
     const responseElement = document.getElementById("apiResponse");
-    const aiCard = document.querySelector(".aiCard");
 
     if (!userPrompt) {
         responseElement.innerText = "Please enter a question.";
@@ -443,4 +442,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
         recognition.start();
     });
+});
+
+
+const searchInput = document.getElementById("userPrompt");
+const suggestionList = document.getElementById("suggestionList");
+
+const suggestions = [
+    { icon: "../icons/user-id-svgrepo-com.svg", text: "How to change my profile" },
+    { icon: "/icons/chart-bar-svgrepo-com.svg", text: "I want to check the energy usage report" },
+    { icon: "/icons/setting-3-svgrepo-com.svg", text: "How to change password" },
+    { icon: "/icons/setting-3-svgrepo-com.svg", text: "Change to dark mode" },
+    { icon: "/icons/setting-3-svgrepo-com.svg", text: "Change to light mode" },
+    { icon: "/icons/setting-3-svgrepo-com.svg", text: "Change to black mode" }
+];
+
+function filterSuggestions() {
+    const userInput = searchInput.value.trim().toLowerCase();
+    const filtered = suggestions.filter(item =>
+        item.text.toLowerCase().includes(userInput)
+    );
+
+    if (!userInput || filtered.length === 0) {
+        suggestionList.style.display = "none";
+        if (aiCard) {
+            aiCard.style.height = "8vh";
+        }
+        return;
+    }
+
+    const limited = filtered.slice(0, 3);
+    suggestionList.innerHTML = limited.map(item => `
+    <div class="suggestion-item" onclick="selectSuggestion('${item.text}')">
+      <div class="ui-menu-icon">
+        <img src="${item.icon}" alt="Vector Icon">
+      </div>
+      <span>${item.text}</span>
+    </div>
+  `).join("");
+
+    suggestionList.style.display = "block";
+    if (aiCard) {
+        aiCard.style.height = "26vh";
+    }
+}
+
+function selectSuggestion(selectedText) {
+    searchInput.value = selectedText;
+    suggestionList.style.display = "none";
+    if (aiCard) {
+        aiCard.style.height = "8vh";
+    }
+}
+
+
+searchInput.addEventListener("focus", filterSuggestions);
+searchInput.addEventListener("input", filterSuggestions);
+
+
+document.addEventListener("click", function (event) {
+    if (
+        !searchInput.parentElement.contains(event.target) &&
+        !suggestionList.contains(event.target)
+    ) {
+        suggestionList.style.display = "none";
+        if (aiCard) {
+            aiCard.style.height = "8vh";
+        }
+    }
 });

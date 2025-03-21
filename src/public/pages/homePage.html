@@ -6,7 +6,6 @@
     <title>Homepage</title>
     <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/js/gemini.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -56,8 +55,21 @@
             <div class="aiCard" style=" height: 8vh;">
                 <div class="input-container">
                     <div class="leftToRightList" style="width: 100%">
-                        <label for="userPrompt"></label><input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...('Help me turn on the light1')"
-                                                               style="width: 80%; border-radius: 5vw">
+                        <label for="userPrompt"></label>
+<!--                        <input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...('Help me turn on the light1')"-->
+<!--                                                               style="width: 80%; border-radius: 5vw">-->
+<!--                        <div id="suggestionsBox" class="suggestions-box" style="display: none;"></div>-->
+                        <div class="search-container" style="width: 200%;">
+                            <div class="search-box">
+                                <input type="text"
+                                       id="userPrompt"
+                                       class="icon-button ui-menu-icon"
+                                       style="width: 95%; border-radius: 5vw"
+                                       placeholder="Ask ECOSPHERE AI..."
+                                       onfocus="showSuggestions()">
+                                <div id="suggestionList" class="suggestion-list" style="display: none;"></div>
+                            </div>
+                        </div>
                         <button id="clearButton" class="icon-button ui-menu-icon"
                                 style="display: none; background-color: rgba(221,221,221,0); width: 3vw">
                             <img src="/icons/delete-1-svgrepo-com.svg" alt="Vector Icon" width="30" height="30">
@@ -92,10 +104,7 @@
                 <canvas id="myChart"></canvas>
             </div>
         </div>
-        <!--        <div class="normalCard">-->
-        <!--            <h3>Notifications</h3>-->
-        <!--            <div id="notificationList"></div>-->
-        <!--        </div>-->
+
     </div>
     <div class="dashboard-content" id="cardContainer2">
         <div class="normalCard" id = "automationcard">
@@ -151,6 +160,7 @@
     </div>
 </div>
 <script src="/js/sidebar.js"></script>
+<script src="/js/gemini.js"></script>
 <script src="/js/theme.js"></script>
 <script src="/js/chart.js"></script>
 <script src="/js/clock.js"></script>
