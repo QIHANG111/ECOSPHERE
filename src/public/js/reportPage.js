@@ -1,599 +1,446 @@
-const API_KEY = "AIzaSyDoSgt53bNbO6Rlqs0QMJjCr9zHofxLtwA";
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEY}`;
+// Room management script for the new API structure
 
-let selectedTimeRange = 'weekly';
-let chartType = 'bar';
-let currentDate = new Date();
+// Open Add Room modal
+function openPopout() {
+    console.log("Opening room modal");
+    document.getElementById("roomModal").style.display = "flex";
+}
 
-// Store all data from database
-let allEnergyData = [];
-
-function prevPeriod() {
-    if (selectedTimeRange === 'weekly') {
-        // Create a copy of the current date
-        const tempDate = new Date(currentDate);
-
-        // First align to the current Monday
-        const mondayDate = alignToMonday(tempDate);
-
-        // Then go back 7 days to get to previous Monday
-        mondayDate.setDate(mondayDate.getDate() - 7);
-
-        // Update the current date to be previous Monday
-        currentDate = new Date(mondayDate);
-    } else if (selectedTimeRange === 'monthly') {
-        // Set to the first day of current month
-        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-
-        // Go back one day to reach previous month
-        firstDay.setDate(0);
-
-        // Set to first day of previous month
-        currentDate = new Date(firstDay.getFullYear(), firstDay.getMonth(), 1);
-    } else if (selectedTimeRange === 'yearly') {
-        // Set to January 1st of previous year
-        currentDate = new Date(currentDate.getFullYear() - 1, 0, 1);
+// Close Add Room modal
+function closeModal() {
+    console.log("Closing room modal");
+    document.getElementById("roomModal").style.display = "none";
+    // Reset form
+    document.getElementById("roomName").value = "";
+    if (document.getElementById("roomType")) {
+        document.getElementById("roomType").value = "bedroom"; // Default value
     }
-
-    // Log the date range for debugging
-    const range = getDateRange();
-    console.log(`Switched to previous ${selectedTimeRange} period: ${range.start} to ${range.end}`);
-
-    updateChartAndReport();
-}
-
-function nextPeriod() {
-    if (selectedTimeRange === 'weekly') {
-        // Create a copy of the current date
-        const tempDate = new Date(currentDate);
-
-        // First align to the current Monday
-        const mondayDate = alignToMonday(tempDate);
-
-        // Then go forward 7 days to get to next Monday
-        mondayDate.setDate(mondayDate.getDate() + 7);
-
-        // Update the current date to be next Monday
-        currentDate = new Date(mondayDate);
-    } else if (selectedTimeRange === 'monthly') {
-        // Set to the first day of next month
-        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-    } else if (selectedTimeRange === 'yearly') {
-        // Set to January 1st of next year
-        currentDate = new Date(currentDate.getFullYear() + 1, 0, 1);
-    }
-
-    // Log the date range for debugging
-    const range = getDateRange();
-    console.log(`Switched to next ${selectedTimeRange} period: ${range.start} to ${range.end}`);
-
-    updateChartAndReport();
-}
-
-/**
- * Helper function: Aligns a date to the Monday of its week
- * Important: Returns a new date object instead of modifying the original
- */
-function alignToMonday(dateObj) {
-    // Create a copy of the date
-    const result = new Date(dateObj);
-
-    const dayOfWeek = result.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
-    // Calculate offset to Monday: Sunday(0) → 6 days, Monday(1) → 0 days, Tuesday(2) → 1 day...
-    const offsetToMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
-    result.setDate(result.getDate() - offsetToMonday);
-
-    return result;
-}
-
-function getDateRange() {
-    if (selectedTimeRange === 'weekly') {
-        // Get Monday of current week
-        const mondayDate = alignToMonday(new Date(currentDate));
-
-        // A week spans from Monday to Sunday
-        const startOfWeek = new Date(mondayDate);
-        const endOfWeek = new Date(mondayDate);
-        endOfWeek.setDate(mondayDate.getDate() + 6); // +6 days → Sunday
-
-        return {
-            start: formatDate(startOfWeek),
-            end: formatDate(endOfWeek)
-        };
-    } else if (selectedTimeRange === 'monthly') {
-        // Get first and last day of the current month
-        const y = currentDate.getFullYear();
-        const m = currentDate.getMonth();
-
-        const startOfMonth = new Date(y, m, 1);
-        // Setting day 0 of next month = last day of current month
-        const endOfMonth = new Date(y, m + 1, 0);
-
-        return {
-            start: formatDate(startOfMonth),
-            end: formatDate(endOfMonth)
-        };
-    } else if (selectedTimeRange === 'yearly') {
-        // Get first and last day of the current year
-        const y = currentDate.getFullYear();
-        const startOfYear = new Date(y, 0, 1);      // January 1st
-        const endOfYear = new Date(y, 11, 31);      // December 31st
-
-        return {
-            start: formatDate(startOfYear),
-            end: formatDate(endOfYear)
-        };
-    }
-
-    // Fallback
-    return { start: null, end: null };
-}
-
-function toggleDropdown() {
-    const dropdown = document.getElementById("dropdownMenu");
-    dropdown.classList.toggle("show");
-}
-
-function toggleDropdownChart() {
-    const dropdown = document.getElementById("dropdownMenu2");
-    dropdown.classList.toggle("show");
-}
-
-window.onclick = function (event) {
-    if (!event.target.matches('.dropdown-btn')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-            dropdowns[i].classList.remove("show");
-        }
-    }
-};
-
-const weeklyReport = document.getElementById('weeklyReport');
-const monthlyReport = document.getElementById('monthlyReport');
-const yearlyReport = document.getElementById('yearlyReport');
-const reportCard = document.getElementById('reportCard');
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // Time range toggle
-    const rangeOptions = document.querySelectorAll('#dropdownMenu a');
-    rangeOptions.forEach(option => {
-        option.addEventListener('click', async function (e) {
-            selectedTimeRange = e.target.getAttribute('data-range');
-
-            // Show/hide different titles based on selection
-            weeklyReport.style.display = (selectedTimeRange === 'weekly') ? 'block' : 'none';
-            monthlyReport.style.display = (selectedTimeRange === 'monthly') ? 'block' : 'none';
-            yearlyReport.style.display = (selectedTimeRange === 'yearly') ? 'block' : 'none';
-
-            // Update chart & report
-            updateChartAndReport();
-        });
+    document.querySelectorAll(".image-selector img").forEach(image => {
+        image.classList.remove("selected");
     });
+    document.querySelector(".image-selector img").classList.add("selected");
+}
 
-    // Chart type toggle
-    const chartTypeOptions = document.querySelectorAll('#dropdownMenu2 a');
-    chartTypeOptions.forEach(option => {
-        option.addEventListener('click', function (e) {
-            chartType = e.target.getAttribute('data-chart');
-            changeChartType(chartType);
-        });
+// Select room wallpaper
+function selectImage(img) {
+    document.querySelectorAll(".image-selector img").forEach(image => {
+        image.classList.remove("selected");
     });
+    img.classList.add("selected");
+}
 
-    // On page load, set current date to today aligned to Monday for weekly view
-    if (selectedTimeRange === 'weekly') {
-        currentDate = alignToMonday(new Date());
+// Enable "Save" button when input is not empty
+function toggleSaveButton() {
+    const input = document.getElementById("roomName");
+    const saveButton = document.querySelector(".save");
+    if (input.value.trim().length > 0) {
+        saveButton.classList.add("enabled");
+        saveButton.onclick = saveRoom;
     } else {
-        currentDate = new Date();
-    }
-
-    // Fetch all data once when page loads
-    await fetchAllData();
-
-    // Display the current time range
-    updatePeriodDisplay();
-
-    // Update the chart
-    updateChartAndReport();
-});
-
-const ctx = document.getElementById('myChart').getContext('2d');
-const myChart = new Chart(ctx, {
-    type: chartType,
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'Energy Usage (kWh)',
-            data: [],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 2,
-            tension: 0.1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            x: {
-                type: 'category',
-                title: {
-                    display: true,
-                    text: 'Date'
-                }
-            },
-            y: {
-                beginAtZero: false,
-                title: {
-                    display: true,
-                    text: 'Usage (kWh)'
-                }
-            }
-        }
-    }
-});
-
-function changeChartType(newType) {
-    myChart.config.type = newType;
-    myChart.update();
-}
-
-function formatDate(dateObj) {
-    const date = new Date(dateObj);
-
-    const year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let day = date.getDate();
-
-    if (month < 10) month = '0' + month;
-    if (day < 10) day = '0' + day;
-
-    return `${year}-${month}-${day}`;
-}
-
-// Parse ISO date string to Date object (handles "2025-03-21" format)
-function parseISODate(dateStr) {
-    const [year, month, day] = dateStr.split('-').map(num => parseInt(num, 10));
-    return new Date(year, month - 1, day);
-}
-
-// Check if a date is within a given range
-function isDateInRange(dateStr, startDateStr, endDateStr) {
-    const date = parseISODate(dateStr);
-    const startDate = parseISODate(startDateStr);
-    const endDate = parseISODate(endDateStr);
-
-    return date >= startDate && date <= endDate;
-}
-
-function generateWeekLabels() {
-    const isoDates = [];
-    const displayLabels = [];
-
-    // Get this week's start/end
-    const { start, end } = getDateRange();
-    const startOfWeek = new Date(start);
-
-    console.log(`Generating week labels for period: ${start} to ${end}`);
-
-    // 7 days of the week
-    const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    for (let i = 0; i < 7; i++) {
-        let tmp = new Date(startOfWeek);
-        tmp.setDate(tmp.getDate() + i);
-
-        // 1) ISO format → "2025-03-21"
-        const isoStr = formatDate(tmp);
-        isoDates.push(isoStr);
-
-        // 2) Display format → "Mon 3/21"
-        displayLabels.push(`${weekDays[i]} ${tmp.getMonth() + 1}/${tmp.getDate()}`);
-    }
-
-    console.log('ISO dates array:', isoDates);
-    console.log('Display labels array:', displayLabels);
-
-    return { isoDates, displayLabels };
-}
-
-function generateMonthLabels() {
-    const isoDates = [];
-    const displayLabels = [];
-
-    const { start, end } = getDateRange();
-    const startOfMonth = new Date(start);
-    const endOfMonth = new Date(end);
-
-    console.log(`Generating month labels for period: ${start} to ${end}`);
-
-    // Get the number of days in the month
-    const daysInMonth = endOfMonth.getDate();
-
-    // Generate a label for each day of the month
-    for (let d = 1; d <= daysInMonth; d++) {
-        let tmp = new Date(startOfMonth.getFullYear(), startOfMonth.getMonth(), d);
-
-        // ISO format
-        const isoStr = formatDate(tmp);
-        isoDates.push(isoStr);
-
-        // Display format → "3/1"
-        displayLabels.push(`${tmp.getMonth() + 1}/${d}`);
-    }
-
-    console.log(`Generated ${isoDates.length} day labels for month view`);
-
-    return { isoDates, displayLabels };
-}
-
-function generateYearLabels() {
-    const isoDates = [];
-    const displayLabels = [];
-
-    const y = currentDate.getFullYear();
-    console.log(`Generating year labels for: ${y}`);
-
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-    // Generate a label for each month of the year
-    for (let m = 0; m < 12; m++) {
-        let tmp = new Date(y, m, 1);
-
-        // ISO format for first day of month
-        const isoStr = formatDate(tmp);
-        isoDates.push(isoStr);
-
-        // Display format → "Jan 2025"
-        displayLabels.push(`${monthNames[m]} ${y}`);
-    }
-
-    return { isoDates, displayLabels };
-}
-
-function updatePeriodDisplay() {
-    const { start, end } = getDateRange();
-
-    // Update title display
-    if (selectedTimeRange === 'weekly') {
-        weeklyReport.textContent = `Weekly Report (${start} to ${end})`;
-    } else if (selectedTimeRange === 'monthly') {
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        monthlyReport.textContent = `Monthly Report (${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()})`;
-    } else if (selectedTimeRange === 'yearly') {
-        yearlyReport.textContent = `Yearly Report (${currentDate.getFullYear()})`;
+        saveButton.classList.remove("enabled");
+        saveButton.onclick = null;
     }
 }
 
-// Fetch all energy data once
-async function fetchAllData() {
+// Get authentication token from localStorage or sessionStorage
+function getAuthToken() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    console.log("Auth token status:", token ? "Found token" : "No token available");
+    return token;
+}
+
+// Get the current user's active house
+async function getCurrentUserHouse() {
+    console.log("Getting current user's house");
+    const token = getAuthToken();
+    if (!token) {
+        console.error("No authentication token found");
+        return null;
+    }
+
     try {
-        // Build API URL - fetch all available data
-        const apiUrl = `/api/energy-usage/all`;
-        console.log(`Fetching all energy data from: ${apiUrl}`);
-
-        // Fallback to range-based API if "all" endpoint doesn't exist
-        // Using a large date range to get all data
-        const fallbackUrl = `/api/energy-usage?range=all&start=2020-01-01&end=2030-12-31`;
-
-        try {
-            let response = await fetch(apiUrl);
-
-            // If "all" endpoint doesn't exist, use fallback
-            if (!response.ok) {
-                console.log("All data endpoint not available, using fallback");
-                response = await fetch(fallbackUrl);
+        // First, get houses owned by the user
+        const response = await fetch('/api/houses/owned', {
+            headers: {
+                'Authorization': `Bearer ${token}`
             }
+        });
 
-            if (!response.ok) {
-                throw new Error(`API returned error: ${response.status} ${response.statusText}`);
-            }
+        if (!response.ok) {
+            console.error(`Failed to get user's houses, status: ${response.status}`);
+            return null;
+        }
 
-            const data = await response.json();
+        const data = await response.json();
+        console.log("User houses data:", data);
 
-            if (!Array.isArray(data)) {
-                throw new TypeError(`Expected an array, but received: ${typeof data}`);
-            }
+        if (!data.success || !data.houses || data.houses.length === 0) {
+            console.error("No houses found for user");
+            return null;
+        }
 
-            // Sort data by date ascending
-            data.sort((a, b) => {
-                return new Date(a.date) - new Date(b.date);
-            });
+        // For now, just return the first house (typically a user's main house)
+        // In a more advanced implementation, you might want to add house selection
+        return data.houses[0];
+    } catch (error) {
+        console.error("Error fetching user's houses:", error);
+        return null;
+    }
+}
 
-            allEnergyData = data;
-            console.log(`Successfully loaded ${allEnergyData.length} data points`);
+// Save room data to backend API
+async function saveRoom() {
+    console.log("Attempting to save room to database");
+    const roomName = document.getElementById("roomName").value.trim();
+    const roomType = document.getElementById("roomType")?.value || "bedroom";
+    const selectedImage = document.querySelector(".image-selector img.selected")?.src;
 
-            return data;
-        } catch (error) {
-            console.error("Failed to fetch data:", error);
+    if (!roomName) {
+        alert("Please enter a room name.");
+        return;
+    }
+
+    if (!selectedImage) {
+        alert("Please select a wallpaper.");
+        return;
+    }
+
+    const token = getAuthToken();
+    if (!token) {
+        alert("You need to be logged in to add a room.");
+        return;
+    }
+
+    try {
+        // First, get the current house ID
+        const house = await getCurrentUserHouse();
+        if (!house) {
+            alert("Could not determine which house to add the room to. Please try again later.");
+            return;
+        }
+
+        console.log(`Sending room creation request for house ${house._id}: ${roomName}`);
+
+        // Create the room record in MongoDB using the updated endpoint
+        const roomResponse = await fetch(`/api/houses/${house._id}/rooms/add-room`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                room_name: roomName,
+                room_type: roomType
+            })
+        });
+
+        console.log("API response status:", roomResponse.status);
+
+        if (!roomResponse.ok) {
+            const errorData = await roomResponse.json();
+            console.error("API error response:", errorData);
+            throw new Error(errorData.error || 'Failed to create room');
+        }
+
+        const roomData = await roomResponse.json();
+        console.log("Room created successfully:", roomData);
+
+        // Save wallpaper info to localStorage (since backend API doesn't have a wallpaper field)
+        let wallpapers = JSON.parse(localStorage.getItem("roomWallpapers")) || {};
+        wallpapers[roomData.room._id] = selectedImage;
+        localStorage.setItem("roomWallpapers", JSON.stringify(wallpapers));
+
+        // Close the modal and refresh the room list
+        closeModal();
+        renderRooms();
+
+        // Show success message
+        alert("Room added successfully!");
+    } catch (error) {
+        console.error("Error saving room:", error);
+        alert("Failed to save room: " + error.message);
+    }
+}
+
+// Fetch rooms from the API
+async function fetchRooms() {
+    console.log("Fetching rooms from database");
+
+    const token = getAuthToken();
+    if (!token) {
+        console.error("No authentication token found");
+        return [];
+    }
+
+    try {
+        // First, get the current house ID
+        const house = await getCurrentUserHouse();
+        if (!house) {
+            console.error("Could not determine current house");
             return [];
         }
+
+        console.log(`Fetching rooms for house ${house._id}`);
+
+        // Get the rooms for this house
+        const response = await fetch(`/api/houses/${house._id}/rooms`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        console.log("Rooms API response status:", response.status);
+
+        if (!response.ok) {
+            console.error(`Failed to get rooms, status: ${response.status}`);
+            return [];
+        }
+
+        const data = await response.json();
+        console.log("Rooms retrieved from API:", data);
+
+        if (!data.success || !data.rooms) {
+            console.error("Invalid or empty rooms data returned from API");
+            return [];
+        }
+
+        return data.rooms;
     } catch (error) {
-        console.error("Error in fetchAllData:", error);
-        allEnergyData = [];
+        console.error("Error fetching rooms from API:", error);
         return [];
     }
 }
 
-function updateChartAndReport() {
-    try {
-        // First update the period display
-        updatePeriodDisplay();
+// Load and render rooms in automationcard
+async function renderRooms() {
+    console.log("Rendering rooms in automationcard");
+    const container = document.getElementById("automationcard");
 
-        // 1) Calculate the period start/end
-        const { start, end } = getDateRange();
-        console.log(`Processing data for range: ${start} to ${end}`);
+    if (!container) {
+        console.error("automationcard element not found!");
+        return;
+    }
 
-        // 2) Filter data for the selected date range
-        const filteredData = allEnergyData.filter(item => {
-            const dateStr = item.date.split("T")[0]; // Remove time part
-            return isDateInRange(dateStr, start, end);
+    const rooms = await fetchRooms();
+    const wallpapers = JSON.parse(localStorage.getItem("roomWallpapers")) || {};
+
+    console.log(`Rendering ${rooms.length} rooms`);
+
+    // Clear previous content
+    container.innerHTML = `
+        <div class='leftToRightList'> 
+            <h3 style="padding-left: 10vw">Rooms</h3>
+            <button class="hidden-button ui-menu-icon" style="width: 5vw; height: 3.5vw" id="automation" onclick="openPopout()">
+                <img src="/icons/add-cross.svg" alt="Vector Icon" width="20" height="20">
+            </button>
+        </div>
+        <div id="roomList" class="room-list"></div>
+    `;
+
+    const roomList = document.getElementById("roomList");
+
+    if (!roomList) {
+        console.error("roomList element not found after creation!");
+        return;
+    }
+
+    // If no rooms exist, show message
+    if (!rooms || rooms.length === 0) {
+        console.log("No rooms to display");
+        let noRoomMessage = document.createElement("p");
+        noRoomMessage.innerText = "No rooms. Click the + icon to add a room.";
+        noRoomMessage.style.color = "gray";
+        noRoomMessage.style.textAlign = "center";
+        roomList.appendChild(noRoomMessage);
+        return;
+    }
+
+    // Get the current house for deletion purposes
+    const house = await getCurrentUserHouse();
+
+    // Display each room in the automationcard
+    rooms.forEach(room => {
+        console.log("Rendering room:", room);
+
+        let roomDiv = document.createElement("div");
+        roomDiv.className = "room-entry";
+
+        // Get room ID
+        const roomId = room._id;
+
+        // Use stored wallpaper or default
+        const wallpaper = wallpapers[roomId] || '/images/wp1.jpg';
+        roomDiv.style.backgroundImage = `url('${wallpaper}')`;
+        roomDiv.style.backgroundSize = "cover";
+        roomDiv.style.minHeight = "80px";
+
+        // Room name
+        let roomNameSpan = document.createElement("span");
+        roomNameSpan.innerText = room.room_name;
+
+        // Room type indicator (if available)
+        if (room.room_type) {
+            let roomTypeSpan = document.createElement("small");
+            roomTypeSpan.innerText = room.room_type;
+            roomTypeSpan.style.opacity = "0.7";
+            roomTypeSpan.style.fontSize = "0.8em";
+            roomTypeSpan.style.display = "block";
+            roomDiv.appendChild(roomTypeSpan);
+        }
+
+        // Delete button for individual rooms
+        let deleteButton = document.createElement("button");
+        deleteButton.innerText = "❌";
+        deleteButton.style.backgroundColor = "rgba(255,0,0,0)";
+        deleteButton.style.color = "white";
+        deleteButton.style.border = "none";
+        deleteButton.style.padding = "3px 6px";
+        deleteButton.style.borderRadius = "5px";
+        deleteButton.style.cursor = "pointer";
+        deleteButton.style.width = "4vw";
+        deleteButton.onclick = function() {
+            if (house) {
+                removeRoom(house._id, roomId);
+            } else {
+                alert("Could not determine which house this room belongs to.");
+            }
+        };
+
+        roomDiv.appendChild(roomNameSpan);
+        roomDiv.appendChild(deleteButton);
+        roomList.appendChild(roomDiv);
+    });
+}
+
+// Delete a single room
+async function removeRoom(houseId, roomId) {
+    console.log(`Attempting to remove room ${roomId} from house ${houseId}`);
+    if (confirm("Are you sure you want to delete this room?")) {
+        const token = getAuthToken();
+        if (!token) {
+            alert("You need to be logged in to delete a room.");
+            return;
+        }
+
+        try {
+            console.log(`Sending delete request for room ${roomId}`);
+            const response = await fetch(`/api/houses/${houseId}/rooms/delete-room/${roomId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            console.log("Delete API response status:", response.status);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("API error response:", errorData);
+                throw new Error(errorData.error || 'Failed to delete room');
+            }
+
+            // Also remove the wallpaper entry
+            let wallpapers = JSON.parse(localStorage.getItem("roomWallpapers")) || {};
+            delete wallpapers[roomId];
+            localStorage.setItem("roomWallpapers", JSON.stringify(wallpapers));
+
+            // Refresh the room list
+            renderRooms();
+
+            alert("Room deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting room:", error);
+            alert("Failed to delete room: " + error.message);
+        }
+    }
+}
+
+// Update HTML to add room type dropdown
+function updateRoomModalHTML() {
+    console.log("Updating room modal HTML");
+    const modalBody = document.querySelector(".roomModal-body");
+    if (!modalBody) {
+        console.error("Modal body not found!");
+        return;
+    }
+
+    // Check if room type field already exists
+    if (document.getElementById("roomType")) {
+        console.log("Room type dropdown already exists");
+        return;
+    }
+
+    // Create room type dropdown after room name
+    const roomNameField = document.getElementById("roomName");
+    if (roomNameField) {
+        console.log("Adding room type dropdown");
+        const typeLabel = document.createElement("label");
+        typeLabel.setAttribute("for", "roomType");
+        typeLabel.innerText = "ROOM TYPE";
+
+        const typeSelect = document.createElement("select");
+        typeSelect.id = "roomType";
+        typeSelect.style.marginBottom = "15px";
+        typeSelect.style.padding = "8px";
+        typeSelect.style.borderRadius = "5px";
+        typeSelect.style.border = "1px solid #ccc";
+
+        // Add room type options
+        const roomTypes = ["bedroom", "living room", "kitchen", "bathroom", "office", "other"];
+        roomTypes.forEach(type => {
+            const option = document.createElement("option");
+            option.value = type;
+            option.innerText = type.charAt(0).toUpperCase() + type.slice(1);
+            typeSelect.appendChild(option);
         });
 
-        console.log(`Filtered ${filteredData.length} data points for the selected range`);
-
-        // Log the date range of filtered data for debugging
-        if (filteredData.length > 0) {
-            console.log('Filtered data range:',
-                filteredData[0].date.split('T')[0],
-                'to',
-                filteredData[filteredData.length-1].date.split('T')[0]);
-        }
-
-        // 3) Prepare labels and data arrays for the chart
-        let displayLabels = [], usageDataArr = [];
-
-        if (selectedTimeRange === 'weekly') {
-            // Weekly view: 7 days
-            const { isoDates, displayLabels: wLabels } = generateWeekLabels();
-            displayLabels = wLabels;
-
-            // Create a map of dates to usage values
-            const usageMap = {};
-            filteredData.forEach(item => {
-                // Ensure consistent date format - keep only the date part, remove time
-                const dayStr = item.date.split("T")[0];
-                usageMap[dayStr] = item.energyusage;
-            });
-
-            // Track which dates have data and which don't
-            const datesWithData = [];
-            const datesWithoutData = [];
-
-            // Map each expected date to its usage value (or 0 if no data)
-            usageDataArr = isoDates.map(d => {
-                if (d in usageMap) {
-                    datesWithData.push(d);
-                    return usageMap[d];
-                } else {
-                    datesWithoutData.push(d);
-                    return 0; // Fill with 0 for dates without data
-                }
-            });
-
-            console.log('Dates with data:', datesWithData);
-            console.log('Dates without data:', datesWithoutData);
-
-        } else if (selectedTimeRange === 'monthly') {
-            // Monthly view: all days in month
-            const { isoDates, displayLabels: mLabels } = generateMonthLabels();
-            displayLabels = mLabels;
-
-            // Create a map of dates to usage values
-            const usageMap = {};
-            filteredData.forEach(item => {
-                const dayStr = item.date.split("T")[0];
-                usageMap[dayStr] = item.energyusage;
-            });
-
-            // Track which dates have data and which don't
-            const datesWithData = [];
-            const datesWithoutData = [];
-
-            // Map each expected date to its usage value (or 0 if no data)
-            usageDataArr = isoDates.map(d => {
-                if (d in usageMap) {
-                    datesWithData.push(d);
-                    return usageMap[d];
-                } else {
-                    datesWithoutData.push(d);
-                    return 0; // Fill with 0 for dates without data
-                }
-            });
-
-            console.log('Monthly view: Dates with data count:', datesWithData.length);
-            console.log('Monthly view: Dates without data count:', datesWithoutData.length);
-
-        } else if (selectedTimeRange === 'yearly') {
-            // Yearly view: sum by month
-            const { isoDates, displayLabels: yLabels } = generateYearLabels();
-            displayLabels = yLabels;
-
-            // Initialize monthly totals
-            const monthlySum = new Array(12).fill(0);
-            const monthlyDataCount = new Array(12).fill(0);
-
-            // Group data by month
-            filteredData.forEach(item => {
-                const dateStr = item.date.split("T")[0]; // "2025-03-21"
-                const [yyyy, mm, dd] = dateStr.split("-");
-                const monthIndex = parseInt(mm, 10) - 1; // 0-11 for Jan-Dec
-
-                if (monthIndex >= 0 && monthIndex < 12) {
-                    const usage = parseFloat(item.energyusage) || 0;
-                    monthlySum[monthIndex] += usage;
-                    monthlyDataCount[monthIndex]++;
-                }
-            });
-
-            usageDataArr = monthlySum;
-
-            console.log('Yearly view: Data points count per month:', monthlyDataCount);
-            console.log('Yearly view: Total usage per month:', monthlySum);
-        }
-
-        // 4) Update Chart.js
-        myChart.data.labels = displayLabels;
-        myChart.data.datasets[0].data = usageDataArr;
-        myChart.update();
-
-        // 5) Generate report
-        if (filteredData.length > 0) {
-            generateEnergyUsageReport(filteredData, displayLabels, usageDataArr)
-                .then(report => {
-                    reportCard.textContent = report;
-                });
-        } else {
-            reportCard.textContent = `No data found for the period ${start} to ${end}. Please check your data source or select a different time range.`;
-        }
-    } catch (err) {
-        console.error("Error updating chart/report:", err);
-        reportCard.textContent = `Error loading data: ${err.message}`;
+        // Insert after room name input
+        roomNameField.parentNode.insertBefore(typeLabel, roomNameField.nextSibling);
+        roomNameField.parentNode.insertBefore(typeSelect, typeLabel.nextSibling);
+        console.log("Room type dropdown added successfully");
+    } else {
+        console.error("Room name field not found!");
     }
 }
 
-async function generateEnergyUsageReport(energyData, fullLabels, usageDataArr) {
-    try {
-        if (!energyData || energyData.length === 0) {
-            return "Invalid or empty energy usage data.";
+// Render rooms on page load and update modal HTML
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("Document loaded, initializing room management");
+    updateRoomModalHTML();
+    renderRooms();
+
+    // Debug logging for token
+    const token = getAuthToken();
+    console.log("Auth token available:", !!token);
+});
+
+// Debugging function
+window.debugRoomSystem = async function() {
+    console.log("=== ROOM SYSTEM DEBUG ===");
+
+    const token = getAuthToken();
+    console.log("Auth token:", token ? "Present" : "Missing");
+
+    const house = await getCurrentUserHouse();
+    console.log("Current House:", house);
+
+    if (house) {
+        try {
+            const response = await fetch(`/api/houses/${house._id}/rooms`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await response.json();
+            console.log("Rooms API Response:", data);
+        } catch (error) {
+            console.error("Error testing rooms API:", error);
         }
-
-        const formattedData = fullLabels.map((label, index) => ({
-            label: label,
-            energyusage: usageDataArr[index]
-        }));
-
-        const prompt = `(0 means no data available for that day)Generate a report on the following ${selectedTimeRange} energy usage data within 150 words:\n\n`
-            + JSON.stringify(formattedData, null, 2);
-
-        const responseText = await fetchGeminiResponse(prompt);
-        return responseText;
-    } catch (error) {
-        console.error("Error generating report:", error);
-        return "Error generating report.";
     }
-}
 
-async function fetchGeminiResponse(prompt) {
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: prompt
-                    }]
-                }]
-            })
-        });
-        const data = await response.json();
+    console.log("automationcard element:", document.getElementById("automationcard"));
+    console.log("roomModal element:", document.getElementById("roomModal"));
+    console.log("=== END DEBUG ===");
 
-        if (data?.candidates?.length > 0) {
-            return data.candidates[0].content.parts[0].text;
-        } else {
-            return "No valid response from Gemini API.";
-        }
-    } catch (error) {
-        console.error("Error fetching Gemini response:", error);
-        return "Error fetching response.";
-    }
-}
+    return "Debug info logged to console";
+};

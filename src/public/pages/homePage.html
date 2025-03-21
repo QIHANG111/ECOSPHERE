@@ -135,9 +135,12 @@
             <span class="save disabled">Save</span>
         </div>
         <div class="roomModal-body">
-            <label for="roomName" >NAME</label>
+            <label for="roomName">NAME</label>
             <input type="text" style="padding-left: 0" id="roomName" oninput="toggleSaveButton()">
-               <label>WALLPAPER</label>
+
+            <!-- Room type dropdown will be added here by updateRoomModalHTML() -->
+
+            <label>WALLPAPER</label>
             <div class="image-selector">
                 <div class="image-list">
                     <img src="/images/wp1.jpg" class="selected" onclick="selectImage(this)" alt="">
