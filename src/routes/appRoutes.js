@@ -770,14 +770,11 @@ router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
     console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.body:', req.body);
 
     try {
-        // Extract token manually
         const token = req.headers.authorization?.split(" ")[1];
         if (!token) {
             console.warn('[WARNING] No token provided');
             return res.status(401).json({ error: 'Unauthorized' });
         }
-
-        // Verify token
         let decoded;
         try {
             decoded = jwt.verify(token, process.env.SECRET_KEY);
@@ -786,7 +783,6 @@ router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
             return res.status(401).json({ error: 'Invalid token' });
         }
 
-        // Extract user ID from token
         const userId = decoded.userId;
         console.log(`[DEBUG] Authenticated user: ${userId}`);
 
@@ -804,7 +800,6 @@ router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
             return res.status(404).json({ error: 'House not found. Cannot add room.' });
         }
 
-        // Create room and associate with house
         const newRoom = new Room({ room_name, houseId });
         await newRoom.save();
         console.log('[DEBUG] New room created:', newRoom._id);
