@@ -235,12 +235,12 @@ AI Response:`;
         const deviceActionMatch = aiResponseText.match(/Ok,\s*turned\s*(on|off)\s*the\s*([a-zA-Z0-9\s]+)/i);
         if (deviceActionMatch) {
             const action = deviceActionMatch[1].toLowerCase();
-            const deviceNameFromAI = deviceActionMatch[2].trim().toLowerCase();
+            const deviceNameFromAI = deviceActionMatch[2].trim();
 
             fetch("/api/devices")
                 .then(res => res.json())
                 .then(devices => {
-                    const matchedDevice = devices.find(d => d.device_name.toLowerCase() === deviceNameFromAI);
+                    const matchedDevice = devices.find(d => d.device_name.toLowerCase() === deviceNameFromAI.toLowerCase());
 
                     if (matchedDevice) {
                         const status = action === "on";
