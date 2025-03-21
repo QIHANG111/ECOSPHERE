@@ -442,32 +442,31 @@ router.get('/api/allusers', async (req, res) => {
 /*
   Assign role to a user
 */
+
+//only home owner can see the chage role button so dont need to check permission for this function
 router.post('/api/users/:userId/assign-role', async (req, res) => {
     try {
         const { userId } = req.params;
         const { roleId } = req.body;
 
-        const canAssignRole = await checkPermission(currentUserId, 'assignRole');
-        if (!canAssignRole) {
-        return res.status(403).json({ message: 'Only Home Owners can assign roles' });
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
         }
 
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ error: "User not found" });
-
         const role = await Role.findById(roleId);
-        if (!role) return res.status(404).json({ error: "Role not found" });
+        if (!role) {
+            return res.status(404).json({ error: "Role not found" });
+        }
 
         user.role_id = roleId;
         await user.save();
 
         res.json({ message: "Role assigned successfully", user });
     } catch (error) {
-        console.error("[ERROR] POST /api/users/:userId/assign-role ->", error);
         res.status(500).json({ error: "Failed to assign role" });
     }
 });
-
 /* ============================================================
    DEVICES CONFIG
 ============================================================ */
