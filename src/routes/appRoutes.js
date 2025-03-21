@@ -816,32 +816,57 @@ router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
 });
 
 /*
-  Delete room
+  delete room - deletes the devices in the room first, then deletes the id from the array in house, then deletes the room doc
 */
-router.delete('/api/rooms/:id', async (req, res) => {
-    console.log('[DEBUG] DELETE /api/rooms/:id ->', req.params);
-    logDbState('/api/rooms/:id');
+router.delete("/api/houses/:houseId/rooms/delete-room/:roomId", async (req, res) => {
+    console.log("[DEBUG] DELETE /api/houses/:houseId/rooms/delete-room/:roomId ->", req.params);
+
     try {
-        const hasPermission = await checkPermission(userId, "deleteDevice");
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            console.log("[DEBUG] No token provided");
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY);
+        } catch (err) {
+            console.log("[DEBUG] Invalid token");
+            return res.status(401).json({ success: false, message: "Invalid token" });
+        }
+
+        const userId = decoded.userId;
+        const { houseId, roomId } = req.params;
+
+        const hasPermission = await checkPermission(userId, "deleteRoom");
         if (!hasPermission) {
             console.log(`[DEBUG] Permission denied for user ${userId}`);
-            return res.status(403).json({ success: false, message: 'Permission denied' });
+            return res.status(403).json({ success: false, message: "Permission denied" });
         }
 
-        const { id } = req.params;
-
-        const room = await Room.findById(id);
+        const room = await Room.findById(roomId);
         if (!room) {
-            console.log(`[DEBUG] Room not found with id: ${id}`);
-            return res.status(404).json({ error: 'Room not found' });
+            console.log(`[DEBUG] Room not found with id: ${roomId}`);
+            return res.status(404).json({ error: "Room not found" });
         }
 
-        await Room.findByIdAndDelete(id);
-        console.log(`[DEBUG] Deleted room with id: ${id}`);
-        res.json({ message: 'Room deleted successfully' });
+        const devicesDeleteResult = await Device.deleteMany({ room: roomId });
+        console.log(`[DEBUG] Deleted devices in room ${roomId}:`, devicesDeleteResult.deletedCount);
+
+        const houseUpdateResult = await House.updateOne(
+            { _id: houseId },
+            { $pull: { rooms: roomId } }
+        );
+        console.log(`[DEBUG] Removed room ${roomId} from house ${houseId}:`, houseUpdateResult);
+
+        await Room.findByIdAndDelete(roomId);
+        console.log(`[DEBUG] Deleted room with id: ${roomId}`);
+
+        res.json({ message: "Room and its devices deleted successfully" });
     } catch (error) {
-        console.error('[ERROR] DELETE /api/rooms/:id ->', error);
-        res.status(500).json({ error: 'Failed to delete room' });
+        console.error("[ERROR] DELETE /api/houses/:houseId/rooms/delete-room/:roomId ->", error);
+        res.status(500).json({ error: "Failed to delete room" });
     }
 });
 
