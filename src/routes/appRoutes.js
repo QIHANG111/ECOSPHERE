@@ -25,10 +25,10 @@ const SECRET_KEY = process.env.SECRET_KEY;
 // And have SECRET_KEY either from env or config
 
 /*notes
--build api for houses - add house at signup, add house at user settings, delete house, get all houses under a user, get list of houses in mongodb
--build automation APIs
--factory reset
--api for device energy usage(not overall)
+-fix bugs and irregularities
+-build automation APIs - update permission status-automation model
+-factory reset(extra time)  
+-forget password finish
 */
 
 const __filename = fileURLToPath(import.meta.url);
@@ -526,11 +526,11 @@ router.delete('/api/device/:id', async (req, res) => {
     const userId = decoded ? decoded.userId : null;
 
     try {
-       /* const hasPermission = await checkPermission(userId, "deleteDevice");
+        const hasPermission = await checkPermission(userId, "deleteDevice");
         if (!hasPermission) {
             console.log(`[DEBUG] Permission denied for user ${userId}`);
             return res.status(403).json({ success: false, message: 'Permission denied' });
-        } */
+        }
 
         const device = await Device.findById(id);
         if (!device) {
@@ -882,7 +882,7 @@ router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
 });
 
 /*
-  Add room doc to rooms collection and array of rooms in house doc
+  Add room doc to rooms collection and room id to array of rooms in house doc
 */
 router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
     console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.params:', req.params);
