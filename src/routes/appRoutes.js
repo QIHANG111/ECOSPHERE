@@ -122,8 +122,8 @@ router.post('/api/signup', async (req, res) => {
         const token = jwt.sign(
             { userId: newUser._id, email: newUser.email, role: newUser.role_id },
             SECRET_KEY,
-            { expiresIn: '2h' }
         );
+        console.log('token generated: ', token)
 
         res.status(201).json({ message: "User registered successfully", token, data: newUser });
     } catch (error) {
@@ -763,25 +763,59 @@ router.put("/api/devices/:id/fan-speed", async (req, res) => {
 ============================================================ */
 
 /*
-  Add room
+  Add room doc to rooms collection and array of rooms in house doc
 */
-router.post('/api/rooms', async (req, res) => {
-    console.log('[DEBUG] POST /api/rooms -> req.body:', req.body);
-    logDbState('/api/rooms');
+router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
+    console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.params:', req.params);
+    console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.body:', req.body);
+
     try {
-        const { room_name, room_type } = req.body;
-        if (!room_name || !room_type) {
-            console.log('[DEBUG] Missing room_name or room_type');
-            return res.status(400).json({ error: 'All fields are required' });
+        // Extract token manually
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            console.warn('[WARNING] No token provided');
+            return res.status(401).json({ error: 'Unauthorized' });
         }
 
-        const newRoom = new Room({ room_name, room_type });
+        // Verify token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY);
+        } catch (err) {
+            console.error('[ERROR] Invalid token:', err);
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+
+        // Extract user ID from token
+        const userId = decoded.userId;
+        console.log(`[DEBUG] Authenticated user: ${userId}`);
+
+        const { houseId } = req.params;
+        const { room_name } = req.body;
+
+        if (!room_name) {
+            console.log('[DEBUG] Missing room_name');
+            return res.status(400).json({ error: 'Room name is required' });
+        }
+
+        const house = await House.findById(houseId);
+        if (!house) {
+            console.warn(`[WARNING] House not found for id: ${houseId}`);
+            return res.status(404).json({ error: 'House not found. Cannot add room.' });
+        }
+
+        // Create room and associate with house
+        const newRoom = new Room({ room_name, houseId });
         await newRoom.save();
         console.log('[DEBUG] New room created:', newRoom._id);
 
+        house.rooms.push(newRoom._id);
+        await house.save();
+        console.log(`[DEBUG] Added room ${newRoom._id} to house ${houseId}`);
+
         res.status(201).json({ message: 'Room added successfully', room: newRoom });
     } catch (error) {
-        console.error('[ERROR] POST /api/rooms ->', error);
+        console.error('[ERROR] POST /api/houses/:houseId/rooms/add-room ->', error);
         res.status(500).json({ error: 'Failed to add room' });
     }
 });
