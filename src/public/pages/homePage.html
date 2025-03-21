@@ -54,20 +54,20 @@
     <div class="dashboard-content" style="margin-top: 0.5vw;">
         <div class="leftToRightList" style="width: 370%;">
             <div class="aiCard" style=" height: 8vh;">
-                    <div class="input-container">
-                        <div class="leftToRightList" style="width: 100%">
-                            <label for="userPrompt"></label><input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...('Help me turn on the light1')"
-                                                                   style="width: 80%; border-radius: 5vw">
-                            <button id="clearButton" class="icon-button ui-menu-icon"
-                                    style="display: none; background-color: rgba(221,221,221,0); width: 3vw">
-                                <img src="/icons/delete-1-svgrepo-com.svg" alt="Vector Icon" width="30" height="30">
-                            </button>
-                            <button id="micButton" class="icon-button ui-menu-icon">
-                                <img src="/icons/microphone-svgrepo-com.svg" alt="Vector Icon" width="25" height="25">
-                            </button>
-                            <button onclick="handleGeminiRequest()" class="icon-button ui-menu-icon">
-                                <img src="/icons/send-alt-2-svgrepo-com.svg" alt="Vector Icon" width="25" height="25">
-                            </button>
+                <div class="input-container">
+                    <div class="leftToRightList" style="width: 100%">
+                        <label for="userPrompt"></label><input type="text" class="icon-button ui-menu-icon" id="userPrompt" placeholder="Ask something...('Help me turn on the light1')"
+                                                               style="width: 80%; border-radius: 5vw">
+                        <button id="clearButton" class="icon-button ui-menu-icon"
+                                style="display: none; background-color: rgba(221,221,221,0); width: 3vw">
+                            <img src="/icons/delete-1-svgrepo-com.svg" alt="Vector Icon" width="30" height="30">
+                        </button>
+                        <button id="micButton" class="icon-button ui-menu-icon">
+                            <img src="/icons/microphone-svgrepo-com.svg" alt="Vector Icon" width="25" height="25">
+                        </button>
+                        <button onclick="handleGeminiRequest()" class="icon-button ui-menu-icon">
+                            <img src="/icons/send-alt-2-svgrepo-com.svg" alt="Vector Icon" width="25" height="25">
+                        </button>
                     </div>
                 </div>
                 <p id="apiResponse" style="margin-top: 1vw; font-weight: bold; font-size: 1em; opacity: 0;"></p>
@@ -76,31 +76,15 @@
 
     </div>
     <div class="dashboard-content" id="cardContainer1">
-            <div class="normalCard">
-                <h3>Status</h3>
-                <div class="upToDownList" id="deviceList"></div>
-            </div>
         <div class="normalCard">
-            <h3>Notifications</h3>
-            <div id="notificationList"></div>
+            <h3>Status</h3>
+            <div class="upToDownList" id="deviceList"></div>
         </div>
-            <div class="normalCard" style="overflow-y: auto;">
-                <p id="currentDateTime" style="font-size: 1em; font-weight: bold; height: 35%;"></p>
-                <a class="weatherwidget-io" href="https://forecast7.com/en/3d16101d71/federal-territory-of-kuala-lumpur/"
-                   data-label_1="KUALA LUMPUR" data-label_2="WEATHER" data-theme="original">
-                    KUALA LUMPUR WEATHER
-                </a>
-            </div>
-    </div>
-    <div class="dashboard-content" id="cardContainer2">
-        <div class="normalCard" id = "automationcard">
-
-        </div>
-        <div class="normalCard" style="text-align: left">
+        <div class="normalCard" style="text-align: left; width: 239%">
             <div class="leftToRightList">
                 <h3 style="padding-left: 5vw">Energy Usage Report</h3>
                 <button class="hidden-button ui-menu-icon " style="width: 5vw; height: 3.5vw" onclick="window.location.href='/pages/reportPage.html';">
-                        <img src="/icons/about.svg" alt="Vector Icon" width="20" height="20" style="flex: 1; text-align: center;">
+                    <img src="/icons/about.svg" alt="Vector Icon" width="20" height="20" style="flex: 1; text-align: center;">
                 </button>
             </div>
             <!-- Canvas for Chart -->
@@ -108,17 +92,32 @@
                 <canvas id="myChart"></canvas>
             </div>
         </div>
-            <!-- 3D Earth Card -->
+        <!--        <div class="normalCard">-->
+        <!--            <h3>Notifications</h3>-->
+        <!--            <div id="notificationList"></div>-->
+        <!--        </div>-->
+    </div>
+    <div class="dashboard-content" id="cardContainer2">
+        <div class="normalCard" id = "automationcard">
+        </div>
 
-            <div class="normalCard earth-card">
-                <div id="earth-container" style="width: 100%; height: 100%;"></div>
-                <div class="time-display">
-                    <div class="time-clock"></div>
-                    <div class="time-date"></div>
-                </div>
-                <div class="orbital-ring"></div>
+        <!-- 3D Earth Card -->
+
+        <div class="normalCard earth-card">
+            <div id="earth-container" style="width: 100%; height: 100%;"></div>
+            <div class="time-display">
+                <div class="time-clock"></div>
+                <div class="time-date"></div>
             </div>
-        
+            <div class="orbital-ring"></div>
+        </div>
+        <div class="normalCard" style="overflow-y: auto;">
+            <p id="currentDateTime" style="font-size: 1em; font-weight: bold; height: 35%;"></p>
+            <a class="weatherwidget-io" href="https://forecast7.com/en/3d16101d71/federal-territory-of-kuala-lumpur/"
+               data-label_1="KUALA LUMPUR" data-label_2="WEATHER" data-theme="original">
+                KUALA LUMPUR WEATHER
+            </a>
+        </div>
 
     </div>
     <div class="dashboard-content" id="cardContainer3">
@@ -135,11 +134,8 @@
             <span class="save disabled">Save</span>
         </div>
         <div class="roomModal-body">
-            <label for="roomName">NAME</label>
+            <label for="roomName" >NAME</label>
             <input type="text" style="padding-left: 0" id="roomName" oninput="toggleSaveButton()">
-
-            <!-- Room type dropdown will be added here by updateRoomModalHTML() -->
-
             <label>WALLPAPER</label>
             <div class="image-selector">
                 <div class="image-list">
