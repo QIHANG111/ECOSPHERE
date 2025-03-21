@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const token = localStorage.getItem("token");
     if (!token) {
-        alert("Please log in first.");
+        // alert("Please log in first.");
         window.location.href = "../pages/signinPage.html"; // No token
         return;
     }

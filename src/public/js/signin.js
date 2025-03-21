@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (response.ok) {
                 console.log("[DEBUG] Received token:", result.token); // token
                 localStorage.setItem("token", result.token); //localStorage
-                alert("Login successful! Redirecting to home page...");
+                // alert("Login successful! Redirecting to home page...");
                 window.location.href = "../pages/homePage.html";
             } else {
                 console.error("[ERROR] Login failed:", result.message);
