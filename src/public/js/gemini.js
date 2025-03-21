@@ -20,7 +20,7 @@ async function fetchGeminiResponse(prompt) {
         if (data?.candidates?.length > 0) {
             return data.candidates[0].content.parts[0].text;
         } else {
-            return "No valid response from Gemini API.";
+            return "No enough data to generate report.";
         }
     } catch (error) {
         console.error("Error:", error);

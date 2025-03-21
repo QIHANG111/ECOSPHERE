@@ -26,10 +26,10 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 /*notes
 -build api for houses - add house at signup, add house at user settings, delete house, get all houses under a user, get list of houses in mongodb
--edit add room to add the room to associated house id
 -build automation APIs
+-factory reset
 -api for device energy usage(not overall)
--get list of rooms under a house, list of houses under a user*/
+*/
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -122,8 +122,8 @@ router.post('/api/signup', async (req, res) => {
         const token = jwt.sign(
             { userId: newUser._id, email: newUser.email, role: newUser.role_id },
             SECRET_KEY,
-            { expiresIn: '2h' }
         );
+        console.log('token generated: ', token)
 
         res.status(201).json({ message: "User registered successfully", token, data: newUser });
     } catch (error) {
@@ -265,6 +265,25 @@ router.post('/api/forgot-password', async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 });
+
+/*
+  Helper function to checkPermissions in the rolePermission map
+*/
+const checkPermission = async (userId, permissionName) => {
+    try {
+        const user = await User.findById(userId).populate('role_id');
+        if (!user || !user.role_id) return false;
+
+        const rolePermissions = await RolePermission.find({ role_id: user.role_id._id }).populate('permission_id');
+        if (!rolePermissions || rolePermissions.length === 0) return false;
+
+        return rolePermissions.some(rp => rp.permission_id.name === permissionName);
+    } catch (error) {
+        console.error('[ERROR] checkPermission ->', error);
+        return false;
+    }
+};
+
 
 /* ============================================================
    USER CONFIG
@@ -453,21 +472,6 @@ router.post('/api/users/:userId/assign-role', async (req, res) => {
    DEVICES CONFIG
 ============================================================ */
 
-const checkPermission = async (userId, permissionName) => {
-    try {
-        const user = await User.findById(userId).populate('role_id');
-        if (!user || !user.role_id) return false;
-
-        const rolePermissions = await RolePermission.find({ role_id: user.role_id._id }).populate('permission_id');
-        if (!rolePermissions || rolePermissions.length === 0) return false;
-
-        return rolePermissions.some(rp => rp.permission_id.name === permissionName);
-    } catch (error) {
-        console.error('[ERROR] checkPermission ->', error);
-        return false;
-    }
-};
-
 /*
   Add Device
   - Creates a new device.
@@ -567,26 +571,6 @@ router.get('/api/devices', async (req, res) => {
     } catch (error) {
         console.error('[ERROR] GET /api/devices ->', error);
         res.status(500).json({ error: 'Server error while fetching devices' });
-    }
-});
-
-/*
-  Get Devices Under a Specific Room
-*/
-router.get('/api/rooms/:roomId/devices', async (req, res) => {
-    try {
-        const { roomId } = req.params;
-        console.log(`[DEBUG] GET /api/rooms/${roomId}/devices -> Fetching room with devices`);
-        const room = await Room.findById(roomId).populate('devices');
-        if (!room) {
-            console.error(`[ERROR] Room not found: ${roomId}`);
-            return res.status(404).json({ error: 'Room not found' });
-        }
-        console.log(`[DEBUG] Room "${room.room_name}" has ${room.devices.length} devices`);
-        res.status(200).json({ success: true, devices: room.devices });
-    } catch (error) {
-        console.error('[ERROR] GET /api/rooms/:roomId/devices ->', error);
-        res.status(500).json({ error: 'Server error while fetching devices for room' });
     }
 });
 
@@ -763,56 +747,377 @@ router.put("/api/devices/:id/fan-speed", async (req, res) => {
 ============================================================ */
 
 /*
-  Add room
+  Add house to house collection, create new houseUser mapping for owners, add to user doc
 */
-router.post('/api/rooms', async (req, res) => {
-    console.log('[DEBUG] POST /api/rooms -> req.body:', req.body);
-    logDbState('/api/rooms');
+router.post('/api/houses/:currentHouseId/add-house', async (req, res) => {
     try {
-        const { room_name, room_type } = req.body;
-        if (!room_name || !room_type) {
-            console.log('[DEBUG] Missing room_name or room_type');
-            return res.status(400).json({ error: 'All fields are required' });
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const { newHouseName } = req.body;
+        const { currentHouseId } = req.params;
+
+        if (!newHouseName) {
+            return res.status(400).json({ success: false, message: 'House name is required' });
         }
 
-        const newRoom = new Room({ room_name, room_type });
+        const houseUserEntry = await HouseUser.findOne({ houseId: currentHouseId, userId, role: 'Home Owner' });
+        if (!houseUserEntry) {
+            return res.status(403).json({ success: false, message: 'Only home owners can add houses' });
+        }
+
+        const newHouse = new House({ 
+            house_name: newHouseName,
+            owners: [], 
+            rooms: [],   
+            dwellers: [] 
+        });
+        await newHouse.save();
+        console.log(`[DEBUG] New house created: ${newHouse._id} (${newHouseName})`);
+
+        const currentOwners = await HouseUser.find({ houseId: currentHouseId, role: 'Home Owner' });
+        const newHouseUserMappings = currentOwners.map(owner => ({
+            houseId: newHouse._id,
+            userId: owner.user_id,
+            role: 'Home Owner'
+        }));
+
+        await HouseUser.insertMany(newHouseUserMappings);
+        console.log(`[DEBUG] Assigned ${newHouseUserMappings.length} owners to new house: ${newHouse._id}`);
+
+        await User.updateMany(
+            { _id: { $in: currentOwners.map(owner => owner.user_id) } },
+            { $push: { houses: newHouse._id } }
+        );
+
+        res.status(201).json({ 
+            success: true, 
+            message: 'House added successfully', 
+            house: newHouse.toObject()
+        });
+
+    } catch (error) {
+        console.error('[ERROR] Adding house ->', error);
+        res.status(500).json({ success: false, message: 'Failed to add house' });
+    }
+});
+
+/*
+  Delete house 
+  - find all rooms in the house
+  - find all devices and delete
+  -delete all rooms
+  - delete all houseUser mappings
+  - delete house id from all owner's documents
+  -delete the house from house collection
+*/
+router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
+    try {
+        const { houseId } = req.params;
+
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const houseUserEntry = await HouseUser.findOne({ houseId, userId, role: 'Home Owner' });
+        if (!houseUserEntry) {
+            return res.status(403).json({ success: false, message: 'Only home owners can delete houses' });
+        }
+
+        console.log(`[DEBUG] Deleting house ${houseId} requested by user ${userId}`);
+
+        const rooms = await Room.find({ houseId });
+        const roomIds = rooms.map(room => room._id);
+
+        const deviceDeleteResult = await Device.deleteMany({ roomId: { $in: roomIds } });
+        console.log(`[DEBUG] Deleted ${deviceDeleteResult.deletedCount} devices from rooms in house ${houseId}`);
+
+        const roomDeleteResult = await Room.deleteMany({ houseId });
+        console.log(`[DEBUG] Deleted ${roomDeleteResult.deletedCount} rooms from house ${houseId}`);
+
+        const houseUserDeleteResult = await HouseUser.deleteMany({ houseId });
+        console.log(`[DEBUG] Deleted ${houseUserDeleteResult.deletedCount} user mappings for house ${houseId}`);
+
+        const ownerUpdateResult = await User.updateMany(
+            { houses: houseId }, 
+            { $pull: { houses: houseId } }
+        );
+        console.log(`[DEBUG] Removed house ${houseId} from ${ownerUpdateResult.modifiedCount} user(s)`);
+
+        const houseDeleteResult = await House.findByIdAndDelete(houseId);
+        if (!houseDeleteResult) {
+            return res.status(404).json({ success: false, message: 'House not found' });
+        }
+
+        console.log(`[DEBUG] Successfully deleted house ${houseId}`);
+        res.status(200).json({ success: true, message: 'House deleted successfully' });
+
+    } catch (error) {
+        console.error('[ERROR] Deleting house ->', error);
+        res.status(500).json({ success: false, message: 'Failed to delete house' });
+    }
+});
+
+/*
+  Add room doc to rooms collection and array of rooms in house doc
+*/
+router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
+    console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.params:', req.params);
+    console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.body:', req.body);
+
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            console.warn('[WARNING] No token provided');
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY);
+        } catch (err) {
+            console.error('[ERROR] Invalid token:', err);
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+
+        const userId = decoded.userId;
+        console.log(`[DEBUG] Authenticated user: ${userId}`);
+
+        const { houseId } = req.params;
+        const { room_name } = req.body;
+
+        if (!room_name) {
+            console.log('[DEBUG] Missing room_name');
+            return res.status(400).json({ error: 'Room name is required' });
+        }
+
+        const house = await House.findById(houseId);
+        if (!house) {
+            console.warn(`[WARNING] House not found for id: ${houseId}`);
+            return res.status(404).json({ error: 'House not found. Cannot add room.' });
+        }
+
+        const newRoom = new Room({ room_name, houseId });
         await newRoom.save();
         console.log('[DEBUG] New room created:', newRoom._id);
 
+        house.rooms.push(newRoom._id);
+        await house.save();
+        console.log(`[DEBUG] Added room ${newRoom._id} to house ${houseId}`);
+
         res.status(201).json({ message: 'Room added successfully', room: newRoom });
     } catch (error) {
-        console.error('[ERROR] POST /api/rooms ->', error);
+        console.error('[ERROR] POST /api/houses/:houseId/rooms/add-room ->', error);
         res.status(500).json({ error: 'Failed to add room' });
     }
 });
 
 /*
-  Delete room
+  delete room - deletes the devices in the room first, then deletes the id from the array in house, then deletes the room doc
 */
-router.delete('/api/rooms/:id', async (req, res) => {
-    console.log('[DEBUG] DELETE /api/rooms/:id ->', req.params);
-    logDbState('/api/rooms/:id');
+router.delete("/api/houses/:houseId/rooms/delete-room/:roomId", async (req, res) => {
+    console.log("[DEBUG] DELETE /api/houses/:houseId/rooms/delete-room/:roomId ->", req.params);
+
     try {
-        const hasPermission = await checkPermission(userId, "deleteDevice");
-        if (!hasPermission) {
-            console.log(`[DEBUG] Permission denied for user ${userId}`);
-            return res.status(403).json({ success: false, message: 'Permission denied' });
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            console.log("[DEBUG] No token provided");
+            return res.status(401).json({ success: false, message: "Unauthorized" });
         }
 
-        const { id } = req.params;
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY);
+        } catch (err) {
+            console.log("[DEBUG] Invalid token");
+            return res.status(401).json({ success: false, message: "Invalid token" });
+        }
 
-        const room = await Room.findById(id);
+        const userId = decoded.userId;
+        const { houseId, roomId } = req.params;
+
+        const hasPermission = await checkPermission(userId, "deleteRoom");
+        if (!hasPermission) {
+            console.log(`[DEBUG] Permission denied for user ${userId}`);
+            return res.status(403).json({ success: false, message: "Permission denied" });
+        }
+
+        const room = await Room.findById(roomId);
         if (!room) {
-            console.log(`[DEBUG] Room not found with id: ${id}`);
+            console.log(`[DEBUG] Room not found with id: ${roomId}`);
+            return res.status(404).json({ error: "Room not found" });
+        }
+
+        const devicesDeleteResult = await Device.deleteMany({ room: roomId });
+        console.log(`[DEBUG] Deleted devices in room ${roomId}:`, devicesDeleteResult.deletedCount);
+
+        const houseUpdateResult = await House.updateOne(
+            { _id: houseId },
+            { $pull: { rooms: roomId } }
+        );
+        console.log(`[DEBUG] Removed room ${roomId} from house ${houseId}:`, houseUpdateResult);
+
+        await Room.findByIdAndDelete(roomId);
+        console.log(`[DEBUG] Deleted room with id: ${roomId}`);
+
+        res.json({ message: "Room and its devices deleted successfully" });
+    } catch (error) {
+        console.error("[ERROR] DELETE /api/houses/:houseId/rooms/delete-room/:roomId ->", error);
+        res.status(500).json({ error: "Failed to delete room" });
+    }
+});
+
+/*
+  Get all rooms in a house
+*/
+router.get('/api/houses/:houseId/rooms', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            console.log('[DEBUG] No token provided');
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.SECRET_KEY);
+        } catch (error) {
+            console.log('[DEBUG] Invalid token');
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+
+        const { houseId } = req.params;
+        console.log(`[DEBUG] GET /api/houses/${houseId}/rooms -> Fetching rooms for user ${decoded.userId}`);
+
+        const house = await House.findById(houseId).populate('rooms');
+        if (!house) {
+            console.error(`[ERROR] House not found with id: ${houseId}`);
+            return res.status(404).json({ error: 'House not found' });
+        }
+
+        console.log(`[DEBUG] Found house "${house.house_name}" with ${house.rooms.length} rooms`);
+        res.status(200).json({ success: true, rooms: house.rooms });
+
+    } catch (error) {
+        console.error(`[ERROR] Fetching rooms ->`, error);
+        res.status(500).json({ error: 'Server error while fetching rooms for house' });
+    }
+});
+
+/*
+  Get all devices under a room
+*/
+router.get('/api/houses/:houseId/rooms/:roomId/devices', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Unauthorized: No token provided' });
+        }
+
+        let userId;
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            userId = decoded.userId;
+        } catch (err) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        }
+
+        const { houseId, roomId } = req.params;
+        console.log(`[DEBUG] GET /api/houses/${houseId}/rooms/${roomId}/devices -> Fetching room with devices`);
+
+        const house = await House.findOne({ _id: houseId, rooms: roomId });
+        if (!house) {
+            console.error(`[ERROR] House ${houseId} does not contain room ${roomId}`);
+            return res.status(404).json({ error: 'Room not found in the specified house' });
+        }
+
+        const room = await Room.findById(roomId).populate('devices');
+        if (!room) {
+            console.error(`[ERROR] Fetching room: ${roomId} -> Room not found`);
             return res.status(404).json({ error: 'Room not found' });
         }
 
-        await Room.findByIdAndDelete(id);
-        console.log(`[DEBUG] Deleted room with id: ${id}`);
-        res.json({ message: 'Room deleted successfully' });
+        console.log(`[DEBUG] Found room "${room.room_name}" with ${room.devices.length} devices`);
+        res.status(200).json({ success: true, devices: room.devices });
     } catch (error) {
-        console.error('[ERROR] DELETE /api/rooms/:id ->', error);
-        res.status(500).json({ error: 'Failed to delete room' });
+        console.error(`[ERROR] Fetching devices ->`, error);
+        res.status(500).json({ error: 'Server error while fetching devices for room' });
+    }
+});
+
+/*
+  Get all houses under a user
+*/
+router.get('/api/houses/owned', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        console.log(`[DEBUG] Fetching houses for owner: ${userId}`);
+
+        const ownedHouseMappings = await HouseUser.find({ user_id: userId, role: 'Home Owner' });
+
+        if (!ownedHouseMappings.length) {
+            console.log(`[DEBUG] No houses found for owner: ${userId}`);
+            return res.status(404).json({ success: false, message: 'No houses found for this user' });
+        }
+
+        const houseIds = ownedHouseMappings.map(mapping => mapping.house_id);
+        const houses = await House.find({ _id: { $in: houseIds } });
+        console.log(`[DEBUG] Found ${houses.length} houses for owner ${userId}`);
+        res.status(200).json({ success: true, houses });
+
+    } catch (error) {
+        console.error('[ERROR] Fetching owned houses ->', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch houses' });
+    }
+}); 
+
+/*
+  get all users under a house 
+*/
+
+router.get('/api/houses/:houseId/users', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        console.log(`[DEBUG] Fetching users for house: ${req.params.houseId}`);
+        const houseUsers = await HouseUser.find({ house_id: req.params.houseId });
+
+        if (!houseUsers.length) {
+            console.log(`[DEBUG] No users found in house: ${req.params.houseId}`);
+            return res.status(404).json({ success: false, message: 'No users found in this house' });
+        }
+
+        const userIds = houseUsers.map(entry => entry.user_id);
+        const userRoles = houseUsers.reduce((acc, entry) => {
+            acc[entry.user_id] = entry.role;
+            return acc;
+        }, {});
+
+        const users = await User.find({ _id: { $in: userIds } }).select('-password');
+        const usersWithRoles = users.map(user => ({
+            ...user.toObject(),
+            role: userRoles[user._id.toString()]
+        }));
+
+        console.log(`[DEBUG] Found ${usersWithRoles.length} users in house ${req.params.houseId}`);
+        res.status(200).json({ success: true, users: usersWithRoles });
+
+    } catch (error) {
+        console.error('[ERROR] Fetching house users ->', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch users in house' });
     }
 });
 
