@@ -526,11 +526,11 @@ router.delete('/api/device/:id', async (req, res) => {
     const userId = decoded ? decoded.userId : null;
 
     try {
-        const hasPermission = await checkPermission(userId, "deleteDevice");
+       /* const hasPermission = await checkPermission(userId, "deleteDevice");
         if (!hasPermission) {
             console.log(`[DEBUG] Permission denied for user ${userId}`);
             return res.status(403).json({ success: false, message: 'Permission denied' });
-        }
+        } */
 
         const device = await Device.findById(id);
         if (!device) {

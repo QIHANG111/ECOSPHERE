@@ -405,8 +405,8 @@
             box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-left: -15px; /* shift left 10px */
-            margin-top: 10px; /* shift down 10px */
+            margin-left: 20px; /* shift left 10px */
+            margin-top: 50px; /* shift down 10px */
         }
 
         /* button main area */
@@ -497,9 +497,254 @@
             max-height: 100%; /* 让图片不会超出容器 */
             object-fit: contain; /* 确保整个图片显示，而不会被裁剪 */
             display: block; /* 避免 inline 元素的额外间距 */
-            margin: auto; /* 居中对齐 */
+            /* margin-top: 20px;
+            margin-left: -25px; */
         }
 
+        .device-name {
+            font-size: 1.5vw;
+           /* margin-top: 40px;
+            margin-left: -25px; */
+        }
+
+        .setting-container {
+            position: relative;
+            flex-shrink: 0; /* 防止图标被压缩 */
+        }
+
+        .setting-icon {
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            position: relative;
+            top: 10px; /* 向下移动 5px */
+            margin-bottom: 30px;
+            margin-left: 140px;
+        }
+
+
+        .dropdown-menu .settings-option {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .dropdown-menu .settings-option:hover {
+            background-color: #f4f4f4;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: -50px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            width: 240px;
+            z-index: 1;
+        }
+
+        .settings-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+
+        /* 📌 开关外框 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;  /* ✅ 调整宽度 */
+            height: 30px; /* ✅ 调整高度 */
+           /* margin-bottom: 30px;
+            margin-right: -20px; */
+        }
+
+        /* ✅ 隐藏默认 checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* 📌 滑动条 */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc; /* ✅ 默认状态颜色 */
+            transition: 0.4s;
+            border-radius: 30px; /* ✅ 圆角，让滑动条更流畅 */
+        }
+
+        /* ✅ 滑块 */
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px; /* ✅ 滑块高度 */
+            width: 26px;  /* ✅ 滑块宽度 */
+            left: 2px; /* ✅ 默认状态下的滑块位置 */
+            bottom: 2px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* ✅ 添加阴影，让滑块更立体 */
+        }
+
+        /* ✅ 开启状态 */
+        input:checked + .slider {
+            background-color: LimeGreen; /* ✅ 绿色背景，表示开启 */
+        }
+
+        /* ✅ 滑块在开启状态下的位置 */
+        input:checked + .slider:before {
+            transform: translateX(30px); /* ✅ 让滑块向右移动 */
+        }
+
+        /* ✅ 鼠标悬停时，增加视觉反馈 */
+        .slider:hover {
+            background-color: #bfbfbf;
+        }
+
+        /* ✅ 点击时的缩放效果 */
+        .switch input:active + .slider:before {
+            transform: scale(1.1);
+        }
+
+        /* 统一按钮样式 */
+        .remove-device {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* 让图标和文本之间有间距 */
+            background-color: #A9A9A9; /* 亮红色背景 */
+            color: white;
+            border-radius: 8px; /* 圆角 */
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            border: none;
+            outline: none;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15); /* 添加阴影 */
+        }
+
+        /* 按钮内的图标 */
+        .remove-device img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 按钮文本 */
+        .remove-device .button-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 悬停时的效果 */
+        .remove-device:hover {
+            background-color: #A9A9A9; /* 深红色 */
+            transform: scale(1.05); /* 轻微放大 */
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 点击时的反馈 */
+        .remove-device:active {
+            transform: scale(0.95); /* 轻微缩小，模拟按压效果 */
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .remove-device {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+
+            .remove-device img {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        /* 温度调节按钮样式 */
+        .temperature-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;;
+            gap: 3px;
+        }
+
+        .temp-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-left: 30px;
+            margin-right: 20px;
+        }
+
+        .temp-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .temp-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* 温度调节按钮样式 */
+        .fan-speed-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .speed-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-left: 3px;
+            margin-right: 10px;
+        }
+
+        .speed-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .speed-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
 
 
     </style>
@@ -583,7 +828,16 @@
     </div>
 
 
-
+    <!-- 模态框 -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to delete this device?</p>
+            <div class="modal-buttons">
+                <button id="confirmDelete">Confirm</button>
+                <button id="cancelDelete">Cancel</button>
+            </div>
+        </div>
+    </div>
 
 
 
@@ -644,7 +898,7 @@
     const furnitureContainer = document.getElementById("furnitureContainer");
 
     // create the empty furniture box
-    const totalBoxes = 4; // change the total furniture box count
+    const totalBoxes = 0; // change the total furniture box count
     for (let i = 0; i < totalBoxes; i++) {
         const box = document.createElement("div");
         box.classList.add("furniture-box");
@@ -812,16 +1066,56 @@
                 <h3 class="device-name">${device.device_name}</h3>
             </div>
             <div class="device-right">
-                <button class="toggle-status ${isOn ? "on" : "off"}" data-id="${device._id}">
-                    ${isOn ? "Turn Off" : "Turn On"}
-                </button>
-                <button class="remove-device" data-id="${device._id}">🗑</button>
+            <div class="setting-container">
+    <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon" onclick="toggleDropdown(this)">
+    <div class="dropdown-menu">
+        <!-- 滑动开关按钮 -->
+        <div class="settings-option">
+            <span>Power</span>
+            <label class="switch">
+                <input type="checkbox" class="toggle-status" data-id="${device._id}" ${isOn ? "checked" : ""} onclick="event.stopPropagation()">
+                <span class="slider round"></span>
+            </label>
+        </div>
+
+        <!-- 温度上下调节按钮 -->
+        <div class="settings-option">
+            <span>Temp</span>
+            <div class="temperature-control">
+                <button class="temp-btn" onclick="adjustTemperature(-1); event.stopPropagation()">-</button>
+                <span class="temp-value">20</span>&deg;C
+                <button class="temp-btn" onclick="adjustTemperature(1); event.stopPropagation()">+</button>
             </div>
-        `;
+        </div>
+
+        <!-- 调节风速按钮 -->
+        <div class="settings-option">
+            <span>Fan Speed</span>
+            <div class="fan-speed-control">
+                <button class="speed-btn" onclick="adjustFanSpeed(-1); event.stopPropagation()">-</button>
+                <span class="speed-value">1</span>
+                <button class="speed-btn" onclick="adjustFanSpeed(1); event.stopPropagation()">+</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="delete-container" onclick="removeDevice('${device._id}')">
+    <div class="delete-button">
+        <div class="delete-icon">
+            <img src="../icons/delete-1-svgrepo-com.svg" alt="remove-icon">
+        </div>
+        <span class="delete-text">Remove</span>
+    </div>
+</div>
+
+        </div>
+    `;
 
             deviceContainer.appendChild(deviceElement);
         }
 
+        // 绑定事件
         async function toggleDeviceStatus(deviceId, newStatus) {
             try {
                 const response = await fetch("/api/update-device", {
@@ -843,22 +1137,80 @@
         }
 
         async function removeDevice(deviceId) {
+            console.log(`🗑 Attempting to delete device: ${deviceId}`);
+
+            if (!deviceId) {
+                console.error("❌ Device ID is missing!");
+                alert("Error: Device ID is missing!");
+                return;
+            }
+
+            if (!confirm("Are you sure you want to delete this device?")) {
+                return;
+            }
+
             try {
-                const response = await fetch(`/api/device/${deviceId}`, {
-                    method: "DELETE"
+                const response = await fetch(`http://localhost:4000/api/device/${deviceId}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" }
                 });
 
+                if (!response.ok) {
+                    throw new Error(`❌ HTTP error! Status: ${response.status}`);
+                }
+
                 const result = await response.json();
+                console.log("📩 Server Response:", result);
+
                 if (result.success) {
-                    console.log("Device removed successfully.");
-                    loadDevices();
+                    console.log(`✅ Successfully deleted device: ${deviceId}`);
+
+                    // ✅ 从界面上删除设备
+                    const deviceElement = document.querySelector(`.remove-device[data-id="${deviceId}"]`)?.closest(".device-card");
+                    if (deviceElement) {
+                        deviceElement.remove();
+                        console.log(`🖼 Device ${deviceId} removed from UI`);
+                    }
+
+                    // ✅ 从 `localStorage` 也删除
+                    let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
+                    devices = devices.filter(device => device.id !== deviceId);
+                    localStorage.setItem("savedDevices", JSON.stringify(devices));
+
+                    // ✅ 刷新页面，重新获取设备列表
+                    window.location.reload();
                 } else {
-                    console.error("Failed to remove device:", result.message);
+                    console.error("❌ Failed to delete device:", result.message);
+                    alert(`Error: ${result.message}`);
                 }
             } catch (error) {
-                console.error("Error removing device:", error);
+                console.error("❌ Error deleting device:", error);
+                alert("Error deleting device. Please check the console for details.");
             }
         }
+
+// ✅ 让 `removeDevice` 变成全局函数
+        window.removeDevice = removeDevice;
+
+
+
+
+        function getUserRoleFromToken(token) {
+            try {
+                const base64Url = token.split('.')[1]; // 获取 `JWT` payload 部分
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+
+                const decodedToken = JSON.parse(jsonPayload);
+                return decodedToken.role || "guest"; // ✅ 如果 `role` 不存在，默认为 `guest`
+            } catch (error) {
+                console.error("❌ Error decoding JWT token:", error);
+                return "guest";
+            }
+        }
+
 
         // 监听 `addelectric.html` 添加的设备
         window.addEventListener("storage", function (event) {
@@ -873,6 +1225,41 @@
         loadDevices();
     });
 
+    // 下拉菜单
+    function toggleDropdown(element) {
+        const dropdownMenu = element.nextElementSibling;
+        document.querySelectorAll(".dropdown-menu").forEach(menu => {
+            if (menu !== dropdownMenu) menu.style.display = "none";
+        });
+        dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+    }
+
+    // 关闭下拉菜单（当点击页面其他地方）
+    window.addEventListener("click", function (event) {
+        if (!event.target.matches('.setting-icon') && !event.target.closest('.dropdown-menu')) {
+            document.querySelectorAll(".dropdown-menu").forEach(menu => menu.style.display = "none");
+        }
+    });
+
+    // 温度调节
+    function adjustTemperature(change) {
+        const tempValue = document.querySelector('.temp-value');
+        let currentTemp = parseInt(tempValue.textContent);
+        currentTemp += change;
+        if (currentTemp < 10) currentTemp = 10; // 最低温度
+        if (currentTemp > 30) currentTemp = 30; // 最高温度
+        tempValue.textContent = currentTemp;
+    }
+
+    // 风速调节
+    function adjustFanSpeed(change) {
+        const speedValue = document.querySelector('.speed-value');
+        let currentSpeed = parseInt(speedValue.textContent);
+        currentSpeed += change;
+        if (currentSpeed < 1) currentSpeed = 1; // 最低风速
+        if (currentSpeed > 5) currentSpeed = 5; // 最高风速
+        speedValue.textContent = currentSpeed;
+    }
 
 
 </script>
