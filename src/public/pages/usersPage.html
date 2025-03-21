@@ -142,7 +142,6 @@
             </div>
         </div>
     </div>
-
     <div id="userSettingsModal" class="modal" style="display:none;">
         <div class="modal-content">
             <span id="closeUserSettings" class="close">&times;</span>
@@ -175,6 +174,38 @@
         </div>
     </div>
     <button id="addUserBtn">Add Member</button>
+
+    <div class="house-list" id="houseListContainer">
+        <h2 class="section-title">Houses</h2>
+    </div>
+
+    <!-- Add House Modal -->
+    <div id="addHouseModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddHouseModal()">&times;</span>
+            <div class="icon-container">
+                <div class="ui-menu-icon">
+                    <img src="/icons/house-2-svgrepo-com.svg" alt="Vector Icon" width="70" height="70">
+                </div>
+            </div>
+            <h2 class="form-title">Add a New House</h2>
+            <p class="form-description">
+                This house will be part of your account.
+            </p>
+
+            <!-- Form for adding a new house -->
+            <form id="addHouseForm">
+                <label for="houseName">New House Name:</label>
+                <input type="text" id="houseName" required />
+
+                <!-- Possibly a hidden field or another method for the currentHouseId -->
+                <input type="hidden" id="currentHouseId" value="PUT_CURRENT_HOUSE_ID_HERE" />
+
+                <button type="submit" id="createHouse">Add House</button>
+            </form>
+        </div>
+    </div>
+    <button id="addHouseBtn">Add House</button>
 
 </div>
 <script src="/js/sidebar.js"></script>

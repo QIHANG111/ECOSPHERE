@@ -1716,7 +1716,7 @@ canvas {
 
 
 
-#addUserForm {
+#addUserForm, #addHouseForm {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1726,6 +1726,12 @@ canvas {
 }
 
 #addUserForm label {
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 5px;
+}
+#addHouseForm label {
     font-size: 16px;
     font-weight: 600;
     align-self: flex-start;
@@ -1744,8 +1750,24 @@ canvas {
     outline: none;
     transition: border 0.3s, background-color 0.3s;
 }
+#addHouseForm input {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border 0.3s, background-color 0.3s;
+}
 
 #addUserForm input:focus {
+    border: 1px solid #007AFF;
+    background-color: #fff;
+}
+#addHouseForm input:focus {
     border: 1px solid #007AFF;
     background-color: #fff;
 }
@@ -1763,12 +1785,25 @@ canvas {
     cursor: pointer;
     transition: background 0.3s, transform 0.2s;
 }
+#addHouseForm button {
+    width: 100%;
+    max-width: 350px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #007AFF, #005DD1);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
 
 #addUserForm button:hover {
     background: linear-gradient(135deg, #005DD1, #0040A5);
     transform: scale(1.02);
 }
-#addUserBtn {
+#addUserBtn,#addHouseBtn {
     display: block;
     margin: 20px auto;
     width: 100%;
@@ -1785,6 +1820,10 @@ canvas {
 }
 
 #addUserBtn:hover {
+    background: linear-gradient(135deg, #005DD1, #0040A5);
+    transform: scale(1.02);
+}
+#addHouseBtn:hover {
     background: linear-gradient(135deg, #005DD1, #0040A5);
     transform: scale(1.02);
 }

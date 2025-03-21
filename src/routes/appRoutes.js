@@ -752,7 +752,9 @@ router.put("/api/devices/:id/fan-speed", async (req, res) => {
 router.post('/api/houses/:currentHouseId/add-house', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
-        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+        if (!token) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
 
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
@@ -761,47 +763,63 @@ router.post('/api/houses/:currentHouseId/add-house', async (req, res) => {
         const { currentHouseId } = req.params;
 
         if (!newHouseName) {
-            return res.status(400).json({ success: false, message: 'House name is required' });
+            return res.status(400).json({ success: false, message: "House name is required" });
         }
 
-        const houseUserEntry = await HouseUser.findOne({ houseId: currentHouseId, userId, role: 'Home Owner' });
+        // Check if current user is indeed a "Home Owner" of the currentHouseId
+        const houseUserEntry = await HouseUser.findOne({
+            house_id: currentHouseId,
+            user_id: userId,
+            role: "Home Owner"
+        });
+
+        // If not found, return Forbidden
         if (!houseUserEntry) {
-            return res.status(403).json({ success: false, message: 'Only home owners can add houses' });
+            return res.status(403).json({ success: false, message: "Only home owners can add houses" });
         }
 
-        const newHouse = new House({ 
+        // Create the new house
+        const newHouse = new House({
             house_name: newHouseName,
-            owners: [], 
-            rooms: [],   
-            dwellers: [] 
+            owners: [],
+            rooms: [],
+            dwellers: []
         });
         await newHouse.save();
         console.log(`[DEBUG] New house created: ${newHouse._id} (${newHouseName})`);
 
-        const currentOwners = await HouseUser.find({ houseId: currentHouseId, role: 'Home Owner' });
+        // Find all current owners of the existing (current) house
+        const currentOwners = await HouseUser.find({
+            house_id: currentHouseId,
+            role: "Home Owner"
+        });
+
+        // Build an array of HouseUser mappings for each of these owners in the new house
         const newHouseUserMappings = currentOwners.map(owner => ({
-            houseId: newHouse._id,
-            userId: owner.user_id,
-            role: 'Home Owner'
+            house_id: newHouse._id,
+            user_id: owner.user_id,
+            role: "Home Owner"
         }));
 
+        // Insert these mappings into HouseUser
         await HouseUser.insertMany(newHouseUserMappings);
         console.log(`[DEBUG] Assigned ${newHouseUserMappings.length} owners to new house: ${newHouse._id}`);
 
+        // Update each owner’s "houses" array to include this new house
         await User.updateMany(
             { _id: { $in: currentOwners.map(owner => owner.user_id) } },
             { $push: { houses: newHouse._id } }
         );
 
-        res.status(201).json({ 
-            success: true, 
-            message: 'House added successfully', 
+        res.status(201).json({
+            success: true,
+            message: "House added successfully",
             house: newHouse.toObject()
         });
 
     } catch (error) {
-        console.error('[ERROR] Adding house ->', error);
-        res.status(500).json({ success: false, message: 'Failed to add house' });
+        console.error("[ERROR] Adding house ->", error);
+        res.status(500).json({ success: false, message: "Failed to add house" });
     }
 });
 

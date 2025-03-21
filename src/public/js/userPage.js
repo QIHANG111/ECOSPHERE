@@ -329,3 +329,88 @@ async function changeUserRole(userId) {
 document.getElementById("closeUserSettings").onclick = () => {
     document.getElementById("userSettingsModal").style.display = "none";
 };
+
+
+// JavaScript to handle opening and closing the 'Add House' modal
+function openAddHouseModal() {
+    document.getElementById('addHouseModal').style.display = 'block';
+}
+
+function closeAddHouseModal() {
+    document.getElementById('addHouseModal').style.display = 'none';
+    // Reset the form fields on close
+    document.getElementById('addHouseForm').reset();
+}
+
+// Event listener for the button that opens the modal
+document.getElementById('addHouseBtn').addEventListener('click', openAddHouseModal);
+
+// Async function to add a new house
+async function addHouse() {
+    try {
+        console.log("[DEBUG] Starting addHouse function");
+
+        // 1) Retrieve the house name from the form
+        const newHouseName = document.getElementById('houseName').value.trim();
+        console.log("[DEBUG] newHouseName:", newHouseName);
+        if (!newHouseName) {
+            alert("Please provide a valid House Name.");
+            return;
+        }
+
+        // 2) Retrieve the currentHouseId
+        const currentHouseId = document.getElementById('currentHouseId').value.trim();
+        console.log("[DEBUG] currentHouseId:", currentHouseId);
+        if (!currentHouseId) {
+            alert("No currentHouseId found. Cannot add new house.");
+            return;
+        }
+
+        // 3) Retrieve the JWT token
+        const token = localStorage.getItem('token');
+        console.log("[DEBUG] token:", token);
+        if (!token) {
+            alert("No token found. Please sign in again.");
+            return;
+        }
+
+        // 4) Make the POST request to your backend endpoint
+        const response = await fetch(`/api/houses/${currentHouseId}/add-house`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ newHouseName })
+        });
+
+        // 5) Handle possible errors or parse successful response
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("[ERROR] Failed to add house:", errorData);
+            throw new Error(errorData.message || "Failed to add house");
+        }
+
+        const data = await response.json();
+        console.log("[DEBUG] House created successfully:", data);
+
+        // 6) House was successfully created
+        alert("House created successfully!");
+
+        // Optional: refresh your list of houses or navigate
+        // window.location.reload();
+
+        // Close the modal after success
+        closeAddHouseModal();
+
+    } catch (err) {
+        console.error("Error adding house:", err);
+        alert(err.message);
+    }
+}
+
+// Attach a 'submit' event listener to the form, not the button
+document.getElementById('addHouseForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    addHouse().then(r => console.log(r));
+});
