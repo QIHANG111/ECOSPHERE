@@ -37,7 +37,7 @@ export const connectDB = async () => {
  *
  * @param {number} count - how many records to insert (default: 60)
  */
-export const insertData = async (count = 365) => {
+export const insertData = async (count = 700) => {
     try {
         console.log("[DEBUG] Starting insertData function with count:", count);
 
@@ -53,7 +53,7 @@ export const insertData = async (count = 365) => {
         for (let i = 0; i < count; i++) {
             const dayDate = new Date(today);
             dayDate.setDate(today.getDate() - (count - 1 - i));
-            const usageValue = faker.number.float({ min: 70, max: 90, precision: 5 });
+            const usageValue = faker.number.float({ min: 15, max: 40, precision: 6 });
             energyData.push({
                 date: dayDate,
                 energyusage: usageValue
