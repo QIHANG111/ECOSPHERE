@@ -8,6 +8,7 @@ const deviceSchema = new mongoose.Schema({
     },
     device_type: {
         type: String,
+        enum: ['cleaning', 'kitchen', 'AC', 'fan', 'light', 'humidifier', "security"], 
         required: true,
         trim: true
     },
@@ -47,12 +48,37 @@ const deviceSchema = new mongoose.Schema({
         },
         default: null
     },
+    startTime: { 
+        type: Date,
+        required: function () {
+            return (this.device_type === "cleaning" || this.device_type === "kitchen") ;
+        },
+        default: null
+    },  
+    expectedStopTime: { 
+        type: Date,
+        required: function () {
+            return (this.device_type === "cleaning" || this.device_type === "kitchen") ;
+        },
+        default: null 
+    }, 
+    duration: { 
+        type: Number,
+        required: function () {
+            return (this.device_type === "cleaning" || this.device_type === "kitchen") ;
+        },
+        default: null 
+    }, 
     room: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room',
         default: null
     },
-    house: { type: mongoose.Schema.Types.ObjectId, ref: "House" }
+    house: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "House"
+    }
+
 });
 
 const Device = mongoose.model('Device', deviceSchema);
