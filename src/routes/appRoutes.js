@@ -1387,6 +1387,10 @@ router.get('/api/notifications', (req, res) => {
     res.json({ notifications }); // Ensuring it's an object with an array
 });
 
+/* ============================================================
+   AUTOMATION CONFIG
+============================================================ */
+
 
 
 export default router;
