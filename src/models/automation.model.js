@@ -7,23 +7,27 @@ const automationSchema = new mongoose.Schema({
     },
     device_type: {
         type: String,
-        enum: ['cleaning', 'kitchen', 'AC', 'fan', 'light', 'humidifier', "security"], 
+        enum: ['cleaning', 'kitchen', 'AC', 'fan', 'light', 'humidifier', 'security'],
         required: true,
         trim: true
     },
     status: {
-        type: String,
+        type: Boolean,
         required: true,
         trim: true,
         default: false
     },
     startTime: {
         type: Date,
-        required: true
+        required: function () {
+            return this.status;
+        }
     },
     endTime: {
         type: Date,
-        required: true,
+        required: function() {
+            return this.status;  
+        },
         validate: {
             validator: function (value) {
                 return this.startTime ? value > this.startTime : true; // Ensure endTime is after startTime
