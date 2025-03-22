@@ -348,7 +348,7 @@ menuItems.forEach((item) => {
                 }
             } catch (error) {
                 console.error("❌ Error deleting device:", error);
-                alert("Error deleting device. Please check the console for details.");
+                alert("You don't have permission to delete this device.");
             }
         }
 

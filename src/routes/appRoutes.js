@@ -889,50 +889,53 @@ router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
         const { houseId } = req.params;
 
         const token = req.headers.authorization?.split(" ")[1];
-        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+        if (!token) {
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        }
 
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const houseUserEntry = await HouseUser.findOne({ houseId, userId, role: 'Home Owner' });
-        if (!houseUserEntry) {
-            return res.status(403).json({ success: false, message: 'Only home owners can delete houses' });
+        // ✅ 权限检查
+        const hasPermission = await checkPermission(userId, "deleteHouse");
+        if (!hasPermission) {
+            return res.status(403).json({ success: false, message: "Permission denied to delete house" });
         }
 
+        // ✅ 继续删除流程
         console.log(`[DEBUG] Deleting house ${houseId} requested by user ${userId}`);
 
-        const rooms = await Room.find({ houseId });
+        const rooms = await Room.find({ house: houseId }); // 注意字段是 house，不是 houseId
         const roomIds = rooms.map(room => room._id);
 
-        const deviceDeleteResult = await Device.deleteMany({ roomId: { $in: roomIds } });
+        const deviceDeleteResult = await Device.deleteMany({ room: { $in: roomIds } });
         console.log(`[DEBUG] Deleted ${deviceDeleteResult.deletedCount} devices from rooms in house ${houseId}`);
 
-        const roomDeleteResult = await Room.deleteMany({ houseId });
+        const roomDeleteResult = await Room.deleteMany({ house: houseId });
         console.log(`[DEBUG] Deleted ${roomDeleteResult.deletedCount} rooms from house ${houseId}`);
 
-        const houseUserDeleteResult = await HouseUser.deleteMany({ houseId });
+        const houseUserDeleteResult = await HouseUser.deleteMany({ house_id: houseId });
         console.log(`[DEBUG] Deleted ${houseUserDeleteResult.deletedCount} user mappings for house ${houseId}`);
 
         const ownerUpdateResult = await User.updateMany(
-            { houses: houseId }, 
+            { houses: houseId },
             { $pull: { houses: houseId } }
         );
         console.log(`[DEBUG] Removed house ${houseId} from ${ownerUpdateResult.modifiedCount} user(s)`);
 
         const houseDeleteResult = await House.findByIdAndDelete(houseId);
         if (!houseDeleteResult) {
-            return res.status(404).json({ success: false, message: 'House not found' });
+            return res.status(404).json({ success: false, message: "House not found" });
         }
 
         console.log(`[DEBUG] Successfully deleted house ${houseId}`);
-        res.status(200).json({ success: true, message: 'House deleted successfully' });
+        res.status(200).json({ success: true, message: "House deleted successfully" });
 
     } catch (error) {
-        console.error('[ERROR] Deleting house ->', error);
-        res.status(500).json({ success: false, message: 'Failed to delete house' });
+        console.error("[ERROR] Deleting house ->", error);
+        res.status(500).json({ success: false, message: "Failed to delete house" });
     }
 });
-
 /*
   Add room doc to rooms collection and room id to array of rooms in house doc
 */

@@ -108,7 +108,7 @@ const roles = [
 ];
 
 const rolePermissionsMapping = {
-    "Home Dweller": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "deleteUser", "getSubuser", "houseUsers", "roomDevices", "updateStatus", "fanSpeed", "viewDevices", "houseDevices"],
+    "Home Dweller": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "addRoom", "addUser", "deleteUser", "getSubuser", "houseUsers", "roomDevices", "updateStatus", "fanSpeed", "viewDevices", "houseDevices"],
     "Home Owner": ["switchOn", "switchOff", "adjustTemp", "adjustBrightness", "viewReport", "addDevice", "deleteDevice", "addRoom", "addUser", "deleteUser", "getSubuser", "houseUsers", "roomDevices", "updateStatus", "fanSpeed", "viewDevices", "houseDevices", "deleteRoom", "assignRole", "updateUser", "changeSettings", "viewUsers"],
     "Developer": ["viewReport", "updateSystem", "backupSystem", "getAllUsers", "getAllDevices", "getStatus"]
 };

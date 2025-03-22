@@ -512,7 +512,7 @@
             console.log("📩 Server response:", data);
 
             if (data.success) {
-                alert(`✅ Device ${data.data.device_name} added successfully!`);
+                // alert(`✅ Device ${data.data.device_name} added successfully!`);
 
                 // 将设备存入 localStorage
                 let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
