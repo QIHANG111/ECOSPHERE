@@ -565,14 +565,14 @@
         dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     }
 
-    // 关闭下拉菜单（当点击页面其他地方）
+
     window.addEventListener("click", function (event) {
         if (!event.target.matches('.setting-icon') && !event.target.closest('.dropdown-menu')) {
             document.querySelectorAll(".dropdown-menu").forEach(menu => menu.style.display = "none");
         }
     });
 
-    // 温度调节
+
     function adjustTemperature(change) {
         const tempValue = document.querySelector('.temp-value');
         let currentTemp = parseInt(tempValue.textContent);
@@ -582,13 +582,13 @@
         tempValue.textContent = currentTemp;
     }
 
-    // 风速调节
+
     function adjustFanSpeed(change) {
         const speedValue = document.querySelector('.speed-value');
         let currentSpeed = parseInt(speedValue.textContent);
         currentSpeed += change;
-        if (currentSpeed < 1) currentSpeed = 1; // 最低风速
-        if (currentSpeed > 5) currentSpeed = 5; // 最高风速
+        if (currentSpeed < 1) currentSpeed = 1;
+        if (currentSpeed > 5) currentSpeed = 5;
         speedValue.textContent = currentSpeed;
     }
 </script>
