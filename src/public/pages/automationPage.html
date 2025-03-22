@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/js/gemini.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+  <script src="/js/homePage.js"></script>
 </head>
 
 <body>
@@ -44,36 +45,33 @@
   </div>
 </div>
 
-<div class="dashboard">
-  <!-- Add Button -->
-  <div class="dashboardDesign">
-    <button id="addFunctionBtn" class="addFunctionButton">
-      <img src="/icons/add.svg" alt="Add" width="20" height="20">
-      Add Function
-    </button>
-  </div>
-
-
-
-  <!-- Container for Added Functions -->
-  <div class="dashboard-content" id="functionContainer">
-  </div>
-
-  <!-- Standby Functions Modal (Hidden by Default) -->
-  <div id="standbyModal" class="standbyModalCP">
-    <div class="standbyModalCp-content">
-      <button class="closeButton" onclick="closeModalAutomationPage()">
-        <img src="/icons/close-button.svg" alt="close" width="100%" height="100%">
+  <div class="dashboard">
+    <!-- Add Button -->
+    <div class="dashboardDesign">
+      <button id="addFunctionButton" class = "addFunctionButton">
+        <img src="/icons/add.svg" alt="Add" width="20" height="20">
+        Add Device
       </button>
-      <h3 class="h3Button">Available Functions</h3>
-      <div id="standbyList"></div>
     </div>
-  </div>
 
 
+    <div id="standbyModal" class="standbyModalCP">
+      <div class="standbyModalCp-content">
+        <div class = "header-containerAP">
+          <div class="text-settings">Available Devices</div>
+          <button class="closeButton" onclick="closeModalAutomationPage()">
+            <img src="/icons/close-button.svg" alt="close" width="100%" height="100%">
+          </button>
+        </div>
+
+        <div id="standbyList"></div>
+      </div>
+    </div>
+
+    <div class="dashboard-content" id="functionContainer"></div>
 
 
-<script src="/js/automationPage.js"></script>
+  <script src="/js/automationPage.js"></script>
 <script src="/js/sidebar.js"></script>
 <script src="/js/theme.js"></script>
 <script src="/js/chart.js"></script>
@@ -84,7 +82,7 @@
   !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
 </script>
 
-
+</div>
 </body>
 
 </html>
