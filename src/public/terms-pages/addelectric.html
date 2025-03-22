@@ -472,6 +472,11 @@
 </div>
 
 <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Please log in first.");
+        window.location.href = "/pages/signinPage.html";
+    }
     let currentDevice = null;
 
     function showAddModal(deviceId, deviceName, deviceIcon) {
@@ -488,9 +493,10 @@
         console.log(`🚀 Adding device: ${currentDevice.id}`);
 
         try {
-            const response = await fetch("http://localhost:4000/api/device", {
+            const response = await fetch("/api/device", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` },
                 body: JSON.stringify({
                     device_name: currentDevice.id,
                     device_type: "unknown",

@@ -272,20 +272,51 @@ router.post('/api/forgot-password', async (req, res) => {
 */
 const checkPermission = async (userId, permissionName) => {
     try {
-        const user = await User.findById(userId).populate('role_id');
-        if (!user || !user.role_id) return false;
+        const user = await User.findById(userId).populate("role_id");
+        if (!user || !user.role_id) {
+            console.warn("[WARN] Invalid user or role_id:", userId);
+            return false;
+        }
 
-        const rolePermissions = await RolePermission.find({ role_id: user.role_id._id }).populate('permission_id');
-        if (!rolePermissions || rolePermissions.length === 0) return false;
+        console.log(`[DEBUG] Checking permission "${permissionName}" for user: ${user.name}, role: ${user.role_id.role_name}`);
 
-        return rolePermissions.some(rp => rp.permission_id.name === permissionName);
+        const rolePermissions = await RolePermission.find({ role_id: user.role_id._id }).populate("permission_id");
+
+        console.log("[DEBUG] Role Permissions for role:", user.role_id.role_name);
+        rolePermissions.forEach(rp => {
+            console.log(" -", rp.permission_id?.name);
+        });
+
+        const hasPermission = rolePermissions.some(rp => rp.permission_id?.name === permissionName);
+        console.log(`[RESULT] hasPermission = ${hasPermission}`);
+        return hasPermission;
     } catch (error) {
-        console.error('[ERROR] checkPermission ->', error);
+        console.error("[ERROR] checkPermission ->", error);
         return false;
     }
 };
 
+//fortest
+router.get('/api/has-permission', async (req, res) => {
+    try {
+        const { userId, permissionName } = req.query;
 
+        if (!userId || !permissionName) {
+            return res.status(400).json({ error: "userId and permissionName are required" });
+        }
+
+        const has = await checkPermission(userId, permissionName);
+        res.json({
+            success: true,
+            userId,
+            permission: permissionName,
+            hasPermission: has
+        });
+    } catch (error) {
+        console.error("[ERROR] /api/has-permission ->", error);
+        res.status(500).json({ error: "Server Error" });
+    }
+});
 /* ============================================================
    USER CONFIG
 ============================================================ */
@@ -480,35 +511,66 @@ router.post('/api/users/:userId/assign-role', async (req, res) => {
       • Updates the device's room reference.
 */
 router.post('/api/device', async (req, res) => {
-    console.log('[DEBUG] POST /api/device -> req.body:', req.body);
-    const { roomName, ...deviceData } = req.body;
-
-    if (!deviceData.device_name || !deviceData.device_type) {
-        console.error('[ERROR] Missing required fields: device_name or device_type');
-        return res.status(400).json({ error: 'Please enter all required fields (device_name and device_type)' });
-    }
-
-    const newDevice = new Device(deviceData);
     try {
-        await newDevice.save();
-        console.log('[DEBUG] Created new device:', newDevice._id);
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-        if (roomName) {
-            const room = await Room.findOne({ room_name: roomName });
-            if (room) {
-                room.devices.push(newDevice._id);
-                await room.save();
-                newDevice.room = room._id;
-                await newDevice.save();
-                console.log(`[DEBUG] Added device ${newDevice._id} to room "${room.room_name}"`);
-            } else {
-                console.warn(`[WARNING] Room with name "${roomName}" not found.`);
-            }
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const { device_name, device_type, ...rest } = req.body;
+
+        if (!device_name || !device_type) {
+            return res.status(400).json({
+                error: "Missing required fields (device_name and device_type)"
+            });
         }
-        res.status(201).json({ success: true, data: newDevice });
+
+        // 获取用户
+        const user = await User.findById(userId);
+        if (!user || !user.houses || user.houses.length === 0) {
+            return res.status(400).json({ error: "User is not associated with any house" });
+        }
+
+        const houseId = user.houses[0]; // 默认使用第一个 house
+
+        // 查找房间
+        let room = await Room.findOne({ house: houseId });
+        if (!room) {
+            // 没有房间就创建一个默认房间
+            room = new Room({
+                room_name: "Default Room",
+                house: houseId,
+                devices: []
+            });
+            await room.save();
+            console.log(`[DEBUG] Created default room "${room.room_name}" for house ${houseId}`);
+        }
+
+        // 创建设备
+        const newDevice = new Device({
+            device_name,
+            device_type,
+            room: room._id,
+            house: houseId,
+            ...rest
+        });
+
+        await newDevice.save();
+
+        // 把设备加入 Room
+        room.devices.push(newDevice._id);
+        await room.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Device created and assigned to room",
+            data: newDevice
+        });
+
     } catch (error) {
-        console.error('[ERROR] POST /api/device ->', error);
-        res.status(500).json({ error: 'Server Error' });
+        console.error("[ERROR] POST /api/device ->", error);
+        res.status(500).json({ error: "Server error" });
     }
 });
 
@@ -521,11 +583,22 @@ router.post('/api/device', async (req, res) => {
 router.delete('/api/device/:id', async (req, res) => {
     console.log('[DEBUG] DELETE /api/device/:id ->', req.params);
     const { id } = req.params;
-    const token = req.headers.authorization?.split(" ")[1];
-    const decoded = token ? jwt.verify(token, SECRET_KEY) : null;
-    const userId = decoded ? decoded.userId : null;
 
     try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            console.log('[DEBUG] Missing Authorization header');
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        if (!userId) {
+            console.log('[DEBUG] Invalid token: missing userId');
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+
         const hasPermission = await checkPermission(userId, "deleteDevice");
         if (!hasPermission) {
             console.log(`[DEBUG] Permission denied for user ${userId}`);
@@ -538,6 +611,7 @@ router.delete('/api/device/:id', async (req, res) => {
             return res.status(404).json({ error: 'Device not found' });
         }
 
+        // Remove device from room
         if (device.room) {
             const room = await Room.findById(device.room);
             if (room) {
@@ -546,15 +620,16 @@ router.delete('/api/device/:id', async (req, res) => {
                 console.log(`[DEBUG] Removed device ${id} from room "${room.room_name}"`);
             }
         }
+
         await Device.findByIdAndDelete(id);
         console.log(`[DEBUG] Deleted device with id: ${id}`);
         res.status(200).json({ success: true, message: 'Device deleted successfully' });
+
     } catch (error) {
         console.error('[ERROR] DELETE /api/device/:id ->', error);
         res.status(500).json({ error: 'Server Error' });
     }
 });
-
 /*
   Get All Devices from the database.
 */

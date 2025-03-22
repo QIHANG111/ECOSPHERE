@@ -51,7 +51,8 @@ const deviceSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room',
         default: null
-    }
+    },
+    house: { type: mongoose.Schema.Types.ObjectId, ref: "House" }
 });
 
 const Device = mongoose.model('Device', deviceSchema);
