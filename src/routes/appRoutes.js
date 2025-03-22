@@ -25,7 +25,6 @@ const SECRET_KEY = process.env.SECRET_KEY;
 // And have SECRET_KEY either from env or config
 
 /*notes
--fix bugs and irregularities
 -build automation APIs - update permission status-automation model
 -factory reset(extra time)  
 -forget password finish
@@ -814,6 +813,69 @@ router.put("/api/devices/:id/fan-speed", async (req, res) => {
     } catch (error) {
         console.error(`[ERROR] PUT /api/devices/:id/fan-speed ->`, error);
         res.status(500).json({ success: false, message: "Server error while updating fan speed" });
+    }
+});
+
+/*
+  start/auto stop cleaning and kitchen devices
+*/
+router.post('/api/devices/:deviceId/start', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            console.warn('[WARNING] No token provided');
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+        let decoded;
+        try {
+            decoded = jwt.verify(token, SECRET_KEY);
+        } catch (err) {
+            console.error('[ERROR] Invalid token:', err);
+            return res.status(401).json({ success: false, message: 'Invalid token' });
+        }
+        const userId = decoded.userId;
+        console.log(`[DEBUG] Authenticated user: ${userId}`);
+
+        const { deviceId } = req.params;
+        const { durationInMinutes } = req.body; 
+
+        if (!durationInMinutes || isNaN(durationInMinutes)) {
+            return res.status(400).json({ success: false, message: 'Valid duration in minutes is required' });
+        }
+
+        const device = await Device.findById(deviceId);
+        if (!device) {
+            return res.status(404).json({ success: false, message: 'Device not found' });
+        }
+
+        if (device.device_type !== 'cleaning' && device.device_type !== 'kitchen') {
+            return res.status(400).json({ success: false, message: 'This device type does not support start/auto-stop' });
+        }
+
+        const startTime = new Date();
+        const expectedStopTime = new Date(startTime.getTime() + durationInMinutes * 60000);
+
+        device.status = 'true';
+        device.startTime = startTime;
+        device.expectedStopTime = expectedStopTime;
+        device.duration = durationInMinutes; 
+
+        await device.save();
+        console.log(`[DEBUG] Device ${deviceId} (${device.device_type}) started at ${startTime}, expected to stop at ${expectedStopTime}`);
+
+        setTimeout(async () => {
+            const currentDevice = await Device.findById(deviceId);
+            if (currentDevice && currentDevice.status === 'true') {
+                currentDevice.status = 'false';
+                await currentDevice.save();
+                console.log(`[DEBUG] Device ${deviceId} auto-stopped at ${new Date()}`);
+            }
+        }, durationInMinutes * 60000);
+
+        res.status(201).json({ success: true, message: 'Device started', data: { deviceId, startTime, expectedStopTime, durationInMinutes } });
+    } catch (error) {
+        console.error('[ERROR] Starting device ->', error);
+        res.status(500).json({ success: false, message: 'Failed to start device' });
     }
 });
 
