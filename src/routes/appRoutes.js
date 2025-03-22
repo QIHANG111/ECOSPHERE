@@ -525,18 +525,17 @@ router.post('/api/device', async (req, res) => {
             });
         }
 
-        // 获取用户
         const user = await User.findById(userId);
         if (!user || !user.houses || user.houses.length === 0) {
             return res.status(400).json({ error: "User is not associated with any house" });
         }
 
-        const houseId = user.houses[0]; // 默认使用第一个 house
+        const houseId = user.houses[0];
 
-        // 查找房间
+
         let room = await Room.findOne({ house: houseId });
         if (!room) {
-            // 没有房间就创建一个默认房间
+
             room = new Room({
                 room_name: "Default Room",
                 house: houseId,
@@ -546,7 +545,6 @@ router.post('/api/device', async (req, res) => {
             console.log(`[DEBUG] Created default room "${room.room_name}" for house ${houseId}`);
         }
 
-        // 创建设备
         const newDevice = new Device({
             device_name,
             device_type,
@@ -557,7 +555,6 @@ router.post('/api/device', async (req, res) => {
 
         await newDevice.save();
 
-        // 把设备加入 Room
         room.devices.push(newDevice._id);
         await room.save();
 

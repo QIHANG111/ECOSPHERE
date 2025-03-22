@@ -486,10 +486,10 @@
 
         <!-- -->
         .device-icon {
-            max-width: 70%;  /* 让图片不会超出容器 */
-            max-height: 70%; /* 让图片不会超出容器 */
-            object-fit: contain; /* 确保整个图片显示，而不会被裁剪 */
-            display: block; /* 避免 inline 元素的额外间距 */
+            max-width: 70%;
+            max-height: 70%;
+            object-fit: contain;
+            display: block;
             /* margin-top: 20px; */
             margin-left: 25px;
         }
@@ -502,7 +502,7 @@
 
         .setting-container {
             position: relative;
-            flex-shrink: 0; /* 防止图标被压缩 */
+            flex-shrink: 0;
         }
 
         .setting-icon {
@@ -510,7 +510,7 @@
             height: 55px;
             cursor: pointer;
             position: relative;
-            top: 10px; /* 向下移动 5px */
+            top: 10px;
             margin-bottom: 30px;
             margin-left: 140px;
         }
@@ -553,24 +553,24 @@
             border-bottom: none;
         }
 
-        /* 📌 开关外框 */
+
         .switch {
             position: relative;
             display: inline-block;
-            width: 60px;  /* ✅ 调整宽度 */
-            height: 30px; /* ✅ 调整高度 */
+            width: 60px;
+            height: 30px;
            /* margin-bottom: 30px;
             margin-right: -20px; */
         }
 
-        /* ✅ 隐藏默认 checkbox */
+
         .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
 
-        /* 📌 滑动条 */
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -578,54 +578,54 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc; /* ✅ 默认状态颜色 */
+            background-color: #ccc;
             transition: 0.4s;
-            border-radius: 30px; /* ✅ 圆角，让滑动条更流畅 */
+            border-radius: 30px;
         }
 
-        /* ✅ 滑块 */
+
         .slider:before {
             position: absolute;
             content: "";
-            height: 26px; /* ✅ 滑块高度 */
-            width: 26px;  /* ✅ 滑块宽度 */
-            left: 2px; /* ✅ 默认状态下的滑块位置 */
+            height: 26px;
+            width: 26px;
+            left: 2px;
             bottom: 2px;
             background-color: white;
             transition: 0.4s;
             border-radius: 50%;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* ✅ 添加阴影，让滑块更立体 */
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-        /* ✅ 开启状态 */
+
         input:checked + .slider {
-            background-color: LimeGreen; /* ✅ 绿色背景，表示开启 */
+            background-color: LimeGreen;
         }
 
-        /* ✅ 滑块在开启状态下的位置 */
+
         input:checked + .slider:before {
-            transform: translateX(30px); /* ✅ 让滑块向右移动 */
+            transform: translateX(30px);
         }
 
-        /* ✅ 鼠标悬停时，增加视觉反馈 */
+
         .slider:hover {
             background-color: #bfbfbf;
         }
 
-        /* ✅ 点击时的缩放效果 */
+
         .switch input:active + .slider:before {
             transform: scale(1.1);
         }
 
-        /* 统一按钮样式 */
+
         .remove-device {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px; /* 让图标和文本之间有间距 */
-            background-color: #A9A9A9; /* 亮红色背景 */
+            gap: 8px;
+            background-color: #A9A9A9;
             color: white;
-            border-radius: 8px; /* 圆角 */
+            border-radius: 8px;
             padding: 6px 12px;
             font-size: 14px;
             font-weight: bold;
@@ -633,34 +633,34 @@
             transition: all 0.3s ease-in-out;
             border: none;
             outline: none;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15); /* 添加阴影 */
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
         }
 
-        /* 按钮内的图标 */
+
         .remove-device img {
             width: 20px;
             height: 20px;
         }
 
-        /* 按钮文本 */
+
         .remove-device .button-text {
             font-size: 14px;
             font-weight: 500;
         }
 
-        /* 悬停时的效果 */
+
         .remove-device:hover {
-            background-color: #A9A9A9; /* 深红色 */
-            transform: scale(1.05); /* 轻微放大 */
+            background-color: #A9A9A9;
+            transform: scale(1.05);
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* 点击时的反馈 */
+
         .remove-device:active {
-            transform: scale(0.95); /* 轻微缩小，模拟按压效果 */
+            transform: scale(0.95);
         }
 
-        /* 移动端优化 */
+
         @media (max-width: 768px) {
             .remove-device {
                 font-size: 12px;
@@ -673,7 +673,6 @@
             }
         }
 
-        /* 温度调节按钮样式 */
         .temperature-control {
             display: flex;
             align-items: center;
@@ -706,7 +705,7 @@
             font-weight: bold;
         }
 
-        /* 温度调节按钮样式 */
+
         .fan-speed-control {
             display: flex;
             align-items: center;
