@@ -93,9 +93,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             listItem.classList.add("house-list-item");
 
             listItem.innerHTML = `
-            <div class="user-avatar">
-                <img src="/icons/house-2-svgrepo-com.svg"" alt="House Icon" width="60" height="60">
-            </div>
+                            <div class="ui-menu-icon">
+  <img src="/icons/house-2-svgrepo-com.svg"" alt="House Icon" width="40" height="40">
+                </div>
             <div class="user-info">
                 <p class="user-name">${house.house_name}</p>
                 <p class="user-role">House ID: ${house._id}</p>
