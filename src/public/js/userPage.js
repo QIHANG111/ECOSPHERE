@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     const modal = document.getElementById("addUserModal");
     const addUserBtn = document.getElementById("addUserBtn");
     const userListContainer = document.getElementById("userListContainer");
+    const houseListContainer = document.getElementById("houseListContainer");
 
     const token = localStorage.getItem("token");
     if (!token) {
@@ -29,6 +30,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             addUserToAvatarList(user);
             addUserToList(user, true, currentUserId);
+
+            addHouseToList(user,currentUserId);
 
             fetchSubUsers(user._id);
 
@@ -71,6 +74,52 @@ document.addEventListener("DOMContentLoaded", async function () {
             closeAddUserModal();
         }
     });
+
+    function addHouseToList(user, currentUserId) {
+        const houseListContainer = document.getElementById("houseListContainer");
+        houseListContainer.innerHTML = ""; // 清空原有内容（如刷新）
+
+        const houses = user.houses || [];
+
+        if (houses.length === 0) {
+            const emptyMessage = document.createElement("p");
+            emptyMessage.textContent = "No houses associated with your account.";
+            houseListContainer.appendChild(emptyMessage);
+            return;
+        }
+
+        houses.forEach(house => {
+            const listItem = document.createElement("div");
+            listItem.classList.add("house-list-item");
+
+            listItem.innerHTML = `
+            <div class="user-avatar">
+                <img src="/icons/house-2-svgrepo-com.svg"" alt="House Icon" width="60" height="60">
+            </div>
+            <div class="user-info">
+                <p class="user-name">${house.house_name}</p>
+                <p class="user-role">House ID: ${house._id}</p>
+            </div>
+            <div style="align-content: end">
+                <div class="ui-menu-icon">
+                    <img src="/icons/setting-3-svgrepo-com.svg" 
+                         data-house-id="${house._id}" 
+                         alt="House Settings Icon" 
+                         width="30" height="30" 
+                         class="house-settings-btn">
+                </div>
+            </div>
+        `;
+
+            houseListContainer.appendChild(listItem);
+
+            const settingsBtn = listItem.querySelector(".house-settings-btn");
+            settingsBtn.addEventListener("click", () => {
+                showHouseSettings(house);
+            });
+        });
+    }
+
 
     function addUserToList(user, isMainUser = false, currentUserId) {
         const avatarUrl = `https://randomuser.me/api/portraits/lego/${user.user_avatar || 1}.jpg`;
@@ -350,41 +399,29 @@ async function addHouse() {
     try {
         console.log("[DEBUG] Starting addHouse function");
 
-        // 1) Retrieve the house name from the form
-        const newHouseName = document.getElementById('houseName').value.trim();
-        console.log("[DEBUG] newHouseName:", newHouseName);
+        const houseNameInput = document.getElementById('houseName');
+        const newHouseName = houseNameInput.value.trim();
+
         if (!newHouseName) {
             alert("Please provide a valid House Name.");
             return;
         }
 
-        // 2) Retrieve the currentHouseId
-        const currentHouseId = document.getElementById('currentHouseId').value.trim();
-        console.log("[DEBUG] currentHouseId:", currentHouseId);
-        if (!currentHouseId) {
-            alert("No currentHouseId found. Cannot add new house.");
-            return;
-        }
-
-        // 3) Retrieve the JWT token
         const token = localStorage.getItem('token');
-        console.log("[DEBUG] token:", token);
         if (!token) {
             alert("No token found. Please sign in again.");
             return;
         }
 
-        // 4) Make the POST request to your backend endpoint
-        const response = await fetch(`/api/houses/${currentHouseId}/add-house`, {
+        const response = await fetch(`/api/houses`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ newHouseName })
+            body: JSON.stringify({ house_name: newHouseName })
         });
 
-        // 5) Handle possible errors or parse successful response
         if (!response.ok) {
             const errorData = await response.json();
             console.error("[ERROR] Failed to add house:", errorData);
@@ -394,14 +431,10 @@ async function addHouse() {
         const data = await response.json();
         console.log("[DEBUG] House created successfully:", data);
 
-        // 6) House was successfully created
         alert("House created successfully!");
-
-        // Optional: refresh your list of houses or navigate
-        // window.location.reload();
-
-        // Close the modal after success
         closeAddHouseModal();
+
+        window.location.reload();
 
     } catch (err) {
         console.error("Error adding house:", err);

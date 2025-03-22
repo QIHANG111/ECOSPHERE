@@ -1744,6 +1744,14 @@ canvas {
     padding: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+.house-list {
+    width: 70%;
+    margin: 0 auto;
+    background-color: var(--c-bg-sidebar);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
 
 
 .user-list-item {
@@ -1754,8 +1762,19 @@ canvas {
     border-bottom: 1px solid #ddd;
     cursor: pointer;
 }
+.house-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
 
 .user-list-item:last-child {
+    border-bottom: none;
+}
+.house-list-item:last-child {
     border-bottom: none;
 }
 
