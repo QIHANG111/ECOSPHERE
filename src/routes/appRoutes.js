@@ -1200,19 +1200,6 @@ router.get('/api/houses/:houseId/rooms', async (req, res) => {
 */
 router.get('/api/houses/:houseId/rooms/:roomId/devices', async (req, res) => {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return res.status(401).json({ error: 'Unauthorized: No token provided' });
-        }
-
-        let userId;
-        try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            userId = decoded.userId;
-        } catch (err) {
-            return res.status(401).json({ error: 'Unauthorized: Invalid token' });
-        }
-
         const { houseId, roomId } = req.params;
         console.log(`[DEBUG] GET /api/houses/${houseId}/rooms/${roomId}/devices -> Fetching room with devices`);
 
