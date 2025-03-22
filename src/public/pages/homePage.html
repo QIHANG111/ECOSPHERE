@@ -107,7 +107,7 @@
 
     </div>
     <div class="dashboard-content" id="cardContainer2">
-        <div class="normalCard" id = "automationcard">
+        <div class="normalCard" id = "roomCard">
         </div>
 
         <!-- 3D Earth Card -->
@@ -143,19 +143,11 @@
             <span class="save disabled">Save</span>
         </div>
         <div class="roomModal-body">
-            <label for="roomName" >NAME</label>
-            <input type="text" style="padding-left: 0" id="roomName" oninput="toggleSaveButton()">
-            <label>WALLPAPER</label>
-            <div class="image-selector">
-                <div class="image-list">
-                    <img src="/images/wp1.jpg" class="selected" onclick="selectImage(this)" alt="">
-                    <img src="/images/wp2.jpg" onclick="selectImage(this)" alt="">
-                    <img src="/images/wp3.jpg" onclick="selectImage(this)" alt="">
-                    <img src="/images/wp4.jpg" onclick="selectImage(this)" alt="">
-                    <img src="/images/wp5.jpg" onclick="selectImage(this)" alt="">
-                    <img src="/images/wp6.jpg" onclick="selectImage(this)" alt="">
-                </div>
-            </div>
+            <label for="roomName">NAME</label>
+            <input type="text" id="roomName" oninput="toggleSaveButton()">
+
+            <label for="houseSelector">SELECT HOUSE</label>
+            <select id="houseSelector"></select>
         </div>
     </div>
 </div>

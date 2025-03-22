@@ -1,394 +1,184 @@
-// Room management script that works exclusively with the database
 
-// Open Add Room modal
 function openPopout() {
-    console.log("Opening room modal");
     document.getElementById("roomModal").style.display = "flex";
 }
 
-// Close Add Room modal
 function closeModal() {
-    console.log("Closing room modal");
     document.getElementById("roomModal").style.display = "none";
-    // Reset form
     document.getElementById("roomName").value = "";
-    if (document.getElementById("roomType")) {
-        document.getElementById("roomType").value = "bedroom"; // Default value
-    }
-    document.querySelectorAll(".image-selector img").forEach(image => {
-        image.classList.remove("selected");
-    });
-    document.querySelector(".image-selector img").classList.add("selected");
+    document.getElementById("houseSelector").selectedIndex = 0;
 }
 
-// Select room wallpaper
-function selectImage(img) {
-    document.querySelectorAll(".image-selector img").forEach(image => {
-        image.classList.remove("selected");
-    });
-    img.classList.add("selected");
-}
 
-// Enable "Save" button when input is not empty
-function toggleSaveButton() {
-    const input = document.getElementById("roomName");
-    const saveButton = document.querySelector(".save");
-    if (input.value.trim().length > 0) {
-        saveButton.classList.add("enabled");
-        saveButton.onclick = saveRoom;
-    } else {
-        saveButton.classList.remove("enabled");
-        saveButton.onclick = null;
-    }
-}
-
-// Get authentication token from localStorage or sessionStorage
-function getAuthToken() {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    console.log("Auth token retrieved:", token ? "Token found" : "No token");
-    return token;
-}
-
-// Save room data to backend API
-// Save room data to backend API
 async function saveRoom() {
-    console.log("Attempting to save room to database");
     const roomName = document.getElementById("roomName").value.trim();
-    const roomType = document.getElementById("roomType")?.value || "bedroom";
-    const selectedImage = document.querySelector(".image-selector img.selected")?.src;
+    const houseId = document.getElementById("houseSelector").value;
 
-    if (!roomName) {
-        alert("Please enter a room name.");
-        return;
-    }
-
-    if (!selectedImage) {
-        alert("Please select a wallpaper.");
+    if (!roomName || !houseId) {
+        alert("Please enter a room name and select a house.");
         return;
     }
 
     const token = getAuthToken();
-    if (!token) {
-        alert("You need to be logged in to add a room.");
-        return;
-    }
-
     try {
-        // First, get the current house ID
-        const house = await getCurrentUserHouse();
-        if (!house) {
-            alert("Could not determine which house to add the room to. Please try again later.");
-            return;
-        }
-
-        console.log(`Sending room creation request for house ${house._id}: ${roomName}`);
-
-        // Looking at your API in paste.txt, we can see your backend only expects 'room_name'
-        // and does not accept 'room_type' parameter in this endpoint
-        const roomResponse = await fetch(`/api/houses/${house._id}/rooms/add-room`, {
+        const response = await fetch(`/api/houses/${houseId}/rooms/add-room`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                room_name: roomName
-                // room_type removed as it's not expected by the API
-            })
+            body: JSON.stringify({ room_name: roomName })
         });
-
-        console.log("API response status:", roomResponse.status);
-        console.log("Request payload:", JSON.stringify({ room_name: roomName }));
-
-        if (!roomResponse.ok) {
-            const errorData = await roomResponse.json();
-            console.error("API error response:", errorData);
-            throw new Error(errorData.error || 'Failed to create room');
-        }
-
-        const roomData = await roomResponse.json();
-        console.log("Room created successfully:", roomData);
-
-        // Save wallpaper info to localStorage (since backend API doesn't have a wallpaper field)
-        let wallpapers = JSON.parse(localStorage.getItem("roomWallpapers")) || {};
-
-        // Check the structure of the response to extract the room ID correctly
-        const roomId = roomData.room?._id || roomData.room?.id || roomData._id;
-
-        if (roomId) {
-            wallpapers[roomId] = selectedImage;
-            localStorage.setItem("roomWallpapers", JSON.stringify(wallpapers));
-        } else {
-            console.warn("Could not determine room ID from response:", roomData);
-        }
-
-        // Close the modal and refresh the room list
-        closeModal();
-        renderRooms();
-
-        // Show success message
-        alert("Room added successfully!");
-    } catch (error) {
-        console.error("Error saving room:", error);
-        alert("Failed to save room: " + error.message);
-    }
-}
-
-// Fetch rooms directly from the API
-async function fetchRooms() {
-    console.log("Fetching rooms from database");
-
-    const token = getAuthToken();
-    if (!token) {
-        console.log("No auth token available");
-        return [];
-    }
-
-    try {
-        // First, get all rooms (if your API supports this)
-        const response = await fetch('/api/rooms', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        console.log("Rooms API response status:", response.status);
-
-        if (!response.ok) {
-            console.error("Failed to get rooms, status:", response.status);
-            return [];
-        }
 
         const data = await response.json();
-        console.log("Rooms retrieved from API:", data);
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to add room.");
+        }
 
-        // Return the rooms array - adjust this based on your API response structure
+        alert("Room added successfully!");
+        closeModal();
+        renderRooms();
+    } catch (error) {
+        console.error("Error saving room:", error);
+        alert("Failed to add room: " + error.message);
+    }
+}
+
+
+async function removeRoom(roomId) {
+    const token = getAuthToken();
+    if (!confirm("Are you sure you want to delete this room?")) return;
+
+    try {
+        const res = await fetch(`/api/rooms/${roomId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const result = await res.json();
+        if (!res.ok) {
+            throw new Error(result.error || "Failed to delete room");
+        }
+
+        renderRooms();
+        alert("Room deleted successfully!");
+    } catch (error) {
+        console.error("Error deleting room:", error);
+        alert("Failed to delete room: " + error.message);
+    }
+}
+
+
+async function fetchRooms() {
+    const token = getAuthToken();
+    try {
+        const response = await fetch('/api/rooms', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await response.json();
         return data.rooms || data || [];
     } catch (error) {
-        console.error("Error fetching rooms from API:", error);
+        console.error("Error fetching rooms:", error);
         return [];
     }
 }
 
-// Load and render rooms in automationcard
 async function renderRooms() {
-    console.log("Rendering rooms in automationcard");
-    let container = document.getElementById("automationcard");
+    const container = document.getElementById("roomCard");
+    if (!container) return;
 
-    if (!container) {
-        console.error("automationcard element not found!");
-        return;
-    }
+    const rooms = await fetchRooms();
 
-    let rooms = await fetchRooms();
-    let wallpapers = JSON.parse(localStorage.getItem("roomWallpapers")) || {};
-
-    console.log(`Rendering ${rooms.length} rooms`);
-    console.log("Wallpaper data:", wallpapers);
-
-    // Clear previous content
     container.innerHTML = `
-        <div class='leftToRightList'> 
+        <div class="leftToRightList"> 
             <h3 style="padding-left: 10vw">Rooms</h3>
             <button class="hidden-button ui-menu-icon" style="width: 5vw; height: 3.5vw" id="automation" onclick="openPopout()">
-                <img src="/icons/add-cross.svg" alt="Vector Icon" width="20" height="20">
+                <img src="/icons/add-cross.svg" alt="Vector Icon" width="30" height="30">
             </button>
         </div>
-        <div id="roomList" class="room-list"></div>
+        <div id="roomList"></div>
     `;
 
-    let roomList = document.getElementById("roomList");
+    const roomList = document.getElementById("roomList");
 
-    if (!roomList) {
-        console.error("roomList element not found after creation!");
+    if (!rooms.length) {
+        roomList.innerHTML = "<p style='color: gray; text-align: center;'>No rooms.</p>";
         return;
     }
 
-    // If no rooms exist, show message
-    if (!rooms || rooms.length === 0) {
-        console.log("No rooms to display");
-        let noRoomMessage = document.createElement("p");
-        noRoomMessage.innerText = "No rooms.";
-        noRoomMessage.style.color = "gray";
-        noRoomMessage.style.textAlign = "center";
-        roomList.appendChild(noRoomMessage);
-        return;
-    }
-
-    // Display each room in the automationcard
     rooms.forEach(room => {
-        console.log("Rendering room:", room);
+        const roomItem = document.createElement("div");
+        roomItem.classList.add("hBar");
 
-        let roomDiv = document.createElement("div");
-        roomDiv.className = "room-entry";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = room.room_name;
+        nameSpan.style.marginRight = "10px";
 
-        // Get room ID
-        const roomId = room._id;
+        const typeSmall = document.createElement("small");
+        typeSmall.style.opacity = "0.7";
+        typeSmall.style.fontSize = "0.8em";
+        typeSmall.style.display = "block";
+        typeSmall.textContent = room.room_type || "room";
 
-        // Use stored wallpaper or default
-        const wallpaper = wallpapers[roomId] || '/images/wp1.jpg';
-        roomDiv.style.backgroundImage = `url('${wallpaper}')`;
-        roomDiv.style.backgroundSize = "cover";
+        const settingsBtn = document.createElement("button");
+        settingsBtn.style.background = "transparent";
+        settingsBtn.style.color = "white";
+        settingsBtn.style.border = "none";
+        settingsBtn.style.cursor = "pointer";
+        settingsBtn.innerHTML = `
+            <div class="ui-menu-icon" style="margin-left: 12vw">
+                <img src="/icons/setting-3-svgrepo-com.svg" alt="Vector Icon" width="30" height="30">
+            </div>
+        `;
 
-        // Room name
-        let roomNameSpan = document.createElement("span");
-        roomNameSpan.innerText = room.room_name;
-
-        // Room type indicator
-        let roomTypeSpan = document.createElement("small");
-        roomTypeSpan.innerText = room.room_type || "room";
-        roomTypeSpan.style.opacity = "0.7";
-        roomTypeSpan.style.fontSize = "0.8em";
-        roomTypeSpan.style.display = "block";
-
-        // Delete button for individual rooms
-        let deleteButton = document.createElement("button");
-        deleteButton.innerText = "❌";
-        deleteButton.style.backgroundColor = "rgba(255,0,0,0)";
-        deleteButton.style.color = "white";
-        deleteButton.style.border = "none";
-        deleteButton.style.padding = "3px 6px";
-        deleteButton.style.borderRadius = "5px";
-        deleteButton.style.cursor = "pointer";
-        deleteButton.style.width = "4vw";
-        deleteButton.onclick = function() {
-            removeRoom(roomId);
-        };
-
-        roomDiv.appendChild(roomNameSpan);
-        roomDiv.appendChild(roomTypeSpan);
-        roomDiv.appendChild(deleteButton);
-        roomList.appendChild(roomDiv);
+        roomItem.appendChild(nameSpan);
+        roomItem.appendChild(typeSmall);
+        roomItem.appendChild(settingsBtn);
+        roomList.appendChild(roomItem);
     });
 }
 
-// Delete a single room
-async function removeRoom(roomId) {
-    console.log(`Attempting to remove room: ${roomId}`);
-    if (confirm("Are you sure you want to delete this room?")) {
-        const token = getAuthToken();
-        if (!token) {
-            alert("You need to be logged in to delete a room.");
-            return;
-        }
 
-        try {
-            console.log(`Sending delete request for room ${roomId}`);
-            const response = await fetch(`/api/rooms/${roomId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+function getAuthToken() {
+    return localStorage.getItem("token") || sessionStorage.getItem("token");
+}
 
-            console.log("Delete API response status:", response.status);
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("API error response:", errorData);
-                throw new Error(errorData.error || 'Failed to delete room');
-            }
-
-            // Also remove the wallpaper entry
-            let wallpapers = JSON.parse(localStorage.getItem("roomWallpapers")) || {};
-            delete wallpapers[roomId];
-            localStorage.setItem("roomWallpapers", JSON.stringify(wallpapers));
-
-            // Refresh the room list
-            renderRooms();
-
-            alert("Room deleted successfully!");
-        } catch (error) {
-            console.error("Error deleting room:", error);
-            alert("Failed to delete room: " + error.message);
-        }
+async function loadHouseOptions() {
+    const token = getAuthToken();
+    const houseSelector = document.getElementById("houseSelector");
+    try {
+        const res = await fetch('/api/user/houses', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        houseSelector.innerHTML = '';
+        data.houses.forEach(h => {
+            const option = document.createElement('option');
+            option.value = h._id;
+            option.textContent = h.house_name;
+            houseSelector.appendChild(option);
+        });
+    } catch (error) {
+        console.error("Failed to load houses:", error);
     }
 }
 
-// Update HTML to add room type dropdown
-function updateRoomModalHTML() {
-    console.log("Updating room modal HTML");
-    const modalBody = document.querySelector(".roomModal-body");
-    if (!modalBody) {
-        console.error("Modal body not found!");
-        return;
-    }
 
-    // Check if room type field already exists
-    if (document.getElementById("roomType")) {
-        console.log("Room type dropdown already exists");
-        return;
-    }
-
-    // Create room type dropdown after room name
-    const roomNameField = document.getElementById("roomName");
-    if (roomNameField) {
-        console.log("Adding room type dropdown");
-        const typeLabel = document.createElement("label");
-        typeLabel.setAttribute("for", "roomType");
-        typeLabel.innerText = "ROOM TYPE";
-
-        const typeSelect = document.createElement("select");
-        typeSelect.id = "roomType";
-        typeSelect.style.marginBottom = "15px";
-        typeSelect.style.padding = "8px";
-        typeSelect.style.borderRadius = "5px";
-        typeSelect.style.border = "1px solid #ccc";
-
-        // Add room type options
-        const roomTypes = ["bedroom", "living room", "kitchen", "bathroom", "office", "other"];
-        roomTypes.forEach(type => {
-            const option = document.createElement("option");
-            option.value = type;
-            option.innerText = type.charAt(0).toUpperCase() + type.slice(1);
-            typeSelect.appendChild(option);
-        });
-
-        // Insert after room name input
-        roomNameField.parentNode.insertBefore(typeLabel, roomNameField.nextSibling);
-        roomNameField.parentNode.insertBefore(typeSelect, typeLabel.nextSibling);
-        console.log("Room type dropdown added successfully");
+function toggleSaveButton() {
+    const input = document.getElementById("roomName");
+    const button = document.querySelector(".save");
+    if (input.value.trim()) {
+        button.classList.add("enabled");
+        button.onclick = saveRoom;
     } else {
-        console.error("Room name field not found!");
+        button.classList.remove("enabled");
+        button.onclick = null;
     }
 }
 
-// Render rooms on page load and update modal HTML
+
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("Document loaded, initializing room management");
-    updateRoomModalHTML();
     renderRooms();
+    loadHouseOptions();
 });
-
-// Debug function
-window.debugRoomSystem = function() {
-    console.log("=== ROOM SYSTEM DEBUG ===");
-    console.log("localStorage 'roomWallpapers':", localStorage.getItem("roomWallpapers"));
-    console.log("localStorage 'token':", localStorage.getItem("token"));
-    console.log("automationcard element:", document.getElementById("automationcard"));
-    console.log("roomModal element:", document.getElementById("roomModal"));
-
-    // Try to fetch rooms directly
-    fetch('/api/rooms', {
-        headers: {
-            'Authorization': `Bearer ${getAuthToken()}`
-        }
-    })
-        .then(response => {
-            console.log("Debug API call status:", response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log("Debug API response:", data);
-        })
-        .catch(error => {
-            console.error("Debug API call error:", error);
-        });
-
-    console.log("=== END DEBUG ===");
-
-    // Try to render rooms again
-    renderRooms();
-
-    return "Debug info logged to console";
-};

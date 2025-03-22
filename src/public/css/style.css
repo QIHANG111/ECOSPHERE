@@ -303,6 +303,21 @@ body {
     transform-origin: center;
 }
 
+
+#roomList {
+    overflow-y: auto;
+    max-height: 40vh;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+#roomList::-webkit-scrollbar {
+    display: none;
+}
+
+.hBar {
+    margin-bottom: 5px;
+}
+
 .normalCard:hover {
     transform: scale(1.03);
     height: 40vh;

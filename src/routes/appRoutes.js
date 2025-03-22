@@ -939,56 +939,83 @@ router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
 /*
   Add room doc to rooms collection and room id to array of rooms in house doc
 */
-router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
-    console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.params:', req.params);
-    console.log('[DEBUG] POST /api/houses/:houseId/rooms/add-room -> req.body:', req.body);
 
+
+router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
-        if (!token) {
-            console.warn('[WARNING] No token provided');
-            return res.status(401).json({ error: 'Unauthorized' });
-        }
-        let decoded;
-        try {
-            decoded = jwt.verify(token, process.env.SECRET_KEY);
-        } catch (err) {
-            console.error('[ERROR] Invalid token:', err);
-            return res.status(401).json({ error: 'Invalid token' });
-        }
+        if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
         const userId = decoded.userId;
-        console.log(`[DEBUG] Authenticated user: ${userId}`);
+
+        const hasPermission = await checkPermission(userId, "addRoom");
+        if (!hasPermission) {
+            return res.status(403).json({ error: 'Permission denied to add room' });
+        }
 
         const { houseId } = req.params;
         const { room_name } = req.body;
 
         if (!room_name) {
-            console.log('[DEBUG] Missing room_name');
             return res.status(400).json({ error: 'Room name is required' });
         }
 
         const house = await House.findById(houseId);
         if (!house) {
-            console.warn(`[WARNING] House not found for id: ${houseId}`);
-            return res.status(404).json({ error: 'House not found. Cannot add room.' });
+            return res.status(404).json({ error: 'House not found' });
         }
 
-        const newRoom = new Room({ room_name, houseId });
+        const newRoom = new Room({ room_name, house: houseId });
         await newRoom.save();
-        console.log('[DEBUG] New room created:', newRoom._id);
 
         house.rooms.push(newRoom._id);
         await house.save();
-        console.log(`[DEBUG] Added room ${newRoom._id} to house ${houseId}`);
 
         res.status(201).json({ message: 'Room added successfully', room: newRoom });
     } catch (error) {
-        console.error('[ERROR] POST /api/houses/:houseId/rooms/add-room ->', error);
-        res.status(500).json({ error: 'Failed to add room' });
+        console.error('[ERROR] Adding room:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
+router.get('/api/rooms', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.userId;
+
+        const user = await User.findById(userId).populate({
+            path: 'houses',
+            populate: { path: 'rooms' }
+        });
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const rooms = user.houses.flatMap(house => house.rooms || []);
+        res.status(200).json({ rooms });
+    } catch (err) {
+        console.error('[ERROR] GET /api/rooms ->', err);
+        res.status(500).json({ error: 'Failed to fetch rooms' });
+    }
+});
+router.get('/api/user/houses', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        const userId = decoded.userId;
+
+        const user = await User.findById(userId).populate("houses", "house_name");
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        res.json({ houses: user.houses });
+    } catch (error) {
+        console.error('[ERROR] GET /api/user/houses ->', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
 /*
   delete room - deletes the devices in the room first, then deletes the id from the array in house, then deletes the room doc
 */
