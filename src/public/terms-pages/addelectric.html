@@ -118,8 +118,8 @@
 
         .device-actions {
             display: flex;
-            align-items: center; /* 垂直居中 */
-            gap: 40px; /* 设置按钮和图标之间的间距 */
+            align-items: center;
+            gap: 40px;
             margin-top: 10px;
         }
 
@@ -132,13 +132,13 @@
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            flex-shrink: 0; /* 防止按钮被压缩 */
+            flex-shrink: 0;
             margin-left: 20px;
         }
 
         .setting-container {
             position: relative;
-            flex-shrink: 0; /* 防止图标被压缩 */
+            flex-shrink: 0;
         }
 
         .setting-icon {
@@ -187,7 +187,7 @@
             border-bottom: none;
         }
 
-        /* 滑动开关样式 */
+
         .switch {
             position: relative;
             display: inline-block;
@@ -233,7 +233,7 @@
             transform: translateX(20px);
         }
 
-        /* 温度调节按钮样式 */
+
         .temperature-control, .fan-speed-control {
             display: flex;
             align-items: center;
@@ -311,7 +311,7 @@
                 <div class="setting-container">
                     <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon" onclick="toggleDropdown(this)">
                     <div class="dropdown-menu">
-                        <!-- 滑动开关按钮 -->
+                        <!-- slide switch button -->
                         <div class="settings-option">
                             <span>Power</span>
                             <label class="switch">
@@ -320,7 +320,7 @@
                             </label>
                         </div>
 
-                        <!-- 温度上下调节按钮 -->
+                        <!--temperature button -->
                         <div class="settings-option">
                             <span>Temperature</span>
                             <div class="temperature-control">
@@ -330,7 +330,7 @@
                             </div>
                         </div>
 
-                        <!-- 调节风速按钮 -->
+                        <!-- fan speed button -->
                         <div class="settings-option">
                             <span>Fan Speed</span>
                             <div class="fan-speed-control">
@@ -535,7 +535,7 @@
                     localStorage.setItem("savedDevices", JSON.stringify(devices));
                 }
 
-                window.location.href = "../pages/devicesPage.html"; // 跳转到设备页面
+                window.location.href = "../pages/devicesPage.html"; // skip to devicepage
             } else {
                 alert(`❌ Failed to add: ${data.message}`);
             }
@@ -577,8 +577,8 @@
         const tempValue = document.querySelector('.temp-value');
         let currentTemp = parseInt(tempValue.textContent);
         currentTemp += change;
-        if (currentTemp < 10) currentTemp = 10; // 最低温度
-        if (currentTemp > 30) currentTemp = 30; // 最高温度
+        if (currentTemp < 10) currentTemp = 10;
+        if (currentTemp > 30) currentTemp = 30;
         tempValue.textContent = currentTemp;
     }
 
