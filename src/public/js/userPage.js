@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     function addHouseToList(user, currentUserId) {
         const houseListContainer = document.getElementById("houseListContainer");
-        houseListContainer.innerHTML = ""; // 清空原有内容（如刷新）
+        houseListContainer.innerHTML = "";
 
         const houses = user.houses || [];
 
@@ -275,9 +275,19 @@ function showUserSettings(user) {
     document.getElementById("changeRoleBtn").onclick = () => changeUserRole(user._id);
 }
 
+function showHouseSettings(house) {
+    document.getElementById("houseSettingsModal").style.display = "block";
+    document.getElementById("settingsHouseName").innerText = house.house_name;
+    document.getElementById("settingsHouseId").innerText = house._id;
+}
+
 document.getElementById("closeUserSettings").onclick = () => {
     document.getElementById("userSettingsModal").style.display = "none";
 };
+
+document.getElementById("closeHouseSettings").onclick = () => {
+    document.getElementById("houseSettingsModal").style.display = "none";
+}
 
 function closeAddUserModal() {
     document.getElementById("addUserModal").style.display = "none";
@@ -333,17 +343,41 @@ async function deleteSubUser(userId) {
         alert("Server error.");
     }
 }
-document.getElementById("deleteUserBtn").onclick = () => {
-    const userId = document.getElementById("settingsUserName").dataset.userId;
-    console.log("User ID:", userId);
-    if (userId) {
-        if (confirm("Are you sure you want to delete this user?")) {
-            deleteSubUser(userId).then(r => console.log(r));
+
+async function deleteHouse(houseId) {
+    try {
+        const response = await fetch(`/api/houses/${houseId}/delete-house`, {
+            method: "DELETE",
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        if (response.ok) {
+            alert("House deleted successfully.");
+            location.reload();
+        } else {
+            const result = await response.json();
+            alert("Failed to delete house: " + result.message);
+        }
+    } catch (error) {
+        console.error("[ERROR] Deleting house failed:", error);
+        alert("Server error.");
+    }
+}
+
+
+document.getElementById("deleteHouseBtn").onclick = () => {
+    const houseId = document.getElementById("settingsHouseId").innerText;
+    console.log("House ID:", houseId);
+    if (houseId) {
+        if (confirm("Are you sure you want to delete this house?")) {
+            deleteHouse(houseId).then(r => console.log(r));
         }
     } else {
-        alert("User ID is not defined.");
+        alert("House ID is not defined.");
     }
-};
+}
 
 
 async function changeUserRole(userId) {

@@ -980,13 +980,11 @@ router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        // ✅ 权限检查
         const hasPermission = await checkPermission(userId, "deleteHouse");
         if (!hasPermission) {
             return res.status(403).json({ success: false, message: "Permission denied to delete house" });
         }
 
-        // ✅ 继续删除流程
         console.log(`[DEBUG] Deleting house ${houseId} requested by user ${userId}`);
 
         // Get all devices belonging to this house, and delete the automation mappings
@@ -995,7 +993,7 @@ router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
         await DeviceAutomation.deleteMany({ device_id: { $in: deviceIds } });
         console.log(`[DEBUG] Deleted automations from rooms in house ${houseId}`);
 
-        const rooms = await Room.find({ house: houseId }); // 注意字段是 house，不是 houseId
+        const rooms = await Room.find({ house: houseId });
         const roomIds = rooms.map(room => room._id);
 
         const deviceDeleteResult = await Device.deleteMany({ room: { $in: roomIds } });
