@@ -16,6 +16,10 @@ import path from 'node:path';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import HouseUser from '../models/houseUser.model.js';
+import Automation from '../models/automation.model.js';
+import { insertDefaultAutomations } from '../database/db.js';
+import DeviceAutomation from '../models/deviceAutomation.model.js';
+
 
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -104,6 +108,9 @@ router.post('/api/signup', async (req, res) => {
             dwellers: []
         });
         await newHouse.save();
+
+        //insert automation rules
+        await insertDefaultAutomations(newHouse._id);
 
         // Insert mapping into the HouseUser collection
         const houseUserMapping = new HouseUser({
@@ -215,9 +222,11 @@ router.post('/api/forgot-password', async (req, res) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
+        // Find user by email
         const user = await User.findOne({ email });
         if (!user) {
             console.warn(`[DEBUG] No account found for email: ${email}`);
+            // Always return success to avoid revealing whether the email exists
             return res.status(200).json({ message: "If an account with that email exists, a reset link has been sent." });
         }
 
@@ -532,7 +541,6 @@ router.post('/api/device', async (req, res) => {
 
         const houseId = user.houses[0];
 
-
         let room = await Room.findOne({ house: houseId });
         if (!room) {
 
@@ -554,6 +562,16 @@ router.post('/api/device', async (req, res) => {
         });
 
         await newDevice.save();
+
+        const automation = await Automation.findOne({ device_type, house: houseId });
+
+        if (!automation) {
+            return res.status(400).json({ error: "No automation rule found for this device type." });
+        }
+
+        // Create mapping from device to automation
+        await DeviceAutomation.create({ device_id: newDevice._id, device_type, house_id: houseId, automation_id: automation._id });
+        console.log(`[DEBUG] Created automation mapping for "${newDevice.device_name}" for house ${houseId}`);
 
         room.devices.push(newDevice._id);
         await room.save();
@@ -617,9 +635,14 @@ router.delete('/api/device/:id', async (req, res) => {
             }
         }
 
+        // Delete mappings in DeviceAutomation (not Automation directly)
+        await DeviceAutomation.deleteMany({ device_id: device._i });
+        console.log(`[DEBUG] Automations deleted for device ${device.device_name} `);
+
         await Device.findByIdAndDelete(id);
         console.log(`[DEBUG] Deleted device with id: ${id}`);
         res.status(200).json({ success: true, message: 'Device deleted successfully' });
+        
 
     } catch (error) {
         console.error('[ERROR] DELETE /api/device/:id ->', error);
@@ -881,7 +904,7 @@ router.post('/api/devices/:deviceId/start', async (req, res) => {
 ============================================================ */
 
 /*
-  Add house to house collection, create new houseUser mapping for owners, add to user doc
+  Add house to house collection, create new houseUser mapping for owners, add to user doc, and add automation rules
 */
 router.post('/api/houses', async (req, res) => {
     try {
@@ -912,6 +935,8 @@ router.post('/api/houses', async (req, res) => {
         });
         await newHouse.save();
         console.log(`[DEBUG] House created: ${newHouse._id} (${house_name})`);
+        await insertDefaultAutomations(newHouse._id);
+        console.log(`[DEBUG] Automation rules inserted to: (${house_name})`);
 
 
         const houseUser = new HouseUser({
@@ -964,6 +989,12 @@ router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
         // ✅ 继续删除流程
         console.log(`[DEBUG] Deleting house ${houseId} requested by user ${userId}`);
 
+        // Get all devices belonging to this house, and delete the automation mappings
+        const devices = await Device.find({ house: houseId });
+        const deviceIds = devices.map(device => device._id);
+        await DeviceAutomation.deleteMany({ device_id: { $in: deviceIds } });
+        console.log(`[DEBUG] Deleted automations from rooms in house ${houseId}`);
+
         const rooms = await Room.find({ house: houseId }); // 注意字段是 house，不是 houseId
         const roomIds = rooms.map(room => room._id);
 
@@ -995,11 +1026,10 @@ router.delete('/api/houses/:houseId/delete-house', async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to delete house" });
     }
 });
+
 /*
   Add room doc to rooms collection and room id to array of rooms in house doc
 */
-
-
 router.post('/api/houses/:houseId/rooms/add-room', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -1387,6 +1417,217 @@ router.get('/api/notifications', (req, res) => {
 /* ============================================================
    AUTOMATION CONFIG
 ============================================================ */
+
+/* 
+  Get all fixed automation rules.
+*/
+router.get('/api/automations', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token)
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        let decoded;
+        try {
+            decoded = jwt.verify(token, SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ success: false, message: "Invalid token" });
+        }
+        const userId = decoded.userId;
+        const { houseId } = req.query;
+        if (!houseId)
+            return res.status(400).json({ success: false, message: "houseId is required" });
+        
+        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
+        if (!houseUser)
+            return res.status(403).json({ success: false, message: "Access denied" });
+
+        const automations = await Automation.find({ house: houseId });
+        return res.status(200).json({ success: true, automations });
+    } catch (error) {
+        console.error("[ERROR] GET /api/automations ->", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+/* 
+  GET /api/automations/:id/status?houseId=...
+  - Get the current status and scheduling info of a specific automation rule.
+*/
+router.get('/api/automations/:id/status', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token)
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        let decoded;
+        try {
+            decoded = jwt.verify(token, SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ success: false, message: "Invalid token" });
+        }
+        const userId = decoded.userId;
+        const { id } = req.params;
+        const { houseId } = req.query;
+        if (!houseId)
+            return res.status(400).json({ success: false, message: "houseId is required" });
+        
+        // Use HouseUser mapping to check access
+        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
+        if (!houseUser)
+            return res.status(403).json({ success: false, message: "Access denied" });
+
+        const automation = await Automation.findById(id);
+        if (!automation || automation.house.toString() !== houseId) {
+            return res.status(404).json({ success: false, message: "Automation rule not found for this house." });
+        }
+        return res.status(200).json({
+            success: true,
+            status: automation.status,
+            startTime: automation.startTime,
+            endTime: automation.endTime
+        });
+    } catch (error) {
+        console.error("[ERROR] GET /api/automations/:id/status ->", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+/* 
+  PUT /api/automations/:id/toggle
+  - Toggle an automation rule on or off.
+  - When turning on (status: true), startTime and endTime must be provided.
+  - When turning off, these fields are cleared.
+  - Expects houseId in the request body.
+*/
+router.put('/api/automations/:id/toggle', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token)
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        let decoded;
+        try {
+            decoded = jwt.verify(token, SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ success: false, message: "Invalid token" });
+        }
+        const userId = decoded.userId;
+        const { id } = req.params;
+        const { status, startTime, endTime, houseId } = req.body;
+        if (!houseId)
+            return res.status(400).json({ success: false, message: "houseId is required" });
+        
+        // Use HouseUser mapping to check access
+        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
+        if (!houseUser)
+            return res.status(403).json({ success: false, message: "Access denied" });
+        
+        if (status === true && (!startTime || !endTime)) {
+            return res.status(400).json({
+                success: false,
+                message: "Start time and end time are required when enabling automation."
+            });
+        }
+        const updateData = { status };
+        if (status === true) {
+            updateData.startTime = new Date(startTime);
+            updateData.endTime = new Date(endTime);
+        } else {
+            updateData.startTime = null;
+            updateData.endTime = null;
+        }
+        const updatedAutomation = await Automation.findByIdAndUpdate(id, updateData, { new: true });
+        if (!updatedAutomation) {
+            return res.status(404).json({ success: false, message: "Automation rule not found." });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Automation rule updated successfully.",
+            automation: updatedAutomation
+        });
+    } catch (error) {
+        console.error("[ERROR] PUT /api/automations/:id/toggle ->", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+/* 
+  PUT /api/automations/:id
+  - General update endpoint for an automation rule.
+  - Expects houseId in the request body for authorization.
+*/
+router.put('/api/automations/:id', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token)
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        let decoded;
+        try {
+            decoded = jwt.verify(token, SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ success: false, message: "Invalid token" });
+        }
+        const userId = decoded.userId;
+        const { id } = req.params;
+        const { houseId } = req.body;
+        if (!houseId)
+            return res.status(400).json({ success: false, message: "houseId is required" });
+        
+        // Use HouseUser mapping to check access
+        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
+        if (!houseUser)
+            return res.status(403).json({ success: false, message: "Access denied" });
+            
+        const updatedAutomation = await Automation.findByIdAndUpdate(id, req.body, { new: true });
+        if (!updatedAutomation) {
+            return res.status(404).json({ success: false, message: "Automation rule not found." });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Automation rule updated.",
+            automation: updatedAutomation
+        });
+    } catch (error) {
+        console.error("[ERROR] PUT /api/automations/:id ->", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+/* 
+  DELETE /api/automations/:id
+  - Delete an automation rule.
+  - Expects houseId in the query parameters for authorization.
+*/
+router.delete('/api/automations/:id', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token)
+            return res.status(401).json({ success: false, message: "Unauthorized" });
+        let decoded;
+        try {
+            decoded = jwt.verify(token, SECRET_KEY);
+        } catch (err) {
+            return res.status(401).json({ success: false, message: "Invalid token" });
+        }
+        const userId = decoded.userId;
+        const { houseId } = req.query;
+        if (!houseId)
+            return res.status(400).json({ success: false, message: "houseId is required" });
+        
+        // Use HouseUser mapping to check access
+        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
+        if (!houseUser)
+            return res.status(403).json({ success: false, message: "Access denied" });
+            
+        const { id } = req.params;
+        const deletedAutomation = await Automation.findByIdAndDelete(id);
+        if (!deletedAutomation) {
+            return res.status(404).json({ success: false, message: "Automation rule not found." });
+        }
+        return res.status(200).json({ success: true, message: "Automation rule deleted successfully." });
+    } catch (error) {
+        console.error("[ERROR] DELETE /api/automations/:id ->", error);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
+});
 
 
 

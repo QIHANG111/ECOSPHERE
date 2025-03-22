@@ -4,6 +4,7 @@ import EnergyUsage from '../models/energy.model.js';
 import Permission from '../models/permission.model.js';
 import Role from '../models/role.model.js';
 import RolePermission from '../models/rolePermission.model.js';
+import Automation from '../models/automation.model.js'; 
 import { faker } from '@faker-js/faker';
 dotenv.config();
 
@@ -187,6 +188,41 @@ export async function addPermissions() {
         console.log("[DEBUG] Roles and permissions mapping updated successfully.");
     } catch (error) {
         console.error("Error updating permissions and role-permission mappings:", error);
+    }
+}
+
+//define set permission rules
+const defaultAutomations = [
+    { device_type: "AC", status: false, startTime: null, endTime: null },
+    { device_type: "fan", status: false, startTime: null, endTime: null },
+    { device_type: "light", status: false, startTime: null, endTime: null },
+    { device_type: "humidifier", status: false, startTime: null, endTime: null },
+    { device_type: "security", status: false, startTime: null, endTime: null },
+    { device_type: "cleaning", status: false, startTime: null, endTime: null },
+    { device_type: "kitchen", status: false, startTime: null, endTime: null }
+];
+
+//insert set rules of automation to be mapped
+export async function insertDefaultAutomations(houseId) {
+    try {
+        // Check if automations already exist for this house
+        const existingCount = await Automation.countDocuments({ house: houseId });
+
+        if (existingCount > 0) {
+            console.log(`[DEBUG] Automations already exist for house: ${houseId}`);
+            return;
+        }
+
+        // Insert default automations for the house
+        const automations = defaultAutomations.map(rule => ({
+            ...rule,
+            house: houseId
+        }));
+
+        await Automation.insertMany(automations);
+        console.log(`[DEBUG] Inserted default automations for house: ${houseId}`);
+    } catch (error) {
+        console.error(`[ERROR] Failed to insert automations for house: ${houseId}`, error.message);
     }
 }
 
