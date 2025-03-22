@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const automationSchema = new mongoose.Schema({
     device_type: {
         type: String,
-        enum: ['cleaning', 'kitchen', 'AC', 'fan', 'light', 'humidifier', "security"], 
+        enum: ['cleaning', 'kitchen', 'AC', 'fan', 'light', 'humidifier', "security"],
         required: true,
         trim: true
     },
@@ -21,8 +21,9 @@ const automationSchema = new mongoose.Schema({
     },
     endTime: {
         type: Date,
-        required: function() {
-            return this.status;  
+        required: function () {
+            // Only required if status is true and device is NOT kitchen/cleaning
+            return this.status && !['cleaning', 'kitchen'].includes(this.device_type);
         },
         validate: {
             validator: function (value) {
@@ -31,9 +32,9 @@ const automationSchema = new mongoose.Schema({
             message: "End time must be after start time"
         }
     },
-    house: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "House", 
+    house: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "House",
         required: true,
         default: null
     }

@@ -24,4 +24,4 @@ const deviceAutomationSchema = new mongoose.Schema({
 });
 
 const DeviceAutomation = mongoose.model("DeviceAutomation", deviceAutomationSchema);
-export default DeviceAutomation;``
+export default DeviceAutomation;
