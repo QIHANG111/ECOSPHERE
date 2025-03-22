@@ -561,7 +561,7 @@ async function generateEnergyUsageReport(energyData, fullLabels, usageDataArr) {
             energyusage: usageDataArr[index]
         }));
 
-        const prompt = `(0 means no data available for that day)Generate a report on the following ${selectedTimeRange} energy usage data within 150 words:\n\n`
+        const prompt = `(if no data means not reach that day do not mention anything about that)Generate a report on the following ${selectedTimeRange} energy usage data within 150 words:\n\n`
             + JSON.stringify(formattedData, null, 2);
 
         const responseText = await fetchGeminiResponse(prompt);
