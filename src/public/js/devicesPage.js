@@ -186,6 +186,13 @@ function generateSettingsOptions(category, deviceId, isOn) {
             <input type="range" class="brightness-slider" min="0" max="100" value="50" onchange="adjustBrightness(this.value)">
         </div>`;
     }
+    if (["cleaning-appliances", "kitchen-electronics"].includes(category)) {
+        html += `
+    <div class="settings-option">
+        <button onclick="startTimedDevice('${deviceId}'); event.stopPropagation()">Start Timed</button>
+    </div>`;
+    }
+
     return html;
 }
 
@@ -264,19 +271,137 @@ window.addEventListener("click", (e) => {
 });
 
 // ✅ 控制函数：温度、风速、亮度
-function adjustTemperature(change) {
-    const tempValue = event.target.closest(".settings-option").querySelector(".temp-value");
+async function adjustTemperature(change) {
+    const option = event.target.closest(".settings-option");
+    const tempValue = option.querySelector(".temp-value");
+    const deviceId = option.closest(".furniture-content").querySelector(".toggle-status").dataset.id;
     let current = parseInt(tempValue.textContent);
-    tempValue.textContent = Math.min(30, Math.max(10, current + change));
+    current = Math.min(30, Math.max(10, current + change));
+    tempValue.textContent = current;
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/update-temperature", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ name: deviceId, temperature: current })
+        });
+        const result = await res.json();
+        if (!result.success) {
+            alert("Failed to update temperature.");
+        }
+    } catch (err) {
+        console.error("Error updating temperature:", err);
+    }
 }
-function adjustFanSpeed(change) {
-    const speedValue = event.target.closest(".settings-option").querySelector(".speed-value");
+
+async function adjustFanSpeed(change) {
+    const option = event.target.closest(".settings-option");
+    const speedValue = option.querySelector(".speed-value");
+    const deviceId = option.closest(".furniture-content").querySelector(".toggle-status").dataset.id;
     let current = parseInt(speedValue.textContent);
-    speedValue.textContent = Math.min(5, Math.max(1, current + change));
+    current = Math.min(8, Math.max(1, current + change));
+    speedValue.textContent = current;
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/devices/${deviceId}/fan-speed`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ fanSpeed: current })
+        });
+        const result = await res.json();
+        if (!result.success) {
+            alert("Failed to update fan speed.");
+        }
+    } catch (err) {
+        console.error("Error updating fan speed:", err);
+    }
 }
-function adjustBrightness(value) {
-    console.log("亮度调整为：", value);
+
+async function adjustBrightness(value) {
+    const deviceId = event.target.closest(".furniture-content").querySelector(".toggle-status").dataset.id;
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/devices/${deviceId}/adjust-brightness`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ brightness: parseInt(value) })
+        });
+        const result = await res.json();
+        if (!result.success) {
+            alert("Failed to adjust brightness.");
+        }
+    } catch (err) {
+        console.error("Error adjusting brightness:", err);
+    }
 }
+
+async function startTimedDevice(deviceId) {
+    const minutes = prompt("Please enter duration in minutes:");
+    const duration = parseInt(minutes);
+    if (isNaN(duration) || duration <= 0) {
+        alert("Invalid duration.");
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/devices/${deviceId}/start`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ durationInMinutes: duration })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+            alert("Device started. It will auto-stop in " + duration + " minutes.");
+        } else {
+            alert("Failed to start device: " + result.message);
+        }
+    } catch (err) {
+        console.error("Error starting timed device:", err);
+    }
+}
+
+document.querySelectorAll(".toggle-status").forEach(checkbox => {
+    checkbox.addEventListener("change", async function () {
+        const deviceId = this.dataset.id;
+        const isOn = this.checked;
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch("/api/update-device", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ name: deviceId, status: isOn })
+            });
+            const result = await res.json();
+            if (!result.success) {
+                alert("Failed to update power status.");
+            }
+        } catch (err) {
+            console.error("Error updating power status:", err);
+        }
+    });
+});
+
+
 
 // ✅ 初始化页面
 window.addEventListener("DOMContentLoaded", () => {
