@@ -1467,130 +1467,247 @@ canvas {
 }
 
 /*CustomizedPage Settings*/
-.addFunctionButton {
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.device-card {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+/*done*/
+.scheduleButton {
+    background-color: #e49c64;
+    color: white;
+    font-size: 90%;
+    border-radius: 10px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2%;
+    margin-left:5%;
+    margin-right:5%;
+    position: relative;
+    width: 90%;
+}
+
+/*done*/
+.scheduleBar {
+    background-color: #a38c7b;
+    color: white;
+    font-size: 90%;
+    border-radius: 10px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2%;
+    margin-left: 5%;
+    margin-right: 5%;
+    position: relative;
+    width: 90%;
+    height: 7.5vh;            /* Fix it to 6vh instead of min-height */
+    box-sizing: border-box; /* Ensures padding doesn't expand the element */
+}
+
+
+/*done*/
+.statusIndicator {
+    margin-top: 1%;
+    font-weight: bold;
+    color: red; /* Default to "Rest" */
+}
+
+/*done*/
+.statusIndicator.on {
+    color: green; /* Active status */
+}
+
+.stopScheduleButton {
+    background-color: #d9534f; /* A red or different color to stand out */
+    color: white;
+    font-size: 90%;
+    border-radius: 15px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    width: 32%;
+    min-height: 2vh;
+    cursor: pointer;
+    border: none;
+    margin: 0 auto 8px auto;
+}
+
+.normalCardAP {
+    /*background-color: rgba(255, 255, 255, 0.4);*/
+    background-color: var(--c-bg-sidebar);
+    color: var(--c-text-primary);
+    box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(0.5vw);
+    border-radius: 2vw;
+    border: 0.1vw solid var(--normal-card-border);
+    height: 40vh;
+    width: 115%;
+    text-align: center;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    transform-origin: center;
+}
+
+#standbyModal {
+    display: none; /* Hide by default */
+}
+
+
+/* Fix overlapping issue */
+.standbyModalCp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+/* Hide the scrollbar track (background) but keep the thumb (circle) */
+.standbyModalCp-content::-webkit-scrollbar {
+    width: 0%; /* Keeps it small */
+    background: transparent; /* Makes the track invisible */
+}
+
+/* For Firefox */
+.standbyModalCp-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255, 255, 255) transparent;
+}
+
+/*done*/
 .standbyModalCP {
-    position: absolute;
+    z-index: 9999;
+    position: fixed;
     top: 18%;
     left: 36%;
     width: 40%;
     height: auto;
     border-radius: 15px;
-    background: rgba(250, 198, 158, 1.0);
+    background: rgb(208, 199, 194);
     overflow-y: auto;
     max-height: 80vh;
-
 }
 
-.standbyModalCP-content {
-    background: #f6c97a;
-    padding: 5%;
-    width: 100%;
-
-    border-radius: 40px;
-    position: relative;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    text-align: left;
+.header-containerAP {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    box-sizing: border-box;
-
-    flex-direction: column; /* Stack elements */
-
-}
-.h3Button{
-    margin-left: 5%;
-    margin-top: 5%;
+    justify-content: space-between; /* Ensures text and button are spaced */
+    padding: 2%; /* Adds some spacing */
+    height: 5%; /* Increase height to fit content */
+    min-height: 5%; /* Prevents collapsing */
+    background-color: rgb(137, 107, 96); /* Slightly darker than the main modal */
 }
 
+/*done*/
+.text-settings{
+    color: #ece3dc;
+    position:fixed;
+    margin-left: 2%;
+    margin-top: 0%;
+    font-weight: bold;
+    font-size: 20px;
+}
 
-
+/*done*/
 .closeButton {
-    position: absolute;
-    right: 5%;
+    margin-left: 93%;
     background: rgba(255,255,255,0.5);
     border: none;
     cursor: pointer;
-    width: 8%; /* Fixed width */
-    height: 10%; /* Fixed height */
+    width: 7%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: translateY(-4%);
 }
 
+/*done*/
 .closeButton img {
     width: 200%; /* Scales inside button */
     height: 200%; /* Keeps proportion */
 }
 
-
-.addButton, .removeButton {
-    margin-left: 180px;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
+/*done*/
 .standbyItem {
     display: flex;
     align-items: center;
-    padding: 3%;
+    justify-content: space-between;
+    padding: 3.5%;
     border-bottom: 1px solid #eee;
+    width: 95%;
 }
 
 .standbyItem span {
-    margin-left: 10px; /* Adjust as needed */
+    flex-grow: 1; /* Ensures text expands properly */
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-overflow: ellipsis; /* Adds "..." if text overflows */
 }
 
+.addFunctionButtonAP {
+    background-color: #896b60;
+    color: #f5f2ea;
+    width: auto; /* Allows button to adjust dynamically */
+    min-width: 30%; /* Prevents it from becoming too small */
+    padding: 1% 2%;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/*done*/
 #standbyList {
     max-height: 300px; /* Adjust as needed */
     overflow-y: auto; /* Enable scrolling */
 }
 
-.function-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
+/*done*/
 .removeFunctionButton {
     position: absolute;
+    top: 0.5%;
+    right: 4%;
+    background: transparent !important;
+    border: none;
+    cursor: pointer;
     width: 15%;
-    height: 15%; /* Adjust based on button size */
-    margin-left: 80%;
-    background: red;
+    height: 25%;
     display: flex;
     align-items: center;
     justify-content: center;
-
 }
 
+/*done*/
 .removeFunctionButton img {
-    width: 300%;
-    height: 300%;
+    width: 180%;
+    height: 180%;
+    object-fit: contain;
 }
 
-
-.StandbyAddButton {
-    margin-left: 80%;
-    position: absolute;
-    width: 15%;
-    background: none;
-    border: none;
-    cursor: pointer;
+/*done*/
+.function-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid var(--c-border-primary);
+    margin-left: -52%;
 }
 
+/*done*/
+.function-header h4{
+    font-size: 98%;
+    margin-left: 34%;
+    font-weight: bold;
+}
+
+/*done*/
 .addFunctionButton {
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1605,15 +1722,18 @@ canvas {
     box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
 
+/*done*/
 .addFunctionButton img {
     width: 18px; /* Adjust size */
     height: 18px;
     margin-right: 8px; /* Space between icon and text */
 }
 
-.dashboardDesign {
-    display: flex;
-    flex-wrap: wrap;
+/*here*/
+.function-card {
+    position: relative;
+    margin: 1rem;
+    transition: transform 0.3s ease;
 }
 
 .circle-container {
