@@ -531,7 +531,9 @@ async function loadAndRenderDevices(houseId, roomId = null) {
             const left = document.createElement("div");
             left.className = "furniture-icon";
             left.innerHTML = `
+        <div class="ui-menu-icon">
                 <img class="icon-image" src="/icons/${category}/${fileName}" alt="${device.device_name}" onerror="this.src='/icons/default-icon.svg'">
+            </div>
             `;
 
             const right = document.createElement("div");
@@ -540,7 +542,9 @@ async function loadAndRenderDevices(houseId, roomId = null) {
                 <div class="furniture-name">${device.device_name}</div>
                 <div class="room-name">${device.room?.room_name || "Unassigned"}</div>
                 <div class="setting-container">
+                        <div class="ui-menu-icon">
                     <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon" onclick="toggleDropdown(this)">
+                </div>
                     <div class="dropdown-menu">
                         <div class="settings-option">
                             <span>Power</span>

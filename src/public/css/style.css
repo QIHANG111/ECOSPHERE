@@ -34,7 +34,7 @@
     --c-bg-secondary: #222128;
     --c-bg-button: #494a50;
     --button-background: #2c2a26;
-    --c-bg-sidebar: rgb(33, 38, 40);
+    --c-bg-sidebar: rgb(33, 38, 40, 0.92);
     --c-bg-card-hover: rgba(73, 82, 97, 0.94);
     --c-glow: rgba(255, 255, 255, 0.7);
     --normal-card-border: rgb(175, 173, 173);
@@ -2168,7 +2168,7 @@ canvas {
 .room-selector {
     padding: 6px 12px;
     font-size: 14px;
-    color: #333;
+    color: var(--c-text-primary);
     background-color: var(--c-bg-sidebar);
     border: 1px solid var(--c-border-primary);
     border-radius: 1vw;

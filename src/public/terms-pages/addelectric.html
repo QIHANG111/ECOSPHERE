@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Device Management</title>
-    <style src="/css/style.css"></style>
+    <link rel="stylesheet" href="../css/style.css">
     <style>
-        /*body {*/
-        /*    font-family: Arial, sans-serif;*/
-        /*    background-color: #f4f4f4;*/
-        /*    margin: 0;*/
-        /*    padding: 20px;*/
-        /*}*/
+
         .category-container {
+            width: 100%;
             margin-bottom: 30px;
         }
         .category-title {
@@ -31,17 +27,12 @@
             gap: 20px;
         }
         .device-card {
-            /*background-color: #fff;*/
-            /*border: 1px solid #ddd;*/
-            /*border-radius: 8px;*/
-            /*padding: 20px;*/
-            /*width: 200px;*/
-            /*text-align: center;*/
-            /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
-
+            width: calc(100% / 5 - 20px);
+        }
+        .device-card {
             background-color: var(--c-bg-sidebar);
             color: var(--c-text-primary);
-            box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);
+            /*box-shadow: 0 2vw 4vw rgba(0, 0, 0, 0.1);*/
             backdrop-filter: blur(0.5vw);
             border-radius: 2vw;
             border: 0.1vw solid var(--normal-card-border);
@@ -68,8 +59,8 @@
             color: var(--c-text-secondary);
         }
         .device-card button {
-            background-color: #007bff;
-            color: #fff;
+            background-color: var(--c-bg-button);
+            color: var(--c-text-primary);
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
@@ -77,7 +68,7 @@
             margin-top: 10px;
         }
         .device-card button:hover {
-            background-color: #0056b3;
+            background-color:var(--c-bg-card-hover);
         }
 
         /* Modal Styles */
@@ -267,176 +258,230 @@
     </style>
 </head>
 <body>
-<h1>Device Management</h1>
-
+<div class="dashboard">
+    <div class="dashboard-content">
 <!-- Lighting Devices -->
 <div class="category-container">
     <div class="category-title">Lighting</div>
     <div class="category-divider"></div>
-    <div class="device-container">
+    <div class="device-container" style="flex-wrap: nowrap; overflow-x: auto;">
         <div class="device-card">
-            <img src="../icons/lighting/beside-lamp.svg" alt="Beside Lamp">
+            <div class="ui-menu-icon">
+                <img src="../icons/lighting/beside-lamp.svg" alt="Beside Lamp">
+            </div>
             <h3>Beside Lamp</h3>
             <button onclick="showAddModal('Beside Lamp', 'Beside Lamp')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/lighting/desk-lamp.svg" alt="Desk Lamp">
+            <div class="ui-menu-icon">
+                <img src="../icons/lighting/desk-lamp.svg" alt="Desk Lamp">
+            </div>
             <h3>Desk Lamp</h3>
             <button onclick="showAddModal('Desk Lamp', 'Desk Lamp')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/lighting/ceiling-lamp.svg" alt="Ceiling Lamp">
+            <div class="ui-menu-icon">
+                <img src="../icons/lighting/ceiling-lamp.svg" alt="Ceiling Lamp">
+            </div>
             <h3>Ceiling Lamp</h3>
             <button onclick="showAddModal('Ceiling Lamp', 'Ceiling Lamp')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/lighting/light-bulbs.svg" alt="Light Bulbs">
+            <div class="ui-menu-icon">
+                <img src="../icons/lighting/light-bulbs.svg" alt="Light Bulbs">
+            </div>
             <h3>Light Bulbs</h3>
             <button onclick="showAddModal('Light Bulbs', 'Light Bulbs')">Add</button>
         </div>
     </div>
 </div>
-
+    </div>
+    <div class="dashboard-content">
 <!-- Household Security Devices -->
 <div class="category-container">
     <div class="category-title">Household Security</div>
     <div class="category-divider"></div>
-    <div class="device-container">
+    <div class="device-container" style="flex-wrap: nowrap; overflow-x: auto;">
         <div class="device-card">
-            <img src="../icons/household-security/smart-door-lock.svg" alt="Smart Door Lock">
+            <div class="ui-menu-icon">
+                <img src="../icons/household-security/smart-door-lock.svg" alt="Smart Door Lock">
+            </div>
             <h3>Smart Door Lock</h3>
             <button class="add-button" onclick="showAddModal('Smart Door Lock', 'Smart Door Lock')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/household-security/cctv.svg" alt="CCTV">
+            <div class="ui-menu-icon">
+                <img src="../icons/household-security/cctv.svg" alt="CCTV">
+            </div>
             <h3>CCTV</h3>
             <button onclick="showAddModal('CCTV', 'CCTV')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/household-security/doorbell.svg" alt="Doorbell">
+            <div class="ui-menu-icon">
+                <img src="../icons/household-security/doorbell.svg" alt="Doorbell">
+            </div>
             <h3>Doorbell</h3>
             <button onclick="showAddModal('Doorbell', 'Doorbell')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/household-security/safe-box.svg" alt="Safe Box">
+            <div class="ui-menu-icon">
+                <img src="../icons/household-security/safe-box.svg" alt="Safe Box">
+            </div>
             <h3>Safe Box</h3>
             <button onclick="showAddModal('Safe Box', 'Safe Box')">Add</button>
         </div>
     </div>
 </div>
+    </div>
 
+    <div class="dashboard-content">
 <!-- Air Treatment Devices -->
 <div class="category-container">
     <div class="category-title">Air Treatment</div>
     <div class="category-divider"></div>
-    <div class="device-container">
+    <div class="device-container" style="flex-wrap: nowrap; overflow-x: auto;">
         <div class="device-card">
-            <img src="../icons/air-treatment/air-conditioner.svg" alt="Air Conditioner">
+            <div class="ui-menu-icon">
+                <img src="../icons/air-treatment/air-conditioner.svg" alt="Air Conditioner">
+            </div>
             <h3>Air Conditioner</h3>
             <button onclick="showAddModal('Air Conditioner', 'Air Conditioner')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/air-treatment/heater.svg" alt="Heater">
+            <div class="ui-menu-icon">
+                <img src="../icons/air-treatment/heater.svg" alt="Heater">
+            </div>
             <h3>Heater</h3>
             <button onclick="showAddModal('Heater', 'Heater')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/air-treatment/humidifier.svg" alt="Humidifier">
+            <div class="ui-menu-icon">
+                <img src="../icons/air-treatment/humidifier.svg" alt="Humidifier">
+            </div>
             <h3>Humidifier</h3>
             <button onclick="showAddModal('Humidifier', 'Humidifier')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/air-treatment/fan.svg" alt="Fan">
+            <div class="ui-menu-icon">
+                <img src="../icons/air-treatment/fan.svg" alt="Fan">
+            </div>
             <h3>Fan</h3>
             <button onclick="showAddModal('Fan', 'Fan')">Add</button>
         </div>
     </div>
 </div>
-
+    </div>
 <!-- Power Switch Devices -->
+<div class="dashboard-content">
 <div class="category-container">
     <div class="category-title">Power Switch</div>
     <div class="category-divider"></div>
-    <div class="device-container">
+    <div class="device-container" style="flex-wrap: nowrap; overflow-x: auto;">
         <div class="device-card">
-            <img src="../icons/power-switch/socket.svg" alt="Socket">
+            <div class="ui-menu-icon">
+                <img src="../icons/power-switch/socket.svg" alt="Socket">
+            </div>
             <h3>Socket</h3>
             <button onclick="showAddModal('Socket', 'Socket')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/power-switch/switch.svg" alt="Switch">
+            <div class="ui-menu-icon">
+                <img src="../icons/power-switch/switch.svg" alt="Switch">
+            </div>
             <h3>Switch</h3>
             <button onclick="showAddModal('Switch', 'Switch')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/power-switch/remote-control.svg" alt="Remote Control">
+            <div class="ui-menu-icon">
+                <img src="../icons/power-switch/remote-control.svg" alt="Remote Control">
+            </div>
             <h3>Remote Control</h3>
             <button onclick="showAddModal('Remote Control', 'Remote Control')">Add</button>
         </div>
     </div>
 </div>
-
-
+</div>
+<div class="dashboard-content">
 <!-- Kitchen Electronics Devices -->
 <div class="category-container">
     <div class="category-title">Kitchen Electronics</div>
     <div class="category-divider"></div>
-    <div class="device-container">
-        <div class="device-card">
-            <img src="../icons/kitchen-electronics/multifunction-cooking-pot.svg" alt="Multifunction Cooking Pot">
+    <div class="device-container" style="display: flex; flex-wrap: wrap; gap: 20px; width: 260%">
+        <div class="device-card" style="width: calc(100% / 4 - 20px);">
+            <div class="ui-menu-icon">
+                <img src="../icons/kitchen-electronics/multifunction-cooking-pot.svg" alt="Multifunction Cooking Pot">
+            </div>
             <h3>Multifunction Cooking Pot</h3>
             <button onclick="showAddModal('Multifunction Cooking Pot', 'Multifunction Cooking Pot')">Add</button>
         </div>
-        <div class="device-card">
-            <img src="../icons/kitchen-electronics/fridge.svg" alt="Fridge">
+        <div class="device-card" style="width: calc(100% / 4 - 20px);">
+            <div class="ui-menu-icon">
+                <img src="../icons/kitchen-electronics/fridge.svg" alt="Fridge">
+            </div>
             <h3>Fridge</h3>
             <button onclick="showAddModal('Fridge', 'Fridge')">Add</button>
         </div>
-        <div class="device-card">
-            <img src="../icons/kitchen-electronics/oven.svg" alt="Oven">
+        <div class="device-card" style="width: calc(100% / 4 - 20px);">
+            <div class="ui-menu-icon">
+                <img src="../icons/kitchen-electronics/oven.svg" alt="Oven">
+            </div>
             <h3>Oven</h3>
             <button onclick="showAddModal('Oven', 'Oven')">Add</button>
         </div>
-        <div class="device-card">
-            <img src="../icons/kitchen-electronics/microwave-oven.svg" alt="Microwave Oven">
+        <div class="device-card" style="width: calc(100% / 4 - 20px);">
+            <div class="ui-menu-icon">
+                <img src="../icons/kitchen-electronics/microwave-oven.svg" alt="Microwave Oven">
+            </div>
             <h3>Microwave Oven</h3>
             <button onclick="showAddModal('Microwave Oven', 'Microwave Oven')">Add</button>
         </div>
-        <div class="device-card">
-            <img src="../icons/kitchen-electronics/electric-kettle.svg" alt="Electric Kettle">
+        <div class="device-card" style="width: calc(100% / 4 - 20px);">
+            <div class="ui-menu-icon">
+                <img src="../icons/kitchen-electronics/electric-kettle.svg" alt="Electric Kettle">
+            </div>
             <h3>Electric Kettle</h3>
             <button onclick="showAddModal('Electric Kettle', 'Electric Kettle')">Add</button>
         </div>
-        <div class="device-card">
-            <img src="../icons/kitchen-electronics/dishwasher.svg" alt="Dishwasher">
+        <div class="device-card" style="width: calc(100% / 4 - 20px);">
+            <div class="ui-menu-icon">
+                <img src="../icons/kitchen-electronics/dishwasher.svg" alt="Dishwasher">
+            </div>
             <h3>Dishwasher</h3>
             <button onclick="showAddModal('Dishwasher', 'Dishwasher')">Add</button>
         </div>
-        <div class="device-card">
-            <img src="../icons/kitchen-electronics/induction-stove.svg" alt="Induction Stove">
+        <div class="device-card" style="width: calc(100% / 4 - 20px);">
+            <div class="ui-menu-icon">
+                <img src="../icons/kitchen-electronics/induction-stove.svg" alt="Induction Stove">
+            </div>
             <h3>Induction Stove</h3>
             <button onclick="showAddModal('Induction Stove', 'Induction Stove')">Add</button>
         </div>
     </div>
 </div>
-
+</div>
+    <div class="dashboard-content">
 <!-- Cleaning Appliances Devices -->
 <div class="category-container">
     <div class="category-title">Cleaning Appliances</div>
     <div class="category-divider"></div>
-    <div class="device-container">
+    <div class="device-container" style="flex-wrap: nowrap; overflow-x: auto;">
         <div class="device-card">
-            <img src="../icons/cleaning-appliances/washer.svg" alt="Washer">
+            <div class="ui-menu-icon">
+                <img src="../icons/cleaning-appliances/washer.svg" alt="Washer">
+            </div>
             <h3>Washer</h3>
             <button onclick="showAddModal('Washer')">Add</button>
         </div>
         <div class="device-card">
-            <img src="../icons/cleaning-appliances/vacuum-robot.svg" alt="Vacuum Robot">
+            <div class="ui-menu-icon">
+                <img src="../icons/cleaning-appliances/vacuum-robot.svg" alt="Vacuum Robot">
+            </div>
             <h3>Vacuum Robot</h3>
             <button onclick="showAddModal('Vacuum Robot')">Add</button>
         </div>
     </div>
 </div>
+    </div>
 
 <!-- Modal -->
 <div id="addModal" class="modal">
@@ -446,7 +491,7 @@
         <button class="cancel" onclick="cancelAdd()">Cancel</button>
     </div>
 </div>
-
+</div>
 <script>
     const token = localStorage.getItem("token");
     if (!token) {
@@ -606,6 +651,6 @@
         speedValue.textContent = currentSpeed;
     }
 </script>
-
+<script src="../js/theme.js"></script>
 </body>
 </html>
