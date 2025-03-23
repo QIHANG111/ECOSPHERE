@@ -186,13 +186,6 @@ function generateSettingsOptions(category, deviceId, isOn) {
             <input type="range" class="brightness-slider" min="0" max="100" value="50" onchange="adjustBrightness(this.value)">
         </div>`;
     }
-    if (["cleaning-appliances", "kitchen-electronics"].includes(category)) {
-        html += `
-    <div class="settings-option">
-        <button onclick="startTimedDevice('${deviceId}'); event.stopPropagation()">Start Timed</button>
-    </div>`;
-    }
-
     return html;
 }
 
@@ -281,13 +274,13 @@ async function adjustTemperature(change) {
 
     try {
         const token = localStorage.getItem("token");
-        const res = await fetch("/api/update-temperature", {
-            method: "POST",
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/temperature`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
             },
-            body: JSON.stringify({ name: deviceId, temperature: current })
+            body: JSON.stringify({ temperature: current })
         });
         const result = await res.json();
         if (!result.success) {
@@ -308,7 +301,7 @@ async function adjustFanSpeed(change) {
 
     try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`/api/devices/${deviceId}/fan-speed`, {
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/fan-speed`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -330,7 +323,7 @@ async function adjustBrightness(value) {
 
     try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`/api/devices/${deviceId}/adjust-brightness`, {
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/brightness`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
@@ -346,61 +339,6 @@ async function adjustBrightness(value) {
         console.error("Error adjusting brightness:", err);
     }
 }
-
-async function startTimedDevice(deviceId) {
-    const minutes = prompt("Please enter duration in minutes:");
-    const duration = parseInt(minutes);
-    if (isNaN(duration) || duration <= 0) {
-        alert("Invalid duration.");
-        return;
-    }
-
-    try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`/api/devices/${deviceId}/start`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ durationInMinutes: duration })
-        });
-
-        const result = await res.json();
-        if (result.success) {
-            alert("Device started. It will auto-stop in " + duration + " minutes.");
-        } else {
-            alert("Failed to start device: " + result.message);
-        }
-    } catch (err) {
-        console.error("Error starting timed device:", err);
-    }
-}
-
-document.querySelectorAll(".toggle-status").forEach(checkbox => {
-    checkbox.addEventListener("change", async function () {
-        const deviceId = this.dataset.id;
-        const isOn = this.checked;
-        try {
-            const token = localStorage.getItem("token");
-            const res = await fetch("/api/update-device", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({ name: deviceId, status: isOn })
-            });
-            const result = await res.json();
-            if (!result.success) {
-                alert("Failed to update power status.");
-            }
-        } catch (err) {
-            console.error("Error updating power status:", err);
-        }
-    });
-});
-
 
 
 // ✅ 初始化页面
