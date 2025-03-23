@@ -264,19 +264,82 @@ window.addEventListener("click", (e) => {
 });
 
 // ✅ 控制函数：温度、风速、亮度
-function adjustTemperature(change) {
-    const tempValue = event.target.closest(".settings-option").querySelector(".temp-value");
+async function adjustTemperature(change) {
+    const option = event.target.closest(".settings-option");
+    const tempValue = option.querySelector(".temp-value");
+    const deviceId = option.closest(".furniture-content").querySelector(".toggle-status").dataset.id;
     let current = parseInt(tempValue.textContent);
-    tempValue.textContent = Math.min(30, Math.max(10, current + change));
+    current = Math.min(30, Math.max(10, current + change));
+    tempValue.textContent = current;
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/temperature`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ temperature: current })
+        });
+        const result = await res.json();
+        if (!result.success) {
+            alert("Failed to update temperature.");
+        }
+    } catch (err) {
+        console.error("Error updating temperature:", err);
+    }
 }
-function adjustFanSpeed(change) {
-    const speedValue = event.target.closest(".settings-option").querySelector(".speed-value");
+
+async function adjustFanSpeed(change) {
+    const option = event.target.closest(".settings-option");
+    const speedValue = option.querySelector(".speed-value");
+    const deviceId = option.closest(".furniture-content").querySelector(".toggle-status").dataset.id;
     let current = parseInt(speedValue.textContent);
-    speedValue.textContent = Math.min(5, Math.max(1, current + change));
+    current = Math.min(8, Math.max(1, current + change));
+    speedValue.textContent = current;
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/fan-speed`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ fanSpeed: current })
+        });
+        const result = await res.json();
+        if (!result.success) {
+            alert("Failed to update fan speed.");
+        }
+    } catch (err) {
+        console.error("Error updating fan speed:", err);
+    }
 }
-function adjustBrightness(value) {
-    console.log("亮度调整为：", value);
+
+async function adjustBrightness(value) {
+    const deviceId = event.target.closest(".furniture-content").querySelector(".toggle-status").dataset.id;
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/brightness`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ brightness: parseInt(value) })
+        });
+        const result = await res.json();
+        if (!result.success) {
+            alert("Failed to adjust brightness.");
+        }
+    } catch (err) {
+        console.error("Error adjusting brightness:", err);
+    }
 }
+
 
 // ✅ 初始化页面
 window.addEventListener("DOMContentLoaded", () => {
