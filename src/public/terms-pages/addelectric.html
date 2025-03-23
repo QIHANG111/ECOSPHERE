@@ -305,10 +305,7 @@
         <div class="device-card">
             <img src="../icons/household-security/smart-door-lock.svg" alt="Smart Door Lock">
             <h3>Smart Door Lock</h3>
-            <div class="device-actions">
-                <button class="add-button" onclick="showAddModal('Smart Door Lock', 'Smart Door Lock')">Add</button>
-                <!-- 下拉菜单部分不变 -->
-            </div>
+            <button class="add-button" onclick="showAddModal('Smart Door Lock', 'Smart Door Lock')">Add</button>
         </div>
         <div class="device-card">
             <img src="../icons/household-security/cctv.svg" alt="CCTV">
@@ -582,30 +579,30 @@
         dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
     }
 
-    // 关闭下拉菜单（当点击页面其他地方）
+
     window.addEventListener("click", function (event) {
         if (!event.target.matches('.setting-icon') && !event.target.closest('.dropdown-menu')) {
             document.querySelectorAll(".dropdown-menu").forEach(menu => menu.style.display = "none");
         }
     });
 
-    // 温度调节
+
     function adjustTemperature(change) {
         const tempValue = document.querySelector('.temp-value');
         let currentTemp = parseInt(tempValue.textContent);
         currentTemp += change;
-        if (currentTemp < 10) currentTemp = 10; // 最低温度
-        if (currentTemp > 30) currentTemp = 30; // 最高温度
+        if (currentTemp < 10) currentTemp = 10;
+        if (currentTemp > 30) currentTemp = 30;
         tempValue.textContent = currentTemp;
     }
 
-    // 风速调节
+
     function adjustFanSpeed(change) {
         const speedValue = document.querySelector('.speed-value');
         let currentSpeed = parseInt(speedValue.textContent);
         currentSpeed += change;
-        if (currentSpeed < 1) currentSpeed = 1; // 最低风速
-        if (currentSpeed > 5) currentSpeed = 5; // 最高风速
+        if (currentSpeed < 1) currentSpeed = 1;
+        if (currentSpeed > 5) currentSpeed = 5;
         speedValue.textContent = currentSpeed;
     }
 </script>
