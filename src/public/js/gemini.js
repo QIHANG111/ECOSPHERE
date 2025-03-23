@@ -313,6 +313,7 @@ You are an AI assistant. Follow these instructions carefully:
 - If the message does not, respond normally.
 - If the message wants to know what you can do/who are you, reply with "I am ECOSPHERE AI, I can help you with energy reports, change settings, and more.".
 - if want to turn on or off devices, reply with "Ok, turned on/off the "+devicename.
+- If the user wants to switch/see another house, reply with "here are the houses you have, which one do you want to switch to?".
 User Input: "${userPrompt}"
 AI Response:`;
 
@@ -376,6 +377,18 @@ AI Response:`;
         else if (aiResponseText.includes("Ok, changed to black theme")) switchTheme("black-theme");
         else if (aiResponseText.includes("Ok, changed to light theme")) switchTheme("light-theme");
 
+        if (aiResponseText.toLowerCase().includes("to switch to")) {
+            fetch("/api/user/houses", {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.houses && data.houses.length > 0) {
+                        showHouseSwitchModal(data.houses);
+                    }
+                })
+                .catch(err => console.error("Failed to fetch houses for switch:", err));
+        }
         if (aiResponseText.includes("reportPage")) window.location.href = "../pages/reportPage.html";
         if (aiResponseText.includes("settingsPage")) window.location.href = "../pages/settingPage.html";
         if (aiResponseText.includes("devicePage")) window.location.href = "../pages/devicesPage.html";
@@ -591,6 +604,36 @@ function selectSuggestion(selectedText) {
 
 searchInput.addEventListener("focus", filterSuggestions);
 searchInput.addEventListener("input", filterSuggestions);
+
+
+function showHouseSwitchModal(houses) {
+    const modal = document.getElementById("switchHouseModal");
+    const select = document.getElementById("houseSwitchSelect");
+    select.innerHTML = "";
+    houses.forEach(h => {
+        const option = document.createElement("option");
+        option.value = h._id;
+        option.textContent = h.house_name;
+        select.appendChild(option);
+    });
+    modal.style.display = "flex";
+}
+
+function closeHouseSwitchModal() {
+    document.getElementById("switchHouseModal").style.display = "none";
+}
+
+function confirmHouseSwitch() {
+    const selectedId = document.getElementById("houseSwitchSelect").value;
+    if (selectedId) {
+        currentHouseId = selectedId;
+        closeHouseSwitchModal();
+        renderRooms(currentHouseId).then(r => console.log("Rooms rendered."));
+        document.getElementById("houseSelector").value = currentHouseId;
+        document.getElementById("houseSelectorForStatus").value = currentHouseId;
+        loadAndRenderDevices(currentHouseId).then(r =>  console.log("Devices loaded and rendered."));
+    }
+}
 
 
 document.addEventListener("click", function (event) {
