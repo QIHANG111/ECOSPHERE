@@ -126,40 +126,6 @@ menuItems.forEach((item) => {
     document.addEventListener("DOMContentLoaded", function () {
     const deviceContainer = document.getElementById("furnitureContainer");
 
-    async function loadDevices() {
-    try {
-    const response = await fetch("/api/devices"); // 从数据库获取设备
-    const devices = await response.json();
-
-    if (!devices || devices.length === 0) {
-    deviceContainer.innerHTML = "<p>No devices added yet.</p>";
-    return;
-}
-
-    deviceContainer.innerHTML = ""; // 清空当前设备列表
-    devices.forEach(device => {
-    renderDevice(device);
-});
-} catch (error) {
-    console.error("Error loading devices:", error);
-}
-}
-
-    // **设备名称关键字 -> 对应的文件夹映射**
-    const categoryMap = {
-    "lamp": "lighting", "bulb": "lighting", "ceiling": "lighting",
-    "door lock": "household-security", "cctv": "household-security",
-    "doorbell": "household-security", "safe box": "household-security",
-    "air conditioner": "air-treatment", "heater": "air-treatment",
-    "humidifier": "air-treatment", "fan": "air-treatment",
-    "socket": "power-switch", "switch": "power-switch",
-    "remote control": "power-switch", "cooking pot": "kitchen-electronics",
-    "fridge": "kitchen-electronics", "oven": "kitchen-electronics",
-    "microwave": "kitchen-electronics", "kettle": "kitchen-electronics",
-    "dishwasher": "kitchen-electronics", "stove": "kitchen-electronics",
-    "washer": "cleaning-appliances", "vacuum robot": "cleaning-appliances"
-};
-
     // **获取分类目录**
     function getCategoryFromName(deviceName) {
     let lowerName = deviceName.toLowerCase();
@@ -424,4 +390,194 @@ menuItems.forEach((item) => {
     speedValue.textContent = currentSpeed;
 }
 
+
+
+
+
+
+//don't change this
+
+async function initCurrentHouse() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Please log in first.");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/user/houses", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        const houses = data.houses || [];
+
+        if (houses.length === 0) {
+            alert("No houses found.");
+            return;
+        }
+
+        currentHouseId = houses[0]._id;
+
+        const selector = document.getElementById("houseSelector");
+        selector.innerHTML = "";
+
+        houses.forEach(h => {
+            const option = document.createElement("option");
+            option.value = h._id;
+            option.textContent = h.house_name;
+            selector.appendChild(option);
+        });
+
+        selector.value = currentHouseId;
+
+        selector.addEventListener("change", () => {
+            currentHouseId = selector.value;
+            renderRoomNavigation(currentHouseId);
+            loadAndRenderDevices(currentHouseId);
+        });
+
+        renderRoomNavigation(currentHouseId);
+        loadAndRenderDevices(currentHouseId);
+    } catch (error) {
+        console.error("Failed to initialize house:", error);
+    }
+}
+
+async function renderRoomNavigation(houseId) {
+    const navBar = document.querySelector(".selection-bar");
+    navBar.innerHTML = "";
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/houses/${houseId}/rooms`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+        const rooms = data.rooms || [];
+
+
+        const allBtn = document.createElement("div");
+        allBtn.className = "nav-box";
+        allBtn.innerHTML = `<a href="#">All Devices</a>`;
+        allBtn.onclick = () => loadAndRenderDevices(houseId);
+        navBar.appendChild(allBtn);
+
+        rooms.forEach(room => {
+            const roomBox = document.createElement("div");
+            roomBox.className = "nav-box";
+            roomBox.innerHTML = `<a href="#">${room.room_name}</a>`;
+            roomBox.onclick = () => loadAndRenderDevices(houseId, room._id);
+            navBar.appendChild(roomBox);
+        });
+    } catch (error) {
+        console.error("Failed to load room navigation:", error);
+    }
+}function formatDeviceFileName(deviceName) {
+    return deviceName
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, '')
+        .trim()
+        .replace(/\s+/g, '-') + '.svg';
+}
+
+function getCategoryFromName(deviceName) {
+    const categoryMap = {
+        "lamp": "lighting", "bulb": "lighting", "ceiling": "lighting",
+        "door lock": "household-security", "cctv": "household-security",
+        "doorbell": "household-security", "safe box": "household-security",
+        "air conditioner": "air-treatment", "heater": "air-treatment",
+        "humidifier": "air-treatment", "fan": "air-treatment",
+        "socket": "power-switch", "switch": "power-switch",
+        "remote control": "power-switch", "cooking pot": "kitchen-electronics",
+        "fridge": "kitchen-electronics", "oven": "kitchen-electronics",
+        "microwave": "kitchen-electronics", "kettle": "kitchen-electronics",
+        "dishwasher": "kitchen-electronics", "stove": "kitchen-electronics",
+        "washer": "cleaning-appliances", "vacuum robot": "cleaning-appliances"
+    };
+
+    const lowerName = deviceName.toLowerCase();
+    for (let keyword in categoryMap) {
+        if (lowerName.includes(keyword)) {
+            return categoryMap[keyword];
+        }
+    }
+    return "default";
+}
+
+async function loadAndRenderDevices(houseId, roomId = null) {
+    const token = localStorage.getItem("token");
+    let url = `/api/houses/${houseId}/devices`;
+    if (roomId) url += `?room=${roomId}`;
+
+    try {
+        const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const devices = data.devices || [];
+
+        const container = document.getElementById("furnitureContainer");
+        container.innerHTML = "";
+
+        devices.forEach(device => {
+            const category = getCategoryFromName(device.device_name);
+            const fileName = formatDeviceFileName(device.device_name);
+
+            const deviceItem = document.createElement("div");
+            deviceItem.className = "furniture-item";
+
+            const left = document.createElement("div");
+            left.className = "furniture-icon";
+            left.innerHTML = `
+                <img class="icon-image" src="/icons/${category}/${fileName}" alt="${device.device_name}" onerror="this.src='/icons/default-icon.svg'">
+            `;
+
+            const right = document.createElement("div");
+            right.className = "furniture-content";
+            right.innerHTML = `
+                <div class="furniture-name">${device.device_name}</div>
+                <div class="room-name">${device.room?.room_name || "Unassigned"}</div>
+                <div class="setting-container">
+                    <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon" onclick="toggleDropdown(this)">
+                    <div class="dropdown-menu">
+                        <div class="settings-option">
+                            <span>Power</span>
+                            <label class="switch">
+                                <input type="checkbox" class="toggle-status" data-id="${device._id}" ${device.status === "true" ? "checked" : ""}>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-option">
+                            <span>Temp</span>
+                            <div class="temperature-control">
+                                <button class="temp-btn" onclick="adjustTemperature(-1); event.stopPropagation()">-</button>
+                                <span class="temp-value">20</span>°C
+                                <button class="temp-btn" onclick="adjustTemperature(1); event.stopPropagation()">+</button>
+                            </div>
+                        </div>
+                        <div class="settings-option">
+                            <span>Fan Speed</span>
+                            <div class="fan-speed-control">
+                                <button class="speed-btn" onclick="adjustFanSpeed(-1); event.stopPropagation()">-</button>
+                                <span class="speed-value">1</span>
+                                <button class="speed-btn" onclick="adjustFanSpeed(1); event.stopPropagation()">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            deviceItem.appendChild(left);
+            deviceItem.appendChild(right);
+            container.appendChild(deviceItem);
+        });
+    } catch (error) {
+        console.error("Error loading devices:", error);
+    }
+}
+document.addEventListener("DOMContentLoaded", () => {
+    initCurrentHouse();
+});
 
