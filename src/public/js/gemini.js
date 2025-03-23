@@ -147,7 +147,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             const deviceItem = document.createElement("div");
             deviceItem.classList.add("hBar");
 
-            // 左侧名称容器：设备名 + 房间名（纵向排列）
             const nameContainer = document.createElement("div");
             nameContainer.style.display = "flex";
             nameContainer.style.flexDirection = "column";
@@ -166,7 +165,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             nameContainer.appendChild(nameSpan);
             nameContainer.appendChild(roomNameSpan);
 
-            // 右侧状态按钮
             const statusBtn = document.createElement("button");
             statusBtn.classList.add("device-status-btn");
             statusBtn.dataset.deviceName = device.device_name;
@@ -193,13 +191,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                     console.error("Error updating device status:", error);
                 });
             });
-
-            // 组装结构
             deviceItem.appendChild(nameContainer);
             deviceItem.appendChild(statusBtn);
             deviceList.appendChild(deviceItem);
 
-            // 如果是空调，添加温度控制
             if (device.device_type === "AC") {
                 createTempControls(device, deviceItem);
             }
