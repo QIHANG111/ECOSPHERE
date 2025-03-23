@@ -781,7 +781,7 @@ router.get('/api/houses/:houseId/devices', async (req, res) => {
             console.log(`[DEBUG] No rooms in house: ${houseId}`);
             return res.status(200).json({ success: true, devices: [] });
         }
-        const devices = await Device.find({ room: { $in: house.rooms } });
+        const devices = await Device.find({ room: { $in: house.rooms } }).populate('room', 'room_name');
         console.log(`[DEBUG] Found ${devices.length} devices in house ${houseId}`);
         res.status(200).json({ success: true, devices });
     } catch (error) {

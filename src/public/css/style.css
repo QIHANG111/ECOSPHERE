@@ -2169,9 +2169,9 @@ canvas {
     padding: 6px 12px;
     font-size: 14px;
     color: #333;
-    background-color: #f8f9fa;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    background-color: var(--c-bg-sidebar);
+    border: 1px solid var(--c-border-primary);
+    border-radius: 1vw;
     margin-left: 1em;
     cursor: pointer;
     appearance: none;
@@ -2180,6 +2180,51 @@ canvas {
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 12px;
+}
+.house-selector {
+    margin-top: 1vw;
+    padding: 6px 12px;
+    font-size: 1.5vw;
+    font-family: "Arial", sans-serif;
+    color: var(--c-text-primary);
+    background-color: var(--c-bg-sidebar);
+    border: 1px solid var(--c-border-primary);
+    border-radius: 1vw;
+    margin-left: 1em;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    transition: 0.2s;
+}
+.house-selector option {
+    padding: 6px 12px;
+    font-size: 1.5vw;
+    font-family: "Arial", sans-serif;
+    color: var(--c-text-primary);
+    background-color: var(--c-bg-sidebar);
+    border: 1vw solid var(--c-border-primary);
+    border-radius: 1vw;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+.house-selector:focus {
+    outline: none;
+}
+.house-selector option:focus {
+    outline: none;
+}
+.house-selector:hover {
+    background-color: var(--c-bg-card-hover);
+    scale: 1.05;
 }
 
 

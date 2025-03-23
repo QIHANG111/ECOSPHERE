@@ -72,53 +72,73 @@ async function fetchRooms() {
     }
 }
 
-async function renderRooms() {
+async function renderRooms(houseId = currentHouseId) {
     const container = document.getElementById("roomCard");
-    if (!container) return;
-    const rooms = await fetchRooms();
-    container.innerHTML = `
-        <div class="leftToRightList"> 
-            <h3 style="padding-left: 10vw">Rooms</h3>
-            <button class="hidden-button ui-menu-icon" style="width: 5vw; height: 3.5vw" id="automation" onclick="openPopout()">
-                <img src="/icons/add-cross.svg" alt="Vector Icon" width="30" height="30">
-            </button>
-        </div>
-        <div id="roomList"></div>
-    `;
-    const roomList = document.getElementById("roomList");
-    if (!rooms.length) {
-        roomList.innerHTML = "<p style='color: gray; text-align: center;'>No rooms.</p>";
-        return;
-    }
-    rooms.forEach(room => {
-        const roomItem = document.createElement("div");
-        roomItem.classList.add("hBar");
-        const nameSpan = document.createElement("span");
-        nameSpan.textContent = room.room_name;
-        nameSpan.style.marginRight = "10px";
-        const typeSmall = document.createElement("small");
-        typeSmall.style.opacity = "0.7";
-        typeSmall.style.fontSize = "0.8em";
-        typeSmall.style.display = "block";
-        typeSmall.textContent = room.house.house_name;
-        const settingsBtn = document.createElement("button");
-        settingsBtn.style.background = "transparent";
-        settingsBtn.style.color = "white";
-        settingsBtn.style.border = "none";
-        settingsBtn.style.cursor = "pointer";
-        settingsBtn.innerHTML = `
-            <div class="ui-menu-icon" style="margin-left: 12vw">
-                <img src="/icons/setting-3-svgrepo-com.svg" alt="Vector Icon" width="30" height="30">
+    if (!container || !houseId) return;
+
+    const token = localStorage.getItem("token");
+    try {
+        const response = await fetch(`/api/houses/${houseId}/rooms`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const result = await response.json();
+        const rooms = result.rooms || [];
+
+        container.innerHTML = `
+            <div class="leftToRightList"> 
+                <h3 style="padding-left: 10vw">Rooms</h3>
+                <button class="hidden-button ui-menu-icon" style="width: 5vw; height: 3.5vw" id="automation" onclick="openPopout()">
+                    <img src="/icons/add-cross.svg" alt="Vector Icon" width="30" height="30">
+                </button>
             </div>
+            <div id="roomList"></div>
         `;
-        settingsBtn.onclick = () => {
-            showRoomSettings(room._id, room.house._id || room.house);
-        };
-        roomItem.appendChild(nameSpan);
-        roomItem.appendChild(typeSmall);
-        roomItem.appendChild(settingsBtn);
-        roomList.appendChild(roomItem);
-    });
+
+        const roomList = document.getElementById("roomList");
+        if (!rooms.length) {
+            roomList.innerHTML = "<p style='color: gray; text-align: center;'>No rooms.</p>";
+            return;
+        }
+
+        rooms.forEach(room => {
+            const roomItem = document.createElement("div");
+            roomItem.classList.add("hBar");
+
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = room.room_name;
+            nameSpan.style.marginRight = "10px";
+
+            const typeSmall = document.createElement("small");
+            typeSmall.style.opacity = "0.7";
+            typeSmall.style.fontSize = "0.8em";
+            typeSmall.style.display = "block";
+            typeSmall.textContent = "Room";
+
+            const settingsBtn = document.createElement("button");
+            settingsBtn.style.background = "transparent";
+            settingsBtn.style.color = "white";
+            settingsBtn.style.border = "none";
+            settingsBtn.style.cursor = "pointer";
+            settingsBtn.innerHTML = `
+                <div class="ui-menu-icon" align="end">
+                    <img src="/icons/setting-3-svgrepo-com.svg" alt="Vector Icon" width="30" height="30">
+                </div>
+            `;
+            settingsBtn.onclick = () => {
+                showRoomSettings(room._id, houseId);
+            };
+
+            roomItem.appendChild(nameSpan);
+            roomItem.appendChild(typeSmall);
+            roomItem.appendChild(settingsBtn);
+            roomList.appendChild(roomItem);
+        });
+
+    } catch (error) {
+        console.error("[ERROR] renderRooms ->", error);
+        container.innerHTML = "<p style='color: red;'>Failed to load rooms.</p>";
+    }
 }
 
 function getAuthToken() {

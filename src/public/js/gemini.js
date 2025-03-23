@@ -4,7 +4,57 @@ const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-
 
 const token = localStorage.getItem("token") || "";
 
+let currentHouseId = null;
 
+async function initCurrentHouseAndRender() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        alert("Please login first.");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/user/houses", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+        const houses = data.houses || [];
+
+        if (houses.length === 0) {
+            alert("You don't have any house yet.");
+            return;
+        }
+
+        currentHouseId = houses[0]._id;
+
+        const houseSelector = document.getElementById("houseSelector");
+        if (houseSelector) {
+            houseSelector.innerHTML = "";
+            houses.forEach(h => {
+                const option = document.createElement("option");
+                option.value = h._id;
+                option.textContent = h.house_name;
+                houseSelector.appendChild(option);
+            });
+            houseSelector.value = currentHouseId;
+            houseSelector.addEventListener("change", () => {
+                currentHouseId = houseSelector.value;
+                renderRooms();
+                loadAndRenderDevices();
+            });
+        }
+
+        renderRooms();
+        loadAndRenderDevices();
+
+    } catch (error) {
+        console.error("[ERROR] initCurrentHouseAndRender ->", error);
+    }
+}
+document.addEventListener("DOMContentLoaded", () => {
+    initCurrentHouseAndRender().then(r => console.log("Initialized current house and rendered."));
+});
 // Fetch AI Response from Gemini API
 async function fetchGeminiResponse(prompt) {
     try {
@@ -50,69 +100,111 @@ function updateDeviceTemperature(deviceName, newTemperature) {
 }
 
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
+    const token = localStorage.getItem("token");
+    const houseSelector = document.getElementById("houseSelectorForStatus");
     const deviceList = document.getElementById("deviceList");
 
-    function loadDevices() {
-        fetch("/api/devices", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        })
-            .then(response => response.json())
-            .then(devices => {
-                deviceList.innerHTML = "";
-
-                devices.forEach(device => {
-                    const deviceItem = document.createElement("div");
-                    deviceItem.classList.add("hBar");
-
-                    const nameSpan = document.createElement("span");
-                    nameSpan.textContent = device.device_name;
-                    nameSpan.style.marginRight = "10px";
-
-                    const statusBtn = document.createElement("button");
-                    statusBtn.classList.add("device-status-btn");
-                    statusBtn.dataset.deviceName = device.device_name;
-
-                    updateButtonAppearance(statusBtn, device.status === "true");
-
-                    statusBtn.addEventListener("click", function () {
-                        const currentStatus = device.status === "true";
-                        const newStatus = !currentStatus; // 每次点击都重新从device获取状态
-
-                        updateDeviceStatus(device.device_name, newStatus).then(() => {
-
-                            updateButtonAppearance(statusBtn, newStatus);
-                            device.status = newStatus.toString();
-
-
-                            if (device.device_type === "AC") {
-                                const tempControls = deviceItem.querySelector(".temperature-control");
-                                const tempDisplay = deviceItem.querySelector(".temperature-display");
-                                const displayStyle = newStatus ? "flex" : "none";
-                                const tempDisplayStyle = newStatus ? "block" : "none";
-                                if (tempControls) tempControls.style.display = displayStyle;
-                                if (tempDisplay) tempDisplay.style.display = tempDisplayStyle;
-                            }
-                        }).catch(error => {
-                            console.error("Error updating device status:", error);
-                        });
-                    });
-
-                    deviceItem.appendChild(nameSpan);
-                    deviceItem.appendChild(statusBtn);
-                    deviceList.appendChild(deviceItem);
-
-                    if (device.device_type === "AC") {
-                        createTempControls(device, deviceItem);
-                    }
-                });
-            })
-            .catch(error => console.error("Error loading devices:", error));
+    async function fetchUserHouses() {
+        const res = await fetch("/api/user/houses", {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        return data.houses || [];
     }
 
+    async function loadDevicesByHouse(houseId) {
+        const res = await fetch(`/api/houses/${houseId}/devices`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        return data.devices || [];
+    }
+
+    async function renderHouseOptions() {
+        const houses = await fetchUserHouses();
+        houseSelector.innerHTML = "";
+        houses.forEach(h => {
+            const option = document.createElement("option");
+            option.value = h._id;
+            option.textContent = h.house_name;
+            houseSelector.appendChild(option);
+        });
+        if (houses.length > 0) {
+            houseSelector.value = houses[0]._id;
+            loadAndRenderDevices(houses[0]._id);
+        }
+    }
+
+    async function loadAndRenderDevices(houseId) {
+        const devices = await loadDevicesByHouse(houseId);
+        const deviceList = document.getElementById("deviceList");
+        if (!deviceList) return;
+
+        deviceList.innerHTML = "";
+
+        devices.forEach(device => {
+            const deviceItem = document.createElement("div");
+            deviceItem.classList.add("hBar");
+
+            // 左侧名称容器：设备名 + 房间名（纵向排列）
+            const nameContainer = document.createElement("div");
+            nameContainer.style.display = "flex";
+            nameContainer.style.flexDirection = "column";
+            nameContainer.style.justifyContent = "center";
+            nameContainer.style.marginRight = "10px";
+
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = device.device_name;
+
+            const roomNameSpan = document.createElement("span");
+            roomNameSpan.style.opacity = "0.7";
+            roomNameSpan.style.fontSize = "0.8em";
+            roomNameSpan.style.marginTop = "2px";
+            roomNameSpan.textContent = device.room?.room_name || "Unassigned";
+
+            nameContainer.appendChild(nameSpan);
+            nameContainer.appendChild(roomNameSpan);
+
+            // 右侧状态按钮
+            const statusBtn = document.createElement("button");
+            statusBtn.classList.add("device-status-btn");
+            statusBtn.dataset.deviceName = device.device_name;
+
+            updateButtonAppearance(statusBtn, device.status === "true");
+
+            statusBtn.addEventListener("click", function () {
+                const currentStatus = device.status === "true";
+                const newStatus = !currentStatus;
+
+                updateDeviceStatus(device.device_name, newStatus).then(() => {
+                    updateButtonAppearance(statusBtn, newStatus);
+                    device.status = newStatus.toString();
+
+                    if (device.device_type === "AC") {
+                        const tempControls = deviceItem.querySelector(".temperature-control");
+                        const tempDisplay = deviceItem.querySelector(".temperature-display");
+                        const displayStyle = newStatus ? "flex" : "none";
+                        const tempDisplayStyle = newStatus ? "block" : "none";
+                        if (tempControls) tempControls.style.display = displayStyle;
+                        if (tempDisplay) tempDisplay.style.display = tempDisplayStyle;
+                    }
+                }).catch(error => {
+                    console.error("Error updating device status:", error);
+                });
+            });
+
+            // 组装结构
+            deviceItem.appendChild(nameContainer);
+            deviceItem.appendChild(statusBtn);
+            deviceList.appendChild(deviceItem);
+
+            // 如果是空调，添加温度控制
+            if (device.device_type === "AC") {
+                createTempControls(device, deviceItem);
+            }
+        });
+    }
 
     function createTempControls(device, deviceItem) {
         const tempControlContainer = document.createElement("div");
@@ -127,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const decreaseBtn = document.createElement("button");
         decreaseBtn.classList.add("temp-btn");
         decreaseBtn.textContent = "−";
-        decreaseBtn.addEventListener("click", function() {
+        decreaseBtn.addEventListener("click", function () {
             if (device.temperature > 16) {
                 device.temperature -= 1;
                 updateDeviceTemperature(device.device_name, device.temperature);
@@ -138,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const increaseBtn = document.createElement("button");
         increaseBtn.classList.add("temp-btn");
         increaseBtn.textContent = "+";
-        increaseBtn.addEventListener("click", function() {
+        increaseBtn.addEventListener("click", function () {
             if (device.temperature < 30) {
                 device.temperature += 1;
                 updateDeviceTemperature(device.device_name, device.temperature);
@@ -167,7 +259,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Error updating device temperature:", error));
     }
 
-    loadDevices();
+    houseSelector.addEventListener("change", function () {
+        currentHouseId = this.value;
+        loadAndRenderDevices(currentHouseId);
+        renderRooms(currentHouseId);
+    });
+
+    await renderHouseOptions();
 });
 
 
