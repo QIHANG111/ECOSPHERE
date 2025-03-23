@@ -16,7 +16,7 @@
     --c-text-secondary: #737374;
     --c-border-primary: #ccc;
     --c-bg-body: rgb(250, 234, 211);
-    --c-bg-primary: #fff;
+    --c-bg-primary: rgb(255, 255, 255,0.75);
     --c-bg-secondary: #d4d8dd;
     --c-bg-button: #fff;
     --c-bg-sidebar: rgba(255, 255, 255, 0.5);
@@ -1283,10 +1283,11 @@ canvas {
 }
 
 .roomModal-content {
+    backdrop-filter: blur(0.8vw);
     background: var(--c-bg-primary);
     color: var(--c-text-primary);
     width: 450px;
-    border-radius: 20px;
+    border-radius: 2vw;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
@@ -1979,6 +1980,18 @@ canvas {
     outline: none;
     transition: border 0.3s, background-color 0.3s;
 }
+#addRoomForm input {
+    width: 94%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    outline: none;
+    transition: border 0.3s, background-color 0.3s;
+}
+
 #addHouseForm input {
     width: 100%;
     max-width: 350px;
@@ -2150,4 +2163,48 @@ canvas {
 .back2 {
     color: var(--c-text-primary);
     cursor: pointer;
+}
+
+.room-selector {
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #333;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-left: 1em;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+
+
+#roomDeviceList {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+
+#roomDeviceList::-webkit-scrollbar {
+    display: none;
+}
+#roomDeviceList {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.device-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+.device-item select {
+    margin-left: 1em;
 }

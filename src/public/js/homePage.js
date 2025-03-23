@@ -100,7 +100,7 @@ async function renderRooms() {
         typeSmall.style.opacity = "0.7";
         typeSmall.style.fontSize = "0.8em";
         typeSmall.style.display = "block";
-        typeSmall.textContent = room.room_type || "room";
+        typeSmall.textContent = room.house.house_name;
         const settingsBtn = document.createElement("button");
         settingsBtn.style.background = "transparent";
         settingsBtn.style.color = "white";
@@ -112,7 +112,7 @@ async function renderRooms() {
             </div>
         `;
         settingsBtn.onclick = () => {
-            showRoomSettings(room._id, room.house);
+            showRoomSettings(room._id, room.house._id || room.house);
         };
         roomItem.appendChild(nameSpan);
         roomItem.appendChild(typeSmall);
@@ -162,9 +162,14 @@ document.addEventListener("DOMContentLoaded", () => {
     loadHouseOptions();
 });
 
+async function closeRoomSettings() {
+    document.getElementById("roomSettingModal").style.display = "none";
+}
+
 async function showRoomSettings(roomId, houseId) {
     const modal = document.getElementById("roomSettingModal");
     const deviceListContainer = document.getElementById("roomDeviceList");
+
     if (!deviceListContainer) return;
     deviceListContainer.innerHTML = "<p>Loading devices...</p>";
     modal.style.display = "flex";
@@ -174,27 +179,113 @@ async function showRoomSettings(roomId, houseId) {
         window.location.href = "/pages/signinPage.html";
         return;
     }
+
     try {
         const response = await fetch(`/api/houses/${houseId}/rooms/${roomId}/devices`, {
             headers: { Authorization: `Bearer ${token}` }
         });
+        const roomResponse = await fetch(`/api/houses/${houseId}/rooms`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        const roomResult = await roomResponse.json();
+        const roomOptions = roomResult.rooms || [];
         const result = await response.json();
+
         if (!response.ok || !result.success) {
             throw new Error(result.error || "Failed to fetch devices");
         }
+
         const devices = result.devices;
         if (!devices.length) {
             deviceListContainer.innerHTML = "<p>No devices in this room.</p>";
             return;
         }
-        let html = `<h3>Devices in Room</h3><ul style="padding-left: 1em;">`;
+
+        let html = `
+            <div class="leftToRightList" style="margin-bottom: 1em;">
+                <input type="text" id="renameRoomInput" placeholder="Enter new room name" style="width: 60%; padding: 5px;" />
+                <button onclick="renameRoom('${roomId}', '${houseId}')" style="margin-left: 5px; width: 6vw">Rename</button>
+            </div>
+        `;
+
+        html += `<div id="scrollDeviceList">`;
+
         devices.forEach(device => {
-            html += `<li><strong>${device.device_name}</strong> (${device.device_type})</li>`;
+            const deviceRoomId = device.room;
+            const roomSelector = `
+                <select class="room-selector" onchange="updateDeviceRoom('${device._id}', this.value)">
+                    ${roomOptions.map(r => `
+                        <option value="${r._id}" ${r._id === deviceRoomId ? 'selected' : ''}>
+                            ${r.room_name}
+                        </option>
+                    `).join("")}
+                </select>
+            `;
+
+            html += `
+                <div class="hBar">
+                    <span><strong>${device.device_name}</strong> (${device.device_type})</span>
+                    ${roomSelector}
+                </div>
+            `;
         });
-        html += `</ul>`;
+
+        html += `</div>`;
         deviceListContainer.innerHTML = html;
     } catch (error) {
         console.error("[ERROR] Failed to fetch room devices:", error);
         deviceListContainer.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+    }
+}
+
+
+async function updateDeviceRoom(deviceId, newRoomId) {
+    const token = localStorage.getItem("token");
+    try {
+        const res = await fetch(`/api/devices/${deviceId}/update-room`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newRoomId })
+        });
+        const result = await res.json();
+        if (!res.ok) {
+            throw new Error(result.error || "Failed to update device room.");
+        }
+        alert("Device room updated successfully.");
+    } catch (error) {
+        console.error("[ERROR] Updating device room:", error);
+        alert("Failed to update device room: " + error.message);
+    }
+}
+
+async function renameRoom(roomId, houseId) {
+    const newName = document.getElementById("renameRoomInput").value.trim();
+    if (!newName) {
+        alert("Room name cannot be empty.");
+        return;
+    }
+    const token = localStorage.getItem("token");
+    try {
+        const res = await fetch(`/api/houses/${houseId}/rooms/${roomId}/rename`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ room_name: newName })
+        });
+        const result = await res.json();
+        if (!res.ok) {
+            throw new Error(result.error || "Failed to rename room.");
+        }
+        alert("Room name updated successfully.");
+        renderRooms();
+        showRoomSettings(roomId, houseId);
+    } catch (error) {
+        console.error("[ERROR] Renaming room:", error);
+        alert("Error: " + error.message);
     }
 }

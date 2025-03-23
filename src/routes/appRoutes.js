@@ -543,7 +543,6 @@ router.post('/api/device', async (req, res) => {
 
         let room = await Room.findOne({ house: houseId });
         if (!room) {
-
             room = new Room({
                 room_name: "Default Room",
                 house: houseId,
@@ -551,6 +550,12 @@ router.post('/api/device', async (req, res) => {
             });
             await room.save();
             console.log(`[DEBUG] Created default room "${room.room_name}" for house ${houseId}`);
+
+            await House.findByIdAndUpdate(
+                houseId,
+                { $addToSet: { rooms: room._id } }
+            );
+            console.log(`[DEBUG] Added default room ID ${room._id} to house ${houseId}`);
         }
 
         const newDevice = new Device({
@@ -1071,10 +1076,9 @@ router.get('/api/rooms', async (req, res) => {
         const token = req.headers.authorization?.split(" ")[1];
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
-
         const user = await User.findById(userId).populate({
             path: 'houses',
-            populate: { path: 'rooms' }
+            populate: { path: 'rooms', populate: { path: 'house', select: 'house_name' } }
         });
 
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -1086,6 +1090,61 @@ router.get('/api/rooms', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch rooms' });
     }
 });
+
+
+router.put('/api/devices/:id/update-room', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        const userId = decoded.userId;
+
+        const { id } = req.params;
+        const { newRoomId } = req.body;
+
+        if (!newRoomId) return res.status(400).json({ error: "Missing newRoomId" });
+
+        const device = await Device.findById(id);
+        if (!device) return res.status(404).json({ error: "Device not found" });
+
+        const oldRoom = await Room.findById(device.room);
+        if (oldRoom) {
+            oldRoom.devices = oldRoom.devices.filter(d => d.toString() !== id);
+            await oldRoom.save();
+        }
+
+        const newRoom = await Room.findById(newRoomId);
+        if (!newRoom) return res.status(404).json({ error: "Target room not found" });
+
+        device.room = newRoomId;
+        await device.save();
+
+        newRoom.devices.push(device._id);
+        await newRoom.save();
+
+        res.status(200).json({ success: true, message: "Device room updated", device });
+    } catch (error) {
+        console.error("[ERROR] PUT /api/devices/:id/update-room", error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+router.put('/api/houses/:houseId/rooms/:roomId/rename', async (req, res) => {
+    try {
+        const { room_name } = req.body;
+        const { roomId } = req.params;
+        if (!room_name) return res.status(400).json({ error: "room_name is required" });
+
+        const room = await Room.findByIdAndUpdate(roomId, { room_name }, { new: true });
+        if (!room) return res.status(404).json({ error: "Room not found" });
+
+        res.status(200).json({ success: true, room });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 router.get('/api/user/houses', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];

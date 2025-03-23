@@ -144,10 +144,11 @@
         </div>
         <div class="roomModal-body">
             <label for="roomName">NAME</label>
+            <form id="addRoomForm">
             <input type="text" id="roomName" oninput="toggleSaveButton()">
-
+            </form>
             <label for="houseSelector">SELECT HOUSE</label>
-            <select id="houseSelector"></select>
+            <select id="houseSelector" class="room-selector"></select>
         </div>
     </div>
 </div>
@@ -155,14 +156,13 @@
 <div id="roomSettingModal" class="roomModal">
     <div class="roomModal-content">
         <div class="modal-header">
-            <div class="ui-menu-icon">
-                <img src="/icons/settings.svg" alt="Vector Icon" width="50" height="50">
+            <span class="cancel" onclick="closeRoomSettings()">Cancel</span>
+            <div class="ui-menu-icon" align="center">
+                <img src="/icons/settings.svg" alt="Vector Icon" width="40" height="40">
             </div>
-            <h2>Room Settings</h2>
         </div>
         <div class="modal-body">
-
-        <div id="roomDeviceList"></div>
+        <div id="roomDeviceList" class=""></div>
     </div>
     </div>
 </div>
