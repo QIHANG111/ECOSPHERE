@@ -526,7 +526,7 @@ router.post('/api/device', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const { device_name, device_type, ...rest } = req.body;
+        const { device_name, device_type, houseId: selectedHouseId, ...rest } = req.body;
 
         if (!device_name || !device_type) {
             return res.status(400).json({
@@ -539,7 +539,18 @@ router.post('/api/device', async (req, res) => {
             return res.status(400).json({ error: "User is not associated with any house" });
         }
 
-        const houseId = user.houses[0];
+        // Determine the house to use.
+        let houseId;
+        if (selectedHouseId) {
+            // Validate that the provided houseId is in the user's houses.
+            if (!user.houses.includes(selectedHouseId)) {
+                return res.status(403).json({ error: "User is not associated with the specified house" });
+            }
+            houseId = selectedHouseId;
+        } else {
+            // Fallback to the first house if no houseId is provided.
+            houseId = user.houses[0];
+        }
 
         let room = await Room.findOne({ house: houseId });
         if (!room) {
@@ -592,6 +603,7 @@ router.post('/api/device', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 /*
   Delete Device
