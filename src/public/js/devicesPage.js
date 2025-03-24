@@ -41,14 +41,12 @@ async function initCurrentHouse() {
 
         const data = await response.json();
         const houses = data.houses || [];
-
         if (houses.length === 0) {
             alert("No houses found.");
             return;
         }
 
         currentHouseId = houses[0]._id;
-
         const selector = document.getElementById("houseSelector");
         selector.innerHTML = "";
 
@@ -74,6 +72,7 @@ async function initCurrentHouse() {
     }
 }
 
+
 async function renderRoomNavigation(houseId) {
     const navBar = document.querySelector(".selection-bar");
     navBar.innerHTML = "";
@@ -87,17 +86,22 @@ async function renderRoomNavigation(houseId) {
         const data = await res.json();
         const rooms = data.rooms || [];
 
+        // “全部设备”按钮
         const allBtn = document.createElement("div");
         allBtn.className = "nav-box";
         allBtn.innerHTML = `<a href="#">All Devices</a>`;
         allBtn.onclick = () => loadAndRenderDevices(houseId);
         navBar.appendChild(allBtn);
 
+        // 房间按钮
         rooms.forEach(room => {
             const roomBox = document.createElement("div");
             roomBox.className = "nav-box";
             roomBox.innerHTML = `<a href="#">${room.room_name}</a>`;
-            roomBox.onclick = () => loadAndRenderDevices(houseId, room._id);
+            roomBox.onclick = () => {
+                console.log(`[INFO] Clicked room ${room.room_name} (${room._id})`);
+                loadAndRenderDevices(houseId, room._id);
+            };
             navBar.appendChild(roomBox);
         });
     } catch (error) {
@@ -192,8 +196,14 @@ function generateSettingsOptions(category, deviceId, isOn) {
 // ✅ 主渲染函数
 async function loadAndRenderDevices(houseId, roomId = null) {
     const token = localStorage.getItem("token");
-    let url = `/api/houses/${houseId}/devices`;
-    if (roomId) url += `?room=${roomId}`;
+    let url;
+    if (roomId) {
+        url = `/api/houses/${houseId}/rooms/${roomId}/devices`;
+    } else {
+        url = `/api/houses/${houseId}/devices`;
+    }
+
+    console.log(`[DEBUG] Fetching devices from: ${url}`);
 
     try {
         const res = await fetch(url, {
@@ -205,10 +215,15 @@ async function loadAndRenderDevices(houseId, roomId = null) {
         const container = document.getElementById("furnitureContainer");
         container.innerHTML = "";
 
+        if (!devices.length) {
+            container.innerHTML = "<p style='color: gray;'>No devices in this room.</p>";
+            return;
+        }
+
         devices.forEach(device => {
             const category = getCategoryFromName(device.device_name);
             const fileName = formatDeviceFileName(device.device_name);
-            const isOn = device.status === "true" || device.status === true;
+            const isOn = device.status === true || device.status === "true";
 
             const deviceItem = document.createElement("div");
             deviceItem.className = "furniture-item";
@@ -216,28 +231,24 @@ async function loadAndRenderDevices(houseId, roomId = null) {
             const left = document.createElement("div");
             left.className = "furniture-icon";
             left.innerHTML = `
-                <div class="ui-menu-icon">
-                    <img class="icon-image" src="/icons/${category}/${fileName}" alt="${device.device_name}" onerror="this.src='/icons/default-icon.svg'">
-                </div>`;
+                <img class="icon-image" src="/icons/${category}/${fileName}" alt="${device.device_name}">
+            `;
 
             const right = document.createElement("div");
             right.className = "furniture-content";
             right.innerHTML = `
                 <div class="furniture-name">${device.device_name}</div>
                 <div class="setting-container">
-                    <img src="../icons/device-page/setting-3.svg" alt="setting-button" class="setting-icon">
-                    <div class="dropdown-menu">
-                        ${generateSettingsOptions(category, device._id, isOn)}
-                    </div>
+                    <img src="../icons/device-page/setting-3.svg" class="setting-icon" alt="settings">
+                    <div class="dropdown-menu">${generateSettingsOptions(category, device._id, isOn)}</div>
                 </div>
                 <div class="delete-container" onclick="removeDevice('${device._id}')">
                     <div class="delete-button">
-                        <div class="delete-icon">
-                            <img src="../icons/delete-1-svgrepo-com.svg" alt="remove-icon">
-                        </div>
+                        <img src="/icons/delete-left-svgrepo-com.svg" width="20" height="20">
                         <span class="delete-text">Remove</span>
                     </div>
-                </div>`;
+                </div>
+            `;
 
             deviceItem.appendChild(left);
             deviceItem.appendChild(right);
@@ -251,12 +262,18 @@ async function loadAndRenderDevices(houseId, roomId = null) {
 // ✅ 全局绑定：点击展开/关闭 dropdown
 window.addEventListener("click", (e) => {
     if (e.target.classList.contains("setting-icon")) {
-        const dropdown = e.target.nextElementSibling;
+        const container = e.target.closest(".setting-container");
+        const dropdown = container.querySelector(".dropdown-menu");
+
+        // 关闭其他打开的菜单
         document.querySelectorAll(".dropdown-menu").forEach(menu => {
             if (menu !== dropdown) menu.style.display = "none";
         });
+
+        // 切换当前的菜单显示状态
         dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
     } else if (!e.target.closest(".dropdown-menu")) {
+        // 如果点击其他地方则关闭所有菜单
         document.querySelectorAll(".dropdown-menu").forEach(menu => {
             menu.style.display = "none";
         });
@@ -290,6 +307,10 @@ async function adjustTemperature(change) {
         console.error("Error updating temperature:", err);
     }
 }
+
+
+
+
 
 async function adjustFanSpeed(change) {
     const option = event.target.closest(".settings-option");

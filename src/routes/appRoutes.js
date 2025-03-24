@@ -1228,6 +1228,24 @@ router.delete("/api/houses/:houseId/rooms/delete-room/:roomId", async (req, res)
         res.status(500).json({ error: "Failed to delete room" });
     }
 });
+router.get("/api/houses/:houseId/devices", async (req, res) => {
+    try {
+        const { houseId } = req.params;
+        const { room } = req.query;
+
+        const query = { house: houseId };
+        if (room) {
+            query.room = room;
+        }
+
+        const devices = await Device.find(query);
+        res.json({ success: true, devices });
+    } catch (error) {
+        console.error("Error fetching devices:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch devices" });
+    }
+});
+
 
 /*
   Get all rooms in a house
