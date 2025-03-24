@@ -526,7 +526,7 @@ router.post('/api/device', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const { device_name, device_type, houseId: selectedHouseId, ...rest } = req.body;
+        const { device_name, device_type, house: selectedHouseId, ...rest } = req.body;
 
         if (!device_name || !device_type) {
             return res.status(400).json({

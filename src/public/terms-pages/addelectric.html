@@ -555,8 +555,8 @@
         await loadUserHouses();
     };
 
-
     const selectedHouseId = document.getElementById("houseSelector").value;
+
     if (!selectedHouseId) {
         alert("Please select a house before adding a device.");
     }
@@ -597,15 +597,26 @@
         }
 
         const token = localStorage.getItem("token");
+        const houseSelector = document.getElementById("houseSelector");
+        const selectedHouseId = houseSelector.value;
+
+        if (!selectedHouseId) {
+            alert("Please select a house before adding a device.");
+            console.warn("No house selected.");
+            return;
+        }
+
         const deviceName = currentDevice.name;
         const deviceType = deviceTypeMap[deviceName] || "unknown";
 
         let requestBody = {
             device_name: deviceName,
             device_type: deviceType,
+            house: selectedHouseId,
             status: true
         };
 
+        // Add extra fields based on device type
         if (deviceType === "light") {
             requestBody.brightness = 3;
         } else if (deviceType === "AC") {
@@ -620,22 +631,28 @@
             requestBody.duration = duration;
         }
 
+        // DEBUG LOGS
+        console.log("🧠 Selected House ID:", selectedHouseId);
+        console.log("📦 Request Body:", requestBody);
+
         try {
             const response = await fetch("/api/device", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "house_id": selectedHouseId,
                     "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(requestBody)
             });
+
+            console.log("📡 Server Response:", response);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const data = await response.json();
+            console.log("✅ Response Data:", data);
 
             if (data.success) {
                 let devices = JSON.parse(localStorage.getItem("savedDevices")) || [];
@@ -643,12 +660,12 @@
                     devices.push(currentDevice);
                     localStorage.setItem("savedDevices", JSON.stringify(devices));
                 }
-                window.location.href = "../pages/devicesPage.html";
+                // window.location.href = "../pages/devicesPage.html";
             } else {
                 alert(`Failed to add: ${data.message}`);
             }
         } catch (error) {
-            console.error("Error adding device:", error);
+            console.error("🚨 Error adding device:", error);
             alert("Error adding device, please check the console!");
         }
 
