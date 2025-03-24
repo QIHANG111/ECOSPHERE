@@ -259,6 +259,15 @@
 </head>
 <body>
 <div class="dashboard">
+
+    <div class="dashboard-content">
+        <div style="margin: 20px;">
+            <label for="houseSelector" >Select House:</label>
+            <select id="houseSelector" class="room-selector">
+                <option value="">-- Choose a House --</option>
+            </select>
+        </div>
+    </div>
     <div class="dashboard-content">
 <!-- Lighting Devices -->
 <div class="category-container">
@@ -542,6 +551,45 @@
         "Vacuum Robot": "cleaning"
     };
 
+    window.onload = async function () {
+        await loadUserHouses();
+    };
+
+
+    const selectedHouseId = document.getElementById("houseSelector").value;
+    if (!selectedHouseId) {
+        alert("Please select a house before adding a device.");
+    }
+
+    async function loadUserHouses() {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+            const res = await fetch("/api/user/houses", {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            const selector = document.getElementById("houseSelector");
+
+            if (data.houses && data.houses.length > 0) {
+                data.houses.forEach(house => {
+                    const option = document.createElement("option");
+                    option.value = house._id;
+                    option.textContent = house.house_name;
+                    selector.appendChild(option);
+                });
+            }
+        } catch (err) {
+            console.error("Error loading houses:", err);
+            alert("Failed to load houses.");
+        }
+    }
+
+
+
     async function confirmAdd() {
         if (!currentDevice) {
             alert("Device ID is empty, cannot add!");
@@ -573,10 +621,11 @@
         }
 
         try {
-            const response = await fetch("http://localhost:4000/api/device", {
+            const response = await fetch("/api/device", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "house_id": selectedHouseId,
                     "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(requestBody)
