@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const automationSchema = new mongoose.Schema({
     device_type: {
         type: String,
-        enum: ['cleaning', 'kitchen', 'AC', 'fan', 'light', 'humidifier', "security"],
+        enum: ['cleaning', 'kitchen', 'AC', 'light', 'humidifier', "security"],
         required: true,
         trim: true
     },
