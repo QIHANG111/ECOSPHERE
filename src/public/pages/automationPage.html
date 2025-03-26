@@ -6,9 +6,7 @@
   <title>Homepage</title>
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="/js/gemini.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-  <script src="/js/homePage.js"></script>
 </head>
 
 <body>
@@ -47,10 +45,11 @@
 
   <div class="dashboard">
     <!-- Add Button -->
+    <select id="houseSelector" class="room-selector"></select>
     <div class="dashboardDesign">
       <button id="addFunctionButton" class = "addFunctionButton">
         <img src="/icons/add.svg" alt="Add" width="20" height="20">
-        Add Device
+        Add Automation
       </button>
     </div>
 
@@ -58,7 +57,7 @@
     <div id="standbyModal" class="standbyModalCP">
       <div class="standbyModalCp-content">
         <div class = "header-containerAP">
-          <div class="text-settings">Available Devices</div>
+          <div class="text-settings">Available</div>
           <button id= "closeModalAutomationPage" class="closeButton" onclick="closeModalAutomationPage()">
             <img src="/icons/close-button.svg" alt="close" width="100%" height="100%">
           </button>
@@ -74,10 +73,6 @@
   <script src="/js/automationPage.js"></script>
 <script src="/js/sidebar.js"></script>
 <script src="/js/theme.js"></script>
-<script src="/js/chart.js"></script>
-<script src="/js/clock.js"></script>
-<script src="/js/dragLayout.js"></script>
-<script src="/js/homePage.js"></script>
 <script>
   !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
 </script>
