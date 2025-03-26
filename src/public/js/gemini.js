@@ -77,24 +77,31 @@ async function fetchGeminiResponse(prompt) {
         return "Error fetching response.";
     }
 }
+async function updateDeviceTemperature(deviceId, change) {
+    const tempSpan = document.querySelector(`#temp-${deviceId}`);
+    let currentTemp = parseInt(tempSpan.textContent) + change;
+    currentTemp = Math.min(30, Math.max(10, currentTemp));
+    tempSpan.textContent = currentTemp;
 
-// Device Control
-function updateDeviceTemperature(deviceId, newTemperature) {
-    fetch("/api/update-temperature", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: deviceId, temperature: newTemperature })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                console.error("Failed to update device temperature:", data.message);
-            } else {
-                console.log(`[INFO] Updated ${deviceName} temperature to ${newTemperature}°C`);
-            }
-        })
-        .catch(error => console.error("Error updating device temperature:", error));
+    const token = localStorage.getItem("token");
+    try {
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/temperature`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ temperature: currentTemp })
+        });
+
+        const result = await res.json();
+        if (!result.success) alert("Failed to update temperature.");
+    } catch (err) {
+        console.error("Error updating temperature:", err);
+    }
 }
+// Device Control
+
 
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -194,9 +201,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             deviceItem.appendChild(statusBtn);
             deviceList.appendChild(deviceItem);
 
-            if (device.device_type === "AC") {
-                createTempControls(device, deviceItem);
-            }
+            // if (device.device_type === "AC") {
+            //     createTempControls(device, deviceItem);
+            // }
         });
     }
 

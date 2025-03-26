@@ -105,7 +105,6 @@ function getCategoryFromName(deviceName) {
 function formatDeviceFileName(deviceName) {
     return deviceName.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim().replace(/\s+/g, '-') + '.svg';
 }
-
 function generateSettingsOptions(category, deviceId, isOn, brightness, temperature) {
     const controls = {
         "air-treatment": ["power", "temperature", "fan"],
@@ -142,9 +141,14 @@ function generateSettingsOptions(category, deviceId, isOn, brightness, temperatu
             </div>
         </div>`;
     }
+
+    html += `
+    <div class="settings-option">
+        <button class="remove-device" onclick="removeDevice('${deviceId}')">Remove Device</button>
+    </div>`;
+
     return html;
 }
-
 async function loadAndRenderDevices(houseId, roomId = null) {
     const token = localStorage.getItem("token");
     const url = roomId ? `/api/houses/${houseId}/rooms/${roomId}/devices` : `/api/houses/${houseId}/devices`;
@@ -175,9 +179,10 @@ async function loadAndRenderDevices(houseId, roomId = null) {
             category,
             device._id,
             device.status,
-            device.brightness,    
-            device.temperature    
+            device.brightness,
+            device.temperature
         )}
+                            
                         </div>
                     </div>
                 </div>
@@ -262,6 +267,26 @@ async function adjustBrightness(deviceId, brightnessValue) {
         console.error("Error updating brightness:", err);
     }
 }
+
+async function removeDevice(deviceId) {
+    if (!confirm("Are you sure you want to delete this device?")) return;
+    const token = localStorage.getItem("token");
+    const response = await fetch(`/api/device/${deviceId}`, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
+    });
+    const result = await response.json();
+    if (result.success) {
+        window.location.reload();
+    } else {
+        alert("Failed to delete device: " + result.message);
+    }
+}
+window.removeDevice = removeDevice;
+
 
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
