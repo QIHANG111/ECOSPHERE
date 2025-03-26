@@ -32,8 +32,8 @@ const deviceSchema = new mongoose.Schema({
     },
     brightness: {
         type: Number,
-        min: 1,
-        max: 5,
+        min: 0,
+        max: 100,
         required: function () {
             return this.device_type === "light";
         },

@@ -42,7 +42,7 @@ cron.schedule("* * * * *", async () => {
 
         for (const deviceAutomation of deviceAutomations) {
             if (!deviceAutomation.device_id || !deviceAutomation.automation_id) {
-                console.warn(`[CRON] Skipping automation (Missing device or automation: ${deviceAutomation._id})`);
+                // console.warn(`[CRON] Skipping automation (Missing device or automation: ${deviceAutomation._id})`);
                 continue;
             }
 
