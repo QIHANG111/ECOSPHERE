@@ -518,6 +518,10 @@ router.post('/api/users/:userId/assign-role', async (req, res) => {
       • Adds the device's ID to the room's devices array.
       • Updates the device's room reference.
 */
+
+
+
+
 router.post('/api/device', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -526,7 +530,7 @@ router.post('/api/device', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const { device_name, device_type, house: selectedHouseId, ...rest } = req.body;
+        const { device_name, device_type, house: selectedHouseId, room_id, ...rest } = req.body;
 
         if (!device_name || !device_type) {
             return res.status(400).json({
@@ -539,34 +543,39 @@ router.post('/api/device', async (req, res) => {
             return res.status(400).json({ error: "User is not associated with any house" });
         }
 
-        // Determine the house to use.
         let houseId;
         if (selectedHouseId) {
-            // Validate that the provided houseId is in the user's houses.
             if (!user.houses.includes(selectedHouseId)) {
                 return res.status(403).json({ error: "User is not associated with the specified house" });
             }
             houseId = selectedHouseId;
         } else {
-            // Fallback to the first house if no houseId is provided.
             houseId = user.houses[0];
         }
 
-        let room = await Room.findOne({ house: houseId });
-        if (!room) {
-            room = new Room({
-                room_name: "Default Room",
-                house: houseId,
-                devices: []
-            });
-            await room.save();
-            console.log(`[DEBUG] Created default room "${room.room_name}" for house ${houseId}`);
+        let room;
+        if (room_id) {
+            room = await Room.findOne({ _id: room_id, house: houseId });
+            if (!room) {
+                return res.status(404).json({ error: "Specified room not found in this house" });
+            }
+        } else {
+            room = await Room.findOne({ house: houseId });
+            if (!room) {
+                room = new Room({
+                    room_name: "Default Room",
+                    house: houseId,
+                    devices: []
+                });
+                await room.save();
+                console.log(`[DEBUG] Created default room "${room.room_name}" for house ${houseId}`);
 
-            await House.findByIdAndUpdate(
-                houseId,
-                { $addToSet: { rooms: room._id } }
-            );
-            console.log(`[DEBUG] Added default room ID ${room._id} to house ${houseId}`);
+                await House.findByIdAndUpdate(
+                    houseId,
+                    { $addToSet: { rooms: room._id } }
+                );
+                console.log(`[DEBUG] Added default room ID ${room._id} to house ${houseId}`);
+            }
         }
 
         const newDevice = new Device({
@@ -580,14 +589,6 @@ router.post('/api/device', async (req, res) => {
         await newDevice.save();
 
         const automation = await Automation.findOne({ device_type, house: houseId });
-
-        // if (!automation) {
-        //     return res.status(400).json({ error: "No automation rule found for this device type." });
-        // }
-
-        // Create mapping from device to automation
-        await DeviceAutomation.create({ device_id: newDevice._id, device_type, house_id: houseId, automation_id: automation._id });
-        console.log(`[DEBUG] Created automation mapping for "${newDevice.device_name}" for house ${houseId}`);
 
         room.devices.push(newDevice._id);
         await room.save();
@@ -603,8 +604,6 @@ router.post('/api/device', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-
 /*
   Delete Device
   - Checks if the requesting user has "deleteDevice" permission.
@@ -689,31 +688,61 @@ router.get('/api/devices', async (req, res) => {
   Update Device Status
 */
 router.post('/api/update-device', async (req, res) => {
-    console.log('[DEBUG] POST /api/update-device -> req.body:', req.body);
-    if (!req.body || typeof req.body.name !== 'string' || (typeof req.body.status !== 'boolean' && req.body.status !== "true" && req.body.status !== "false")) {
-        console.error('[ERROR] Invalid request body for update-device');
-        return res.status(400).json({ error: "Invalid request format. 'name' must be a string and 'status' must be a boolean or valid string ('true'/'false')." });
+    const { id, status } = req.body;
+
+    if (!id || (typeof status !== 'boolean' && status !== "true" && status !== "false")) {
+        return res.status(400).json({ error: "Missing or invalid id/status" });
     }
-    const { name, status } = req.body;
+
     const statusValue = status === "true" || status === true;
 
     try {
-        const updatedDevice = await Device.findOneAndUpdate(
-            { device_name: name },
+        const updatedDevice = await Device.findByIdAndUpdate(
+            id,
             { status: statusValue },
             { new: true }
         );
+
         if (!updatedDevice) {
-            console.log(`[DEBUG] Device not found with name: ${name}`);
-            return res.status(404).json({ error: 'Device not found' });
+            return res.status(404).json({ error: "Device not found" });
         }
-        console.log(`[DEBUG] Updated device '${name}' status to: ${statusValue}`);
+
         res.json({ success: true, updatedDevice });
     } catch (error) {
         console.error('[ERROR] POST /api/update-device ->', error);
-        res.status(500).json({ error: 'Server error while updating device status' });
+        res.status(500).json({ error: "Server error" });
     }
 });
+
+
+
+router.post('/api/update-device-by-name', async (req, res) => {
+    const { name, status } = req.body;
+
+    if (!name || (typeof status !== 'boolean' && status !== "true" && status !== "false")) {
+        return res.status(400).json({ error: "Invalid request: name and status required." });
+    }
+
+    const statusValue = status === "true" || status === true;
+
+    try {
+        const result = await Device.updateMany(
+            { device_name: name },
+            { status: statusValue }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ success: false, message: "No devices found with that name." });
+        }
+
+        console.log(`[AI] Updated all devices named '${name}' to status ${statusValue}`);
+        res.json({ success: true, message: `Updated ${result.modifiedCount} device(s).` });
+    } catch (err) {
+        console.error("[ERROR] /api/update-device-by-name ->", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 /*
   Update Temperature for an AC Device
@@ -1600,6 +1629,56 @@ router.put('/api/automations/:id/toggle', async (req, res) => {
     } catch (error) {
         console.error("[ERROR] PUT /api/automations/:id/toggle ->", error);
         res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+
+
+router.put("/api/houses/:houseId/devices/:deviceId/temperature", async (req, res) => {
+    const { houseId, deviceId } = req.params;
+    const { temperature } = req.body;
+
+    if (typeof temperature !== 'number' || temperature < 10 || temperature > 30) {
+        return res.status(400).json({ success: false, message: "Temperature must be between 10 and 30." });
+    }
+
+    try {
+        const device = await Device.findOne({ _id: deviceId, house: houseId });
+        if (!device) {
+            return res.status(404).json({ success: false, message: "Device not found." });
+        }
+
+        device.temperature = temperature;
+        await device.save();
+
+        res.json({ success: true, message: "Temperature updated successfully.", device });
+    } catch (error) {
+        console.error("[ERROR] updating temperature:", error);
+        res.status(500).json({ success: false, message: "Server error." });
+    }
+});
+
+router.put("/api/houses/:houseId/devices/:deviceId/brightness", async (req, res) => {
+    const { houseId, deviceId } = req.params;
+    const { brightness } = req.body;
+
+    if (typeof brightness !== 'number' || brightness < 0 || brightness > 100) {
+        return res.status(400).json({ success: false, message: "Brightness must be between 0 and 100." });
+    }
+
+    try {
+        const device = await Device.findOne({ _id: deviceId, house: houseId });
+        if (!device) {
+            return res.status(404).json({ success: false, message: "Device not found." });
+        }
+
+        device.brightness = brightness;
+        await device.save();
+
+        res.json({ success: true, message: "Brightness updated successfully.", device });
+    } catch (error) {
+        console.error("[ERROR] updating brightness:", error);
+        res.status(500).json({ success: false, message: "Server error." });
     }
 });
 
