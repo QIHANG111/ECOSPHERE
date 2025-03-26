@@ -1492,158 +1492,135 @@ router.get('/api/notifications', (req, res) => {
    AUTOMATION CONFIG
 ============================================================ */
 
-/* Get all fixed automation rules with associated devices. */
 router.get('/api/automations', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
         if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-        
-        let decoded;
-        try {
-            decoded = jwt.verify(token, SECRET_KEY);
-        } catch (err) {
-            return res.status(401).json({ success: false, message: "Invalid token" });
-        }
-        
-        const userId = decoded.userId;
+
+        const decoded = jwt.verify(token, SECRET_KEY);
         const { houseId } = req.query;
         if (!houseId) return res.status(400).json({ success: false, message: "houseId is required" });
-        
-        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
-        if (!houseUser) return res.status(403).json({ success: false, message: "Access denied" });
-        
+
         const automations = await Automation.find({ house: houseId });
-        const automationIds = automations.map(a => a._id);
-        const deviceAutomations = await DeviceAutomation.find({ automation: { $in: automationIds } }).populate('device');
-        
-        return res.status(200).json({ success: true, automations, deviceAutomations });
+        res.status(200).json({ success: true, automations });
     } catch (error) {
-        console.error("[ERROR] GET /api/automations ->", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error("[GET] /api/automations error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
 
-/* 
-  GET /api/automations/:id/status?houseId=...
-  - Get the current status and scheduling info of a specific automation rule.
-*/
-router.get('/api/automations/:id/status', async (req, res) => {
-    try {
-        const token = req.headers.authorization?.split(" ")[1];
-        if (!token)
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        let decoded;
-        try {
-            decoded = jwt.verify(token, SECRET_KEY);
-        } catch (err) {
-            return res.status(401).json({ success: false, message: "Invalid token" });
-        }
-        const userId = decoded.userId;
-        const { id } = req.params;
-        const { houseId } = req.query;
-        if (!houseId)
-            return res.status(400).json({ success: false, message: "houseId is required" });
-        
-        // Use HouseUser mapping to check access
-        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
-        if (!houseUser)
-            return res.status(403).json({ success: false, message: "Access denied" });
 
-        const automation = await Automation.findById(id);
-        if (!automation || automation.house.toString() !== houseId) {
-            return res.status(404).json({ success: false, message: "Automation rule not found for this house." });
-        }
-        return res.status(200).json({
-            success: true,
-            status: automation.status,
-            startTime: automation.startTime,
-            endTime: automation.endTime
-        });
-    } catch (error) {
-        console.error("[ERROR] GET /api/automations/:id/status ->", error);
-        return res.status(500).json({ success: false, message: "Server error" });
-    }
-});
 
-/* Toggle an automation rule on or off with associated devices. */
-router.put('/api/automations/:id/toggle', async (req, res) => {
+
+router.post('/api/automations', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
         if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-        
-        let decoded;
-        try {
-            decoded = jwt.verify(token, SECRET_KEY);
-        } catch (err) {
-            return res.status(401).json({ success: false, message: "Invalid token" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const { device_type, house } = req.body;
+
+        if (!device_type || !house) {
+            return res.status(400).json({ success: false, message: "device_type and house are required" });
         }
-        
-        const userId = decoded.userId;
-        const { id } = req.params;
-        const { status, startTime, endTime, houseId } = req.body;
-        if (!houseId) return res.status(400).json({ success: false, message: "houseId is required" });
-        
-        // Check if user is authorized 
-        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
-        if (!houseUser) return res.status(403).json({ success: false, message: "Access denied" });
-        
-        // Retrieve the automation rule 
-        const automation = await Automation.findById(id);
-        if (!automation) {
-            return res.status(404).json({ success: false, message: "Automation rule not found." });
+
+        const existing = await Automation.findOne({ device_type, house });
+        if (existing) {
+            return res.status(400).json({ success: false, message: "Automation already exists for this device type in the house" });
         }
-        
-        const updateData = { status };
-        if (status === true) {
-            if (!startTime) {
-                return res.status(400).json({ success: false, message: "Start time is required when enabling automation." });
-            }
-            let calculatedEndTime;
-            if (endTime) {
-                // Use provided endTime if given
-                calculatedEndTime = new Date(endTime);
-            } else {
-                // No endTime provided, so check if any associated device is "cleaning" or "kitchen" type
-                const deviceAutomations = await DeviceAutomation.find({ automation: id }).populate('device_id');
-                const hasCleaningOrKitchen = deviceAutomations.some(mapping => 
-                    mapping.device_id && 
-                    (mapping.device_id.device_type === 'cleaning' || mapping.device_id.device_type === 'kitchen')
-                );
-                if (hasCleaningOrKitchen) {
-                    calculatedEndTime = new Date(startTime);
-                    calculatedEndTime.setHours(calculatedEndTime.getHours() + 1); // Fixed duration: 1 hour
-                } else {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "End time is required for non-cleaning and non-kitchen automations." 
-                    });
-                }
-            }
-            updateData.startTime = new Date(startTime);
-            updateData.endTime = calculatedEndTime;
-        } else {
-            updateData.startTime = null;
-            updateData.endTime = null;
-        }
-        
-        const updatedAutomation = await Automation.findByIdAndUpdate(id, updateData, { new: true });
-        if (!updatedAutomation) {
-            return res.status(404).json({ success: false, message: "Automation rule not found." });
-        }
-        
-        // Update all device automation mappings associated with this automation rule to have the same status
-        await DeviceAutomation.updateMany({ automation: id }, { status });
-        
-        return res.status(200).json({ 
-            success: true, 
-            message: "Automation rule updated successfully.", 
-            automation: updatedAutomation 
+
+        const newAutomation = new Automation({
+            device_type,
+            house,
+            status: false
         });
+
+        await newAutomation.save();
+
+        res.status(201).json({ success: true, automation: newAutomation });
     } catch (error) {
-        console.error("[ERROR] PUT /api/automations/:id/toggle ->", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error("[POST] /api/automations error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
+
+router.put('/api/automations/:id/toggle', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { houseId, status, startTime, endTime } = req.body;
+
+        if (!houseId || typeof status !== "boolean") {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+
+        const automation = await Automation.findById(id);
+        if (!automation) {
+            return res.status(404).json({ success: false, message: "Automation not found" });
+        }
+
+        automation.status = status;
+
+        if (status === true) {
+            if (!startTime) {
+                return res.status(400).json({ success: false, message: "Start time is required" });
+            }
+
+            const start = new Date(startTime);
+            let end;
+
+            if (endTime) {
+                end = new Date(endTime);
+            } else if (['cleaning', 'kitchen'].includes(automation.device_type)) {
+                end = new Date(start);
+                end.setHours(end.getHours() + 1);
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: "End time is required for non-cleaning/kitchen automations"
+                });
+            }
+
+            if (end <= start) {
+                return res.status(400).json({ success: false, message: "End time must be after start time" });
+            }
+
+            automation.startTime = start;
+            automation.endTime = end;
+
+        } else {
+            automation.startTime = null;
+            automation.endTime = null;
+        }
+
+        await automation.save();
+        await DeviceAutomation.updateMany({ automation_id: id }, { status });
+
+        res.status(200).json({ success: true, automation });
+
+    } catch (error) {
+        console.error("[ERROR] PUT /api/automations/:id/toggle ->", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+router.delete('/api/automations/:id', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const { id } = req.params;
+
+        const result = await Automation.findByIdAndDelete(id);
+        if (!result) return res.status(404).json({ success: false, message: "Automation not found" });
+
+        res.status(200).json({ success: true, message: "Automation deleted" });
+    } catch (error) {
+        console.error("[DELETE] /api/automations/:id error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
 
 export default router;
 
