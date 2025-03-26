@@ -125,7 +125,6 @@ async function removeFunction(id) {
             addedDevices = addedDevices.filter(d => d.id !== id);
             localStorage.setItem("devices", JSON.stringify(addedDevices));
             renderDevices();
-            alert("Automation deleted successfully.");
         } else {
             alert(`Failed to delete automation: ${data.message || "Unknown error"}`);
         }

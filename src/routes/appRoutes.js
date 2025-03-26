@@ -581,9 +581,9 @@ router.post('/api/device', async (req, res) => {
 
         const automation = await Automation.findOne({ device_type, house: houseId });
 
-        if (!automation) {
-            return res.status(400).json({ error: "No automation rule found for this device type." });
-        }
+        // if (!automation) {
+        //     return res.status(400).json({ error: "No automation rule found for this device type." });
+        // }
 
         // Create mapping from device to automation
         await DeviceAutomation.create({ device_id: newDevice._id, device_type, house_id: houseId, automation_id: automation._id });
