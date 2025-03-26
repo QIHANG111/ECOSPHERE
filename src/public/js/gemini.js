@@ -77,27 +77,31 @@ async function fetchGeminiResponse(prompt) {
         return "Error fetching response.";
     }
 }
+async function updateDeviceTemperature(deviceId, change) {
+    const tempSpan = document.querySelector(`#temp-${deviceId}`);
+    let currentTemp = parseInt(tempSpan.textContent) + change;
+    currentTemp = Math.min(30, Math.max(10, currentTemp));
+    tempSpan.textContent = currentTemp;
 
-// Device Control
-function updateDeviceTemperature(deviceName, newTemperature) {
-    fetch("/api/update-temperature", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ name: deviceName, temperature: newTemperature })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                console.error("Failed to update device temperature:", data.message);
-            } else {
-                console.log(`[INFO] Updated ${deviceName} temperature to ${newTemperature}°C`);
-            }
-        })
-        .catch(error => console.error("Error updating device temperature:", error));
+    const token = localStorage.getItem("token");
+    try {
+        const res = await fetch(`/api/houses/${currentHouseId}/devices/${deviceId}/temperature`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ temperature: currentTemp })
+        });
+
+        const result = await res.json();
+        if (!result.success) alert("Failed to update temperature.");
+    } catch (err) {
+        console.error("Error updating temperature:", err);
+    }
 }
+// Device Control
+
 
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -171,11 +175,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             updateButtonAppearance(statusBtn, device.status === "true");
 
+            statusBtn.dataset.deviceId = device._id;
+
             statusBtn.addEventListener("click", function () {
-                const currentStatus = device.status === "true";
+                const currentStatus = device.status === "true" || device.status === true;
                 const newStatus = !currentStatus;
 
-                updateDeviceStatus(device.device_name, newStatus).then(() => {
+                updateDeviceStatus(device._id, newStatus).then(() => {
                     updateButtonAppearance(statusBtn, newStatus);
                     device.status = newStatus.toString();
 
@@ -195,9 +201,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             deviceItem.appendChild(statusBtn);
             deviceList.appendChild(deviceItem);
 
-            if (device.device_type === "AC") {
-                createTempControls(device, deviceItem);
-            }
+            // if (device.device_type === "AC") {
+            //     createTempControls(device, deviceItem);
+            // }
         });
     }
 
@@ -278,11 +284,11 @@ function updateButtonAppearance(button, isOn) {
 
 
 
-function updateDeviceStatus(deviceName, newStatus) {
+function updateDeviceStatus(deviceId, newStatus) {
     return fetch("/api/update-device", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: deviceName, status: newStatus })
+        body: JSON.stringify({ id: deviceId, status: newStatus })
     })
         .then(response => response.json())
         .then(data => {
@@ -291,6 +297,20 @@ function updateDeviceStatus(deviceName, newStatus) {
             }
         });
 }
+
+function updateDeviceStatusByName(deviceName, newStatus) {
+    return fetch("/api/update-device-by-name", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: deviceName, status: newStatus })
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) throw new Error(data.message);
+        });
+}
+
+
 
 const aiCard = document.querySelector(".aiCard");
 // AI Theme & Device Control
@@ -337,7 +357,7 @@ AI Response:`;
 
                     if (matchedDevice) {
                         const status = action === "on";
-                        updateDeviceStatus(matchedDevice.device_name, status).then(() => {
+                        updateDeviceStatusByName(matchedDevice.device_name, status).then(() => {
                             console.log("Device status updated successfully.");
                             refreshButtonStatus(matchedDevice.device_name, status);
                         }).catch(err => {
@@ -362,7 +382,7 @@ AI Response:`;
                 .then(devices => {
                     const matchedDevice = devices.find(d => d.device_name.toLowerCase() === deviceNameFromAI && d.device_type === "AC");
                     if (matchedDevice) {
-                        updateDeviceTemperature(matchedDevice.device_name, temperature).then(() => {
+                        updateDeviceTemperature(device._id, temperature).then(() => {
                             console.log("Temperature updated successfully.");
                             refreshTemperatureDisplay(matchedDevice.device_name, temperature);
                         });
@@ -647,5 +667,3 @@ document.addEventListener("click", function (event) {
         }
     }
 });
-
-

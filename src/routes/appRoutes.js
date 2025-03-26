@@ -518,6 +518,10 @@ router.post('/api/users/:userId/assign-role', async (req, res) => {
       • Adds the device's ID to the room's devices array.
       • Updates the device's room reference.
 */
+
+
+
+
 router.post('/api/device', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
@@ -526,7 +530,7 @@ router.post('/api/device', async (req, res) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         const userId = decoded.userId;
 
-        const { device_name, device_type, house: selectedHouseId, ...rest } = req.body;
+        const { device_name, device_type, house: selectedHouseId, room_id, ...rest } = req.body;
 
         if (!device_name || !device_type) {
             return res.status(400).json({
@@ -539,34 +543,39 @@ router.post('/api/device', async (req, res) => {
             return res.status(400).json({ error: "User is not associated with any house" });
         }
 
-        // Determine the house to use.
         let houseId;
         if (selectedHouseId) {
-            // Validate that the provided houseId is in the user's houses.
             if (!user.houses.includes(selectedHouseId)) {
                 return res.status(403).json({ error: "User is not associated with the specified house" });
             }
             houseId = selectedHouseId;
         } else {
-            // Fallback to the first house if no houseId is provided.
             houseId = user.houses[0];
         }
 
-        let room = await Room.findOne({ house: houseId });
-        if (!room) {
-            room = new Room({
-                room_name: "Default Room",
-                house: houseId,
-                devices: []
-            });
-            await room.save();
-            console.log(`[DEBUG] Created default room "${room.room_name}" for house ${houseId}`);
+        let room;
+        if (room_id) {
+            room = await Room.findOne({ _id: room_id, house: houseId });
+            if (!room) {
+                return res.status(404).json({ error: "Specified room not found in this house" });
+            }
+        } else {
+            room = await Room.findOne({ house: houseId });
+            if (!room) {
+                room = new Room({
+                    room_name: "Default Room",
+                    house: houseId,
+                    devices: []
+                });
+                await room.save();
+                console.log(`[DEBUG] Created default room "${room.room_name}" for house ${houseId}`);
 
-            await House.findByIdAndUpdate(
-                houseId,
-                { $addToSet: { rooms: room._id } }
-            );
-            console.log(`[DEBUG] Added default room ID ${room._id} to house ${houseId}`);
+                await House.findByIdAndUpdate(
+                    houseId,
+                    { $addToSet: { rooms: room._id } }
+                );
+                console.log(`[DEBUG] Added default room ID ${room._id} to house ${houseId}`);
+            }
         }
 
         const newDevice = new Device({
@@ -580,14 +589,6 @@ router.post('/api/device', async (req, res) => {
         await newDevice.save();
 
         const automation = await Automation.findOne({ device_type, house: houseId });
-
-        if (!automation) {
-            return res.status(400).json({ error: "No automation rule found for this device type." });
-        }
-
-        // Create mapping from device to automation
-        await DeviceAutomation.create({ device_id: newDevice._id, device_type, house_id: houseId, automation_id: automation._id });
-        console.log(`[DEBUG] Created automation mapping for "${newDevice.device_name}" for house ${houseId}`);
 
         room.devices.push(newDevice._id);
         await room.save();
@@ -603,8 +604,6 @@ router.post('/api/device', async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-
 /*
   Delete Device
   - Checks if the requesting user has "deleteDevice" permission.
@@ -689,31 +688,61 @@ router.get('/api/devices', async (req, res) => {
   Update Device Status
 */
 router.post('/api/update-device', async (req, res) => {
-    console.log('[DEBUG] POST /api/update-device -> req.body:', req.body);
-    if (!req.body || typeof req.body.name !== 'string' || (typeof req.body.status !== 'boolean' && req.body.status !== "true" && req.body.status !== "false")) {
-        console.error('[ERROR] Invalid request body for update-device');
-        return res.status(400).json({ error: "Invalid request format. 'name' must be a string and 'status' must be a boolean or valid string ('true'/'false')." });
+    const { id, status } = req.body;
+
+    if (!id || (typeof status !== 'boolean' && status !== "true" && status !== "false")) {
+        return res.status(400).json({ error: "Missing or invalid id/status" });
     }
-    const { name, status } = req.body;
+
     const statusValue = status === "true" || status === true;
 
     try {
-        const updatedDevice = await Device.findOneAndUpdate(
-            { device_name: name },
+        const updatedDevice = await Device.findByIdAndUpdate(
+            id,
             { status: statusValue },
             { new: true }
         );
+
         if (!updatedDevice) {
-            console.log(`[DEBUG] Device not found with name: ${name}`);
-            return res.status(404).json({ error: 'Device not found' });
+            return res.status(404).json({ error: "Device not found" });
         }
-        console.log(`[DEBUG] Updated device '${name}' status to: ${statusValue}`);
+
         res.json({ success: true, updatedDevice });
     } catch (error) {
         console.error('[ERROR] POST /api/update-device ->', error);
-        res.status(500).json({ error: 'Server error while updating device status' });
+        res.status(500).json({ error: "Server error" });
     }
 });
+
+
+
+router.post('/api/update-device-by-name', async (req, res) => {
+    const { name, status } = req.body;
+
+    if (!name || (typeof status !== 'boolean' && status !== "true" && status !== "false")) {
+        return res.status(400).json({ error: "Invalid request: name and status required." });
+    }
+
+    const statusValue = status === "true" || status === true;
+
+    try {
+        const result = await Device.updateMany(
+            { device_name: name },
+            { status: statusValue }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ success: false, message: "No devices found with that name." });
+        }
+
+        console.log(`[AI] Updated all devices named '${name}' to status ${statusValue}`);
+        res.json({ success: true, message: `Updated ${result.modifiedCount} device(s).` });
+    } catch (err) {
+        console.error("[ERROR] /api/update-device-by-name ->", err);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 /*
   Update Temperature for an AC Device
@@ -1492,158 +1521,185 @@ router.get('/api/notifications', (req, res) => {
    AUTOMATION CONFIG
 ============================================================ */
 
-/* Get all fixed automation rules with associated devices. */
 router.get('/api/automations', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
         if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-        
-        let decoded;
-        try {
-            decoded = jwt.verify(token, SECRET_KEY);
-        } catch (err) {
-            return res.status(401).json({ success: false, message: "Invalid token" });
-        }
-        
-        const userId = decoded.userId;
+
+        const decoded = jwt.verify(token, SECRET_KEY);
         const { houseId } = req.query;
         if (!houseId) return res.status(400).json({ success: false, message: "houseId is required" });
-        
-        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
-        if (!houseUser) return res.status(403).json({ success: false, message: "Access denied" });
-        
+
         const automations = await Automation.find({ house: houseId });
-        const automationIds = automations.map(a => a._id);
-        const deviceAutomations = await DeviceAutomation.find({ automation: { $in: automationIds } }).populate('device');
-        
-        return res.status(200).json({ success: true, automations, deviceAutomations });
+        res.status(200).json({ success: true, automations });
     } catch (error) {
-        console.error("[ERROR] GET /api/automations ->", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error("[GET] /api/automations error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
 
-/* 
-  GET /api/automations/:id/status?houseId=...
-  - Get the current status and scheduling info of a specific automation rule.
-*/
-router.get('/api/automations/:id/status', async (req, res) => {
-    try {
-        const token = req.headers.authorization?.split(" ")[1];
-        if (!token)
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        let decoded;
-        try {
-            decoded = jwt.verify(token, SECRET_KEY);
-        } catch (err) {
-            return res.status(401).json({ success: false, message: "Invalid token" });
-        }
-        const userId = decoded.userId;
-        const { id } = req.params;
-        const { houseId } = req.query;
-        if (!houseId)
-            return res.status(400).json({ success: false, message: "houseId is required" });
-        
-        // Use HouseUser mapping to check access
-        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
-        if (!houseUser)
-            return res.status(403).json({ success: false, message: "Access denied" });
 
-        const automation = await Automation.findById(id);
-        if (!automation || automation.house.toString() !== houseId) {
-            return res.status(404).json({ success: false, message: "Automation rule not found for this house." });
-        }
-        return res.status(200).json({
-            success: true,
-            status: automation.status,
-            startTime: automation.startTime,
-            endTime: automation.endTime
-        });
-    } catch (error) {
-        console.error("[ERROR] GET /api/automations/:id/status ->", error);
-        return res.status(500).json({ success: false, message: "Server error" });
-    }
-});
 
-/* Toggle an automation rule on or off with associated devices. */
-router.put('/api/automations/:id/toggle', async (req, res) => {
+
+router.post('/api/automations', async (req, res) => {
     try {
         const token = req.headers.authorization?.split(" ")[1];
         if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
-        
-        let decoded;
-        try {
-            decoded = jwt.verify(token, SECRET_KEY);
-        } catch (err) {
-            return res.status(401).json({ success: false, message: "Invalid token" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const { device_type, house } = req.body;
+
+        if (!device_type || !house) {
+            return res.status(400).json({ success: false, message: "device_type and house are required" });
         }
-        
-        const userId = decoded.userId;
-        const { id } = req.params;
-        const { status, startTime, endTime, houseId } = req.body;
-        if (!houseId) return res.status(400).json({ success: false, message: "houseId is required" });
-        
-        // Check if user is authorized 
-        const houseUser = await HouseUser.findOne({ houseId, user_id: userId });
-        if (!houseUser) return res.status(403).json({ success: false, message: "Access denied" });
-        
-        // Retrieve the automation rule 
-        const automation = await Automation.findById(id);
-        if (!automation) {
-            return res.status(404).json({ success: false, message: "Automation rule not found." });
+
+        const existing = await Automation.findOne({ device_type, house });
+        if (existing) {
+            return res.status(400).json({ success: false, message: "Automation already exists for this device type in the house" });
         }
-        
-        const updateData = { status };
-        if (status === true) {
-            if (!startTime) {
-                return res.status(400).json({ success: false, message: "Start time is required when enabling automation." });
-            }
-            let calculatedEndTime;
-            if (endTime) {
-                // Use provided endTime if given
-                calculatedEndTime = new Date(endTime);
-            } else {
-                // No endTime provided, so check if any associated device is "cleaning" or "kitchen" type
-                const deviceAutomations = await DeviceAutomation.find({ automation: id }).populate('device_id');
-                const hasCleaningOrKitchen = deviceAutomations.some(mapping => 
-                    mapping.device_id && 
-                    (mapping.device_id.device_type === 'cleaning' || mapping.device_id.device_type === 'kitchen')
-                );
-                if (hasCleaningOrKitchen) {
-                    calculatedEndTime = new Date(startTime);
-                    calculatedEndTime.setHours(calculatedEndTime.getHours() + 1); // Fixed duration: 1 hour
-                } else {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "End time is required for non-cleaning and non-kitchen automations." 
-                    });
-                }
-            }
-            updateData.startTime = new Date(startTime);
-            updateData.endTime = calculatedEndTime;
-        } else {
-            updateData.startTime = null;
-            updateData.endTime = null;
-        }
-        
-        const updatedAutomation = await Automation.findByIdAndUpdate(id, updateData, { new: true });
-        if (!updatedAutomation) {
-            return res.status(404).json({ success: false, message: "Automation rule not found." });
-        }
-        
-        // Update all device automation mappings associated with this automation rule to have the same status
-        await DeviceAutomation.updateMany({ automation: id }, { status });
-        
-        return res.status(200).json({ 
-            success: true, 
-            message: "Automation rule updated successfully.", 
-            automation: updatedAutomation 
+
+        const newAutomation = new Automation({
+            device_type,
+            house,
+            status: false
         });
+
+        await newAutomation.save();
+
+        res.status(201).json({ success: true, automation: newAutomation });
     } catch (error) {
-        console.error("[ERROR] PUT /api/automations/:id/toggle ->", error);
-        return res.status(500).json({ success: false, message: "Server error" });
+        console.error("[POST] /api/automations error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
+
+router.put('/api/automations/:id/toggle', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { houseId, status, startTime, endTime } = req.body;
+
+        if (!houseId || typeof status !== "boolean") {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+
+        const automation = await Automation.findById(id);
+        if (!automation) {
+            return res.status(404).json({ success: false, message: "Automation not found" });
+        }
+
+        automation.status = status;
+
+        if (status === true) {
+            if (!startTime) {
+                return res.status(400).json({ success: false, message: "Start time is required" });
+            }
+
+            const start = new Date(startTime);
+            let end;
+
+            if (endTime) {
+                end = new Date(endTime);
+            } else if (['cleaning', 'kitchen'].includes(automation.device_type)) {
+                end = new Date(start);
+                end.setHours(end.getHours() + 1);
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: "End time is required for non-cleaning/kitchen automations"
+                });
+            }
+
+            if (end <= start) {
+                return res.status(400).json({ success: false, message: "End time must be after start time" });
+            }
+
+            automation.startTime = start;
+            automation.endTime = end;
+
+        } else {
+            automation.startTime = null;
+            automation.endTime = null;
+        }
+
+        await automation.save();
+        await DeviceAutomation.updateMany({ automation_id: id }, { status });
+
+        res.status(200).json({ success: true, automation });
+
+    } catch (error) {
+        console.error("[ERROR] PUT /api/automations/:id/toggle ->", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
+
+
+router.put("/api/houses/:houseId/devices/:deviceId/temperature", async (req, res) => {
+    const { houseId, deviceId } = req.params;
+    const { temperature } = req.body;
+
+    if (typeof temperature !== 'number' || temperature < 10 || temperature > 30) {
+        return res.status(400).json({ success: false, message: "Temperature must be between 10 and 30." });
+    }
+
+    try {
+        const device = await Device.findOne({ _id: deviceId, house: houseId });
+        if (!device) {
+            return res.status(404).json({ success: false, message: "Device not found." });
+        }
+
+        device.temperature = temperature;
+        await device.save();
+
+        res.json({ success: true, message: "Temperature updated successfully.", device });
+    } catch (error) {
+        console.error("[ERROR] updating temperature:", error);
+        res.status(500).json({ success: false, message: "Server error." });
+    }
+});
+
+router.put("/api/houses/:houseId/devices/:deviceId/brightness", async (req, res) => {
+    const { houseId, deviceId } = req.params;
+    const { brightness } = req.body;
+
+    if (typeof brightness !== 'number' || brightness < 0 || brightness > 100) {
+        return res.status(400).json({ success: false, message: "Brightness must be between 0 and 100." });
+    }
+
+    try {
+        const device = await Device.findOne({ _id: deviceId, house: houseId });
+        if (!device) {
+            return res.status(404).json({ success: false, message: "Device not found." });
+        }
+
+        device.brightness = brightness;
+        await device.save();
+
+        res.json({ success: true, message: "Brightness updated successfully.", device });
+    } catch (error) {
+        console.error("[ERROR] updating brightness:", error);
+        res.status(500).json({ success: false, message: "Server error." });
+    }
+});
+
+router.delete('/api/automations/:id', async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const { id } = req.params;
+
+        const result = await Automation.findByIdAndDelete(id);
+        if (!result) return res.status(404).json({ success: false, message: "Automation not found" });
+
+        res.status(200).json({ success: true, message: "Automation deleted" });
+    } catch (error) {
+        console.error("[DELETE] /api/automations/:id error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+});
+
 
 export default router;
 
