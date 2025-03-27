@@ -24,19 +24,8 @@ import DeviceAutomation from '../models/deviceAutomation.model.js';
 dotenv.config();
 const SECRET_KEY = process.env.SECRET_KEY;
 
-// If you're using JWT, make sure to import it:
-// import jwt from 'jsonwebtoken';
-// And have SECRET_KEY either from env or config
-
-/*notes
--build automation APIs - update permission status-automation model
--factory reset(extra time)  
--forget password finish
-*/
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
 
 const router = express.Router();
 let notifications = [];
